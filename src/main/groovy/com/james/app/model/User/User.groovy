@@ -2,6 +2,7 @@ package com.james.app.model.User
 
 import jakarta.persistence.*
 import groovy.transform.Canonical
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @Entity
 @Table(name = "user_table")
@@ -21,11 +22,12 @@ class User {
     @Enumerated(EnumType.STRING)
     UserRole role
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cuidador_id")
-    User cuidador
-
-    @OneToMany(mappedBy = "cuidador", cascade = CascadeType.ALL)
-    List<User> idososVinculados = []
+    @ManyToMany
+    @JoinTable(
+            name = "user_relations",
+            joinColumns = @JoinColumn(name = "idoso_id"),
+            inverseJoinColumns = @JoinColumn(name = "responsavel_id")
+    )
+    @JsonIgnoreProperties("responsaveis")
+    List<User> responsaveis = []
 }
-

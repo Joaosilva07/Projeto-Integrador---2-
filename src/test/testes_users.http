@@ -1,0 +1,47 @@
+### Listar todos os usuários (Teste se o import.sql funcionou)
+GET http://localhost:8080/api/user
+Accept: application/json
+
+###
+
+### Buscar um idoso específico e ver seus responsáveis
+# Ajuste o ID conforme o que apareceu no seu banco (ex: 31)
+GET http://localhost:8080/api/user/31
+Accept: application/json
+
+###
+
+### Criar um novo usuário (Auto-cadastro)
+POST http://localhost:8080/api/user
+Content-Type: application/json
+
+{
+  "nome": "João Desenvolvedor",
+  "email": "joao@tst.jus.br",
+  "role": "IDOSO"
+}
+
+###
+
+### Vincular um Responsável a um Idoso (Teste do Many-to-Many)
+# Idoso 31 recebe o Responsável 1
+PATCH http://localhost:8080/api/user/31/link/1
+
+###
+
+### Atualizar dados de um usuário
+PUT http://localhost:8080/api/user/1
+Content-Type: application/json
+
+{
+  "nome": "Ricardo Oliveira Alterado",
+  "email": "ricardo.novo@gmail.com",
+  "role": "CUIDADOR"
+}
+
+###
+
+### Deletar um usuário
+DELETE http://localhost:8080/api/user/50
+###
+GET http://localhost:8080/api/user/31
