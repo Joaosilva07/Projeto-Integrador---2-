@@ -9,28 +9,37 @@ import org.springframework.http.HttpStatus
 class UserController {
 
     private final UserService userService
-
-    UserController(UserService userService) {
-        this.userService = userService
-    }
+    UserController(UserService userService) { this.userService = userService }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    User create(@RequestBody User usuario) {
-        return userService.save(usuario)
-    }
+    User create(@RequestBody User u) { userService.save(u) }
 
     @GetMapping
-    List<User> listAll() {
-        return userService.findAll()
+    List<User> list() { userService.userRepository.findAll() }
+
+    @GetMapping("/{id}")
+    User getById(@PathVariable("id") Long id) {
+        userService.userRepository.findById(id).orElseThrow {
+            new RuntimeException("Usuário não encontrado")
+        }
     }
 
-    @PatchMapping("/{idosoId}/link/{cuidadorId}")
+    @PutMapping("/{id}")
+    User update(@PathVariable("id") Long id, @RequestBody User u) {
+        userService.update(id, u)
+    }
+
+    // Corrigindo o 400: Adicionado ("id")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void link(
-            @PathVariable("idosoId") Long idosoId,
-            @PathVariable("cuidadorId") Long cuidadorId
-    ) {
-        userService.linkElderlyToCaregiver(idosoId, cuidadorId)
+    void delete(@PathVariable("id") Long id) {
+        userService.delete(id)
+    }
+
+    @PatchMapping("/{idosoId}/link/{responsavelId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void link(@PathVariable("idosoId") Long idosoId, @PathVariable("responsavelId") Long responsavelId) {
+        userService.addResponsavel(idosoId, responsavelId)
     }
 }
