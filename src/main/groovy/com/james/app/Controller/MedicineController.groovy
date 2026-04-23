@@ -20,7 +20,7 @@ class MedicineController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/create_medicine")
     Medicine create(@RequestBody Medicine medicine) {
         return service.saveMedicine(medicine);
     }
