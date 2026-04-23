@@ -1,5 +1,6 @@
-package com.james.app.User
+package com.james.app.Controller
 
+import com.james.app.Service.UserService
 import com.james.app.model.User.User
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus

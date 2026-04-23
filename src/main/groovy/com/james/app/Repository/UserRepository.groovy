@@ -1,4 +1,4 @@
-package com.james.app.User
+package com.james.app.Repository
 
 import com.james.app.model.User.User
 import org.springframework.data.jpa.repository.JpaRepository

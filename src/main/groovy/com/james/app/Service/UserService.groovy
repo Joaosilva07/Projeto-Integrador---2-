@@ -1,5 +1,6 @@
-package com.james.app.User
+package com.james.app.Service
 
+import com.james.app.Repository.UserRepository
 import com.james.app.model.User.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
