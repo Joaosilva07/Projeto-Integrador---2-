@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAMES — Entrar</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../CSS/Loguin_.css" />
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<aside class="left-panel">
+  <div class="left-brand">
+    <div class="brand-name">JAMES
+    </div>
+    <div class="brand-tagline">Gestão de Cuidados</div>
+  </div>
+
+  <div class="left-middle">
+    <h1 class="left-headline">Cuide com <em>atenção,</em><br>gerencie com clareza.</h1>
+    <div class="left-features">
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Acompanhe medicamentos, horários e estoque de cada paciente</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Registre cada cuidado realizado e mantenha o histórico sempre atualizado</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Vincule cuidadores e parentes ao idoso com controle de acesso</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Agenda de tarefas diárias — banho, fisioterapia, caminhadas e mais</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-footer">© 2026 JAMES · Todos os direitos reservados</div>
+</aside>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('entrar', this)">Entrar</button>
+      <button class="tab" onclick="showTab('criar', this)">Criar conta</button>
+      <button class="tab" onclick="showTab('vincular', this)">Vincular conta</button>
+    </div>
+
+    <!-- ════════ ENTRAR ════════ -->
+    <div class="form-view active" id="tab-entrar">
+      <div class="form-title">Bem-vindo de volta</div>
+      <div class="form-subtitle">Entre com sua conta para continuar</div>
+
+      <div class="social-row">
+        <button class="social-btn">
+          <!-- Google icon -->
+          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Entrar com Google
+        </button>
+        <button class="social-btn">
+          <!-- Facebook icon -->
+          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="18" height="18" rx="4" fill="#1877F2"/>
+            <path d="M12.5 9H10.5V15H8V9H6.5V7H8V5.5C8 4.12 8.88 3 10.5 3H12V5H11C10.72 5 10.5 5.22 10.5 5.5V7H12.5L12.5 9Z" fill="white"/>
+          </svg>
+          Entrar com Facebook
+        </button>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">ou entre com e-mail</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <form onsubmit="login(event)">
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="loginSenha" placeholder="••••••••" required>
+        </div>
+
+        <div class="forgot"><a>Esqueci minha senha</a></div>
+
+        <button type="submit" class="btn-submit">Entrar na conta</button>
+      </form>
+
+      <span class="form-link">Não tem conta? <a onclick="switchTab('criar')">Criar gratuitamente</a></span>
+    </div>
+
+    <!-- ════════ CRIAR CONTA ════════ -->
+    <div class="form-view" id="tab-criar">
+      <div class="form-title">Criar conta</div>
+      <div class="form-subtitle">Preencha seus dados para começar</div>
+
+      <div class="social-row">
+        <button class="social-btn">
+          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Registrar com Google
+        </button>
+        <button class="social-btn">
+          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="18" height="18" rx="4" fill="#1877F2"/>
+            <path d="M12.5 9H10.5V15H8V9H6.5V7H8V5.5C8 4.12 8.88 3 10.5 3H12V5H11C10.72 5 10.5 5.22 10.5 5.5V7H12.5L12.5 9Z" fill="white"/>
+          </svg>
+          Registrar com Facebook
+        </button>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">ou crie com e-mail</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <div class="field field-row">
+        <div>
+          <label>Nome</label>
+          <input type="text" placeholder="Seu nome">
+        </div>
+        <div>
+          <label>Sobrenome</label>
+          <input type="text" placeholder="Sobrenome">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" placeholder="seu@email.com">
+      </div>
+
+      <div class="field">
+        <label>Telefone</label>
+        <input type="tel" placeholder="(11) 99999-9999">
+      </div>
+
+      <div class="field">
+        <label>Perfil de acesso</label>
+        <div class="type-selector">
+          <div class="type-option selected" onclick="selectType(this)">
+            <span class="type-emoji">🧓</span>
+            <span class="type-label">Idoso</span>
+          </div>
+          <div class="type-option" onclick="selectType(this)">
+            <span class="type-emoji">🩺</span>
+            <span class="type-label">Cuidador</span>
+          </div>
+          <div class="type-option" onclick="selectType(this)">
+            <span class="type-emoji">👨‍👩‍👧</span>
+            <span class="type-label">Parente</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" placeholder="Mínimo 8 caracteres">
+      </div>
+
+      <div class="field">
+        <label>Confirmar senha</label>
+        <input type="password" placeholder="Repita a senha">
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="terms">
+        <label for="terms">Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do James
+</label>
+      </div>
+
+      <button class="btn-submit">Criar minha conta</button>
+
+      <span class="form-link">Já tem conta? <a onclick="switchTab('entrar')">Entrar agora</a></span>
+    </div>
+
+    <!-- ════════ VINCULAR CONTA ════════ -->
+    <div class="form-view" id="tab-vincular">
+      <div class="form-title">Vincular conta</div>
+      <div class="form-subtitle">Conecte-se a um idoso ou cuidador já cadastrado</div>
+
+      <!-- Progress steps -->
+      <div class="vincular-steps">
+        <div class="vstep active" id="vs1">
+          <div class="vstep-num">1</div>
+          <div class="vstep-label">Sua conta</div>
+        </div>
+        <div class="vstep idle" id="vs2">
+          <div class="vstep-num">2</div>
+          <div class="vstep-label">Encontrar</div>
+        </div>
+        <div class="vstep idle" id="vs3">
+          <div class="vstep-num">3</div>
+          <div class="vstep-label">Confirmar</div>
+        </div>
+      </div>
+
+      <!-- Step 1: login -->
+      <div class="vstep-content active" id="vstep-content-1">
+        <div class="alert-info">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Para vincular, primeiro confirme sua identidade entrando com sua conta.
+        </div>
+
+        <div class="field">
+          <label>Seu e-mail</label>
+          <input type="email" placeholder="seu@email.com">
+        </div>
+        <div class="field">
+          <label>Sua senha</label>
+          <input type="password" placeholder="••••••••">
+        </div>
+
+        <button class="btn-submit" onclick="vincularNext(2)">Continuar →</button>
+      </div>
+
+      <!-- Step 2: find person -->
+      <div class="vstep-content" id="vstep-content-2">
+        <div class="alert-info">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Informe o e-mail ou código da pessoa com quem deseja se vincular.
+        </div>
+
+        <div class="field">
+          <label>E-mail ou código do paciente / cuidador</label>
+          <input type="text" placeholder="email@exemplo.com ou #CUIDAR-1234">
+        </div>
+
+        <div class="field">
+          <label>Tipo de vínculo</label>
+          <select>
+            <option value="">Selecione o tipo de relação…</option>
+            <option>Sou cuidador deste idoso</option>
+            <option>Sou parente / responsável deste idoso</option>
+            <option>Sou o próprio idoso</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Mensagem (opcional)</label>
+          <input type="text" placeholder="Ex: Sou filho(a) e quero acompanhar os cuidados">
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-submit btn-ghost-green" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); flex:1;" onclick="vincularNext(1)">← Voltar</button>
+          <button class="btn-submit" style="flex:2;" onclick="vincularNext(3)">Enviar solicitação →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: confirm -->
+      <div class="vstep-content" id="vstep-content-3">
+        <div style="text-align:center; padding: 8px 0 20px;">
+          <div style="width:56px; height:56px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">✉️</div>
+          <div style="font-family:'Lora',serif; font-size:18px; font-weight:500; color:var(--text-primary); margin-bottom:8px;">Código de confirmação</div>
+          <div style="font-size:13px; color:var(--text-muted); line-height:1.6; max-width:300px; margin:0 auto;">
+            Enviamos um código de 4 dígitos para o e-mail da outra pessoa. Peça que ela compartilhe com você.
+          </div>
+        </div>
+
+        <div class="code-inputs">
+          <input type="text" maxlength="1" oninput="moveCode(this, null, document.querySelectorAll('.code-inputs input')[1])">
+          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[0], document.querySelectorAll('.code-inputs input')[2])">
+          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[1], document.querySelectorAll('.code-inputs input')[3])">
+          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[2], null)">
+        </div>
+
+        <button class="btn-submit terra" onclick="vincularDone()">Confirmar vínculo</button>
+
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn-submit" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); font-size:12.5px;" onclick="vincularNext(2)">← Voltar</button>
+          <button class="btn-submit" style="background:transparent; color:var(--sage-600); border:1px solid var(--border); font-size:12.5px;">Reenviar código</button>
+        </div>
+      </div>
+
+    </div>
+    <!-- / vincular -->
+
+  </div>
+</div>
+
+<script>
+  function showTab(name, el) {
+    document.querySelectorAll('.form-view').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (el) el.classList.add('active');
+  }
+
+  function switchTab(name) {
+    const tabs = document.querySelectorAll('.tab');
+    const map = { entrar: 0, criar: 1, vincular: 2 };
+    showTab(name, tabs[map[name]]);
+  }
+
+  function selectType(el) {
+    el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function vincularNext(step) {
+    [1,2,3].forEach(i => {
+      const s = document.getElementById('vs' + i);
+      const c = document.getElementById('vstep-content-' + i);
+      s.className = 'vstep ' + (i < step ? 'done' : i === step ? 'active' : 'idle');
+      c.classList.toggle('active', i === step);
+    });
+  }
+
+  function vincularDone() {
+    const content = document.getElementById('vstep-content-3');
+    content.innerHTML = `
+      <div style="text-align:center; padding: 20px 0 10px;">
+        <div style="width:64px; height:64px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:28px;">✅</div>
+        <div style="font-family:'Lora',serif; font-size:20px; font-weight:500; color:var(--text-primary); margin-bottom:10px;">Vínculo confirmado!</div>
+        <div style="font-size:13.5px; color:var(--text-muted); line-height:1.7; max-width:300px; margin:0 auto 24px;">
+          Sua conta foi vinculada com sucesso. Você já pode acompanhar os cuidados.
+        </div>
+        <button class="btn-submit" style="max-width:240px; margin:0 auto;" onclick="switchTab('entrar')">Ir para o login →</button>
+      </div>`;
+    document.querySelectorAll('.vstep').forEach(s => { s.className = 'vstep done'; });
+  }
+
+  function moveCode(el, prev, next) {
+    if (el.value && next) next.focus();
+    if (!el.value && prev) prev.focus();
+  }
+</script>
+
+</body>
+</html>
