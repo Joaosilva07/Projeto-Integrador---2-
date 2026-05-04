@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -173,6 +173,10 @@
             <span class="type-label">Parente</span>
           </div>
         </div>
+          <div class="type-option" onclick="selectType(this)">
+            <span class="type-emoji">👑</span>
+            <span class="type-label">Admin</span>
+          </div>
       </div>
 
       <div class="field">
@@ -353,7 +357,7 @@
     el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
     const label = el.querySelector('.type-label').textContent.trim().toUpperCase();
-    const map = { 'IDOSO': 'IDOSO', 'CUIDADOR': 'CUIDADOR', 'PARENTE': 'PARENTE' };
+    const map = { 'IDOSO': 'IDOSO', 'CUIDADOR': 'CUIDADOR', 'PARENTE': 'PARENTE', 'ADMIN': 'ADMIN' };
     selectedRole = map[label] || 'IDOSO';
   }
 
