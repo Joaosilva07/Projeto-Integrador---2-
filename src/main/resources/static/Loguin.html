@@ -96,6 +96,8 @@
           <input type="password" id="loginSenha" placeholder="••••••••" required>
         </div>
 
+        <div id="loginErro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
+
         <div class="forgot"><a>Esqueci minha senha</a></div>
 
         <button type="submit" class="btn-submit">Entrar na conta</button>
@@ -137,17 +139,17 @@
       <div class="field field-row">
         <div>
           <label>Nome</label>
-          <input type="text" placeholder="Seu nome">
+          <input type="text" id="criarNome" placeholder="Seu nome">
         </div>
         <div>
           <label>Sobrenome</label>
-          <input type="text" placeholder="Sobrenome">
+          <input type="text" id="criarSobrenome" placeholder="Sobrenome">
         </div>
       </div>
 
       <div class="field">
         <label>E-mail</label>
-        <input type="email" placeholder="seu@email.com">
+        <input type="email" id="criarEmail" placeholder="seu@email.com">
       </div>
 
       <div class="field">
@@ -175,12 +177,12 @@
 
       <div class="field">
         <label>Senha</label>
-        <input type="password" placeholder="Mínimo 8 caracteres">
+        <input type="password" id="criarSenha" placeholder="Mínimo 8 caracteres">
       </div>
 
       <div class="field">
         <label>Confirmar senha</label>
-        <input type="password" placeholder="Repita a senha">
+        <input type="password" id="criarSenhaConf" placeholder="Repita a senha">
       </div>
 
       <div class="check-row">
@@ -189,7 +191,9 @@
 </label>
       </div>
 
-      <button class="btn-submit">Criar minha conta</button>
+      <div id="criarErro" style="color:#c0392b; font-size:13px; margin-bottom:8px; display:none;"></div>
+
+      <button class="btn-submit" onclick="registrar(event)">Criar minha conta</button>
 
       <span class="form-link">Já tem conta? <a onclick="switchTab('entrar')">Entrar agora</a></span>
     </div>
@@ -312,11 +316,6 @@
     showTab(name, tabs[map[name]]);
   }
 
-  function selectType(el) {
-    el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-
   function vincularNext(step) {
     [1,2,3].forEach(i => {
       const s = document.getElementById('vs' + i);
@@ -343,6 +342,71 @@
   function moveCode(el, prev, next) {
     if (el.value && next) next.focus();
     if (!el.value && prev) prev.focus();
+  }
+
+  // ═══════════════════════════════════════
+  // INTEGRAÇÃO COM A API
+  // ═══════════════════════════════════════
+  let selectedRole = 'IDOSO';
+
+  function selectType(el) {
+    el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const label = el.querySelector('.type-label').textContent.trim().toUpperCase();
+    const map = { 'IDOSO': 'IDOSO', 'CUIDADOR': 'CUIDADOR', 'PARENTE': 'PARENTE' };
+    selectedRole = map[label] || 'IDOSO';
+  }
+
+  async function login(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
+    const erroEl = document.getElementById('loginErro');
+    erroEl.style.display = 'none';
+    try {
+      const res = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (!res.ok) throw new Error('E-mail ou senha incorretos.');
+      const user = await res.json();
+      sessionStorage.setItem('jamesUser', JSON.stringify(user));
+      window.location.href = '/Index.html';
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.style.display = 'block';
+    }
+  }
+
+  async function registrar(e) {
+    e.preventDefault();
+    const nome = (document.getElementById('criarNome').value + ' ' + document.getElementById('criarSobrenome').value).trim();
+    const email = document.getElementById('criarEmail').value;
+    const senha = document.getElementById('criarSenha').value;
+    const senhaConf = document.getElementById('criarSenhaConf').value;
+    const erroEl = document.getElementById('criarErro');
+    erroEl.style.display = 'none';
+    if (!nome || !email || !senha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display = 'block'; return; }
+    if (senha !== senhaConf) { erroEl.textContent = 'As senhas não conferem.'; erroEl.style.display = 'block'; return; }
+    if (!document.getElementById('terms').checked) { erroEl.textContent = 'Aceite os Termos de Uso.'; erroEl.style.display = 'block'; return; }
+    try {
+      const res = await fetch('/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha, role: selectedRole })
+      });
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || 'Erro ao criar conta.');
+      }
+      const user = await res.json();
+      sessionStorage.setItem('jamesUser', JSON.stringify(user));
+      window.location.href = '/Index.html';
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.style.display = 'block';
+    }
   }
 </script>
 

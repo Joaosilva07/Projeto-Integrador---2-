@@ -106,6 +106,7 @@
             <div class="user-role">Cuidadora</div>
           </div>
         </div>
+        <button onclick="logout()" style="margin-top:8px;width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer;">Sair</button>
       </div>
     </aside>
 
@@ -1543,23 +1544,338 @@
         adicionarNotificacao("⏰ Você tem tarefas pendentes");
       }
 
-      // roda ao carregar
-      window.onload = () => {
-        renderNotificacoes();
-        verificarAlertas();
-      };
+      function verificarAlertas() {
+        adicionarNotificacao("⚠️ Medicamento com estoque baixo");
+        adicionarNotificacao("⏰ Você tem tarefas pendentes");
+      }
 
       function atualizarDashboard() {
-        document.getElementById("alert-count").textContent =
-          notificacoes.length;
+        document.getElementById("alert-count").textContent = notificacoes.length;
       }
 
       window.onload = () => {
+        // ── Auth ──────────────────────────────────────────────
+        const userJson = sessionStorage.getItem('jamesUser');
+        if (!userJson) { window.location.href = '/Loguin.html'; return; }
+        const me = JSON.parse(userJson);
+        document.querySelector('.user-name').textContent = me.nome || 'Usuário';
+        document.querySelector('.user-role').textContent = me.role || '';
+        const initials = (me.nome || 'U').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        document.querySelector('.user-avatar').textContent = initials;
+
+        // ── Notificações ───────────────────────────────────────
         renderNotificacoes();
-        verificarAlertas();
         atualizarDashboard();
+
+        // ── Carregar dados da API ──────────────────────────────
+        carregarUsuarios();
+        carregarMedicamentos();
+        carregarEventos();
       };
+
+      // ═══════════════════════════════════════════════════════
+      // USUÁRIOS
+      // ═══════════════════════════════════════════════════════
+      async function carregarUsuarios() {
+        try {
+          const res = await fetch('/api/user');
+          const users = await res.json();
+          renderTabelaUsuarios(users);
+          atualizarStatsUsuarios(users);
+        } catch(e) { console.error('Erro ao carregar usuários', e); }
+      }
+
+      function atualizarStatsUsuarios(users) {
+        const idosos = users.filter(u => u.role === 'IDOSO').length;
+        const cuidadores = users.filter(u => u.role === 'CUIDADOR').length;
+        const parentes = users.filter(u => u.role === 'PARENTE').length;
+        const statsCards = document.querySelectorAll('#view-usuarios .stat-card .stat-value');
+        if (statsCards[0]) statsCards[0].textContent = idosos;
+        if (statsCards[1]) statsCards[1].textContent = cuidadores;
+        if (statsCards[2]) statsCards[2].textContent = parentes;
+        const dashIdosos = document.querySelectorAll('#view-dashboard .stat-value')[1];
+        if (dashIdosos) dashIdosos.textContent = idosos;
+      }
+
+      function renderTabelaUsuarios(users) {
+        const tbody = document.querySelector('#view-usuarios table tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        const roleColors = { IDOSO: 'av-blue', CUIDADOR: 'av-green', PARENTE: 'av-amber' };
+        const roleBadge = { IDOSO: 'badge-idoso', CUIDADOR: 'badge-cuidador', PARENTE: 'badge-parente' };
+        const roleLabel = { IDOSO: 'Idoso', CUIDADOR: 'Cuidador', PARENTE: 'Parente' };
+        users.forEach(u => {
+          const initials = (u.nome || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+          const vinculados = (u.responsaveis || []).map(r => r.nome).join(', ') || '—';
+          tbody.innerHTML += `<tr>
+            <td><div class="flex-cell"><div class="avatar ${roleColors[u.role] || 'av-blue'}">${initials}</div><div><div class="name">${u.nome}</div><div class="sub">${u.email}</div></div></div></td>
+            <td><span class="badge ${roleBadge[u.role] || ''}">${roleLabel[u.role] || u.role}</span></td>
+            <td>${u.email}</td>
+            <td>${vinculados}</td>
+            <td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px;color:var(--terracotta)" onclick="excluirUsuario(${u.id})">Excluir</button></td>
+          </tr>`;
+        });
+      }
+
+      async function excluirUsuario(id) {
+        if (!confirm('Excluir este usuário?')) return;
+        await fetch('/api/user/' + id, { method: 'DELETE' });
+        carregarUsuarios();
+      }
+
+      function abrirModalUsuario() {
+        document.getElementById('modal-usuario').classList.add('active');
+      }
+      function fecharModalUsuario() {
+        document.getElementById('modal-usuario').classList.remove('active');
+      }
+
+      async function salvarUsuario() {
+        const nome = document.getElementById('u-nome').value.trim();
+        const email = document.getElementById('u-email').value.trim();
+        const senha = document.getElementById('u-senha').value.trim();
+        const role = document.getElementById('u-role').value;
+        const erroEl = document.getElementById('u-erro');
+        erroEl.style.display = 'none';
+        if (!nome || !email || !senha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display='block'; return; }
+        try {
+          const res = await fetch('/api/user', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ nome, email, senha, role })
+          });
+          if (!res.ok) { const t = await res.text(); throw new Error(t); }
+          fecharModalUsuario();
+          document.getElementById('u-nome').value=''; document.getElementById('u-email').value='';
+          document.getElementById('u-senha').value='';
+          carregarUsuarios();
+        } catch(e) { erroEl.textContent = e.message; erroEl.style.display='block'; }
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // MEDICAMENTOS
+      // ═══════════════════════════════════════════════════════
+      async function carregarMedicamentos() {
+        try {
+          const res = await fetch('/Medicines');
+          const meds = await res.json();
+          renderCardsMedicamentos(meds);
+          const dashMeds = document.querySelectorAll('#view-dashboard .stat-value')[3];
+          if (dashMeds) dashMeds.textContent = meds.length;
+        } catch(e) { console.error('Erro ao carregar medicamentos', e); }
+      }
+
+      function renderCardsMedicamentos(meds) {
+        const grid = document.querySelector('#view-medicamentos .cards-grid');
+        if (!grid) return;
+        // Manter o card "+" no final
+        const addCard = grid.querySelector('[style*="dashed"]');
+        grid.innerHTML = '';
+        meds.forEach(m => {
+          const baixo = (m.Unidades || 0) <= 5;
+          grid.innerHTML += `<div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-icon" style="background:var(--terracotta-light);font-size:18px;margin-bottom:8px;">💊</div>
+                <div class="card-name">${m.Nome || 'Sem nome'}</div>
+                <div class="card-detail">${m.Horario || ''}</div>
+              </div>
+              <span class="badge ${baixo ? 'badge-estoque-baixo' : 'badge-estoque-ok'}">${baixo ? 'Estoque baixo' : 'OK'}</span>
+            </div>
+            <div class="card-row"><span class="card-row-label">Horário</span><span class="card-row-value">${m.Horario || '—'}</span></div>
+            <div class="card-row"><span class="card-row-label">Paciente</span><span class="card-row-value">${m.Paciente ? m.Paciente.nome : '—'}</span></div>
+            <div class="card-row"><span class="card-row-label">Estoque</span><span class="card-row-value" style="color:${baixo ? 'var(--terracotta)' : 'var(--sage-600)'}">${m.Unidades ?? '?'} unid.</span></div>
+            <button class="btn btn-ghost" style="margin-top:8px;width:100%;font-size:12px;color:var(--terracotta)" onclick="excluirMedicamento(${m.id})">Excluir</button>
+          </div>`;
+        });
+        if (addCard) grid.appendChild(addCard);
+        else grid.innerHTML += `<div class="card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:200px;cursor:pointer;background:var(--sand-50);" onclick="abrirModalMedicamento()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">Adicionar medicamento</div></div></div>`;
+      }
+
+      async function excluirMedicamento(id) {
+        if (!confirm('Excluir este medicamento?')) return;
+        await fetch('/Medicines/' + id, { method: 'DELETE' });
+        carregarMedicamentos();
+      }
+
+      function abrirModalMedicamento() {
+        document.getElementById('modal-med').classList.add('active');
+      }
+      function fecharModalMedicamento() {
+        document.getElementById('modal-med').classList.remove('active');
+      }
+
+      async function salvarMedicamento() {
+        const nome = document.getElementById('m-nome').value.trim();
+        const horario = document.getElementById('m-horario').value.trim();
+        const unidades = parseInt(document.getElementById('m-unidades').value) || 0;
+        const pacienteId = document.getElementById('m-paciente').value;
+        const erroEl = document.getElementById('m-erro');
+        erroEl.style.display = 'none';
+        if (!nome) { erroEl.textContent = 'Informe o nome do medicamento.'; erroEl.style.display='block'; return; }
+        const body = { Nome: nome, Horario: horario, Unidades: unidades };
+        if (pacienteId) body.Paciente = { id: parseInt(pacienteId) };
+        try {
+          const res = await fetch('/Medicines/create_medicine', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+          });
+          if (!res.ok) throw new Error('Erro ao salvar.');
+          fecharModalMedicamento();
+          document.getElementById('m-nome').value=''; document.getElementById('m-horario').value='';
+          document.getElementById('m-unidades').value=''; document.getElementById('m-paciente').value='';
+          carregarMedicamentos();
+        } catch(e) { erroEl.textContent = e.message; erroEl.style.display='block'; }
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // AGENDA / EVENTOS
+      // ═══════════════════════════════════════════════════════
+      async function carregarEventos() {
+        try {
+          const res = await fetch('/Eventos/listaEventos');
+          const evs = await res.json();
+          eventos = evs.map(e => ({ ...e, data: e.data, hora: e.hora, titulo: e.titulo, tipo: e.tipo || 'other' }));
+          renderAgendaLista(evs);
+        } catch(e) { console.error('Erro ao carregar eventos', e); }
+      }
+
+      function renderAgendaLista(evs) {
+        const hoje = new Date().toISOString().split('T')[0];
+        const container = document.querySelector('#view-agenda .agenda-grid');
+        if (!container) return;
+        const hojeEvs = evs.filter(e => e.data === hoje);
+        if (hojeEvs.length === 0) return;
+        container.innerHTML = '';
+        hojeEvs.forEach(e => {
+          container.innerHTML += `<div class="agenda-card">
+            <div class="agenda-card-header">
+              <div class="agenda-patient-dot" style="background:var(--sage-500)"></div>
+              <div>
+                <div class="agenda-patient-name">${e.titulo}</div>
+                <div class="agenda-patient-age">${e.hora} · ${e.tipo || ''} · ${e.paciente ? e.paciente.nome : ''}</div>
+              </div>
+            </div>
+            <div style="padding:8px 0">
+              <button class="btn btn-ghost" style="font-size:12px;color:var(--terracotta)" onclick="excluirEvento(${e.id})">Excluir evento</button>
+            </div>
+          </div>`;
+        });
+        container.innerHTML += `<div class="agenda-card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;background:var(--sand-50);" onclick="openEventModal()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">Adicionar evento</div></div></div>`;
+      }
+
+      async function excluirEvento(id) {
+        if (!confirm('Excluir este evento?')) return;
+        await fetch('/Eventos/' + id, { method: 'DELETE' });
+        carregarEventos();
+      }
+
+      // Override saveEvent para também chamar a API
+      const _saveEventOriginal = saveEvent;
+      saveEvent = async function() {
+        const titulo = document.getElementById('event-title').value;
+        const data = document.getElementById('event-date').value;
+        const hora = document.getElementById('event-time').value;
+        const tipo = document.getElementById('event-type').value;
+        if (!titulo || !data || !hora) { alert('Preencha todos os campos!'); return; }
+        try {
+          const res = await fetch('/Eventos/criarEvent', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ titulo, data, hora, tipo })
+          });
+          if (res.ok) {
+            closeEventModal();
+            document.getElementById('event-title').value='';
+            document.getElementById('event-date').value='';
+            document.getElementById('event-time').value='';
+            document.getElementById('event-type').value='medication';
+            carregarEventos();
+          }
+        } catch(e) { alert('Erro ao salvar evento.'); }
+      };
+
+      // Carregar lista de pacientes no select do modal de medicamentos
+      async function preencherSelectPacientes() {
+        try {
+          const res = await fetch('/api/user');
+          const users = await res.json();
+          const sel = document.getElementById('m-paciente');
+          sel.innerHTML = '<option value="">Nenhum</option>';
+          users.filter(u => u.role === 'IDOSO').forEach(u => {
+            sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+          });
+        } catch(e) {}
+      }
+
+      // Sobrescrever abrirModalMedicamento para preencher select
+      const _abrirModalMed = abrirModalMedicamento;
+      abrirModalMedicamento = function() {
+        preencherSelectPacientes();
+        document.getElementById('modal-med').classList.add('active');
+      };
+
+      // Botão "topbar-btn" chama ação da view ativa
+      document.getElementById('topbar-btn').addEventListener('click', () => {
+        const activeView = document.querySelector('.view.active');
+        if (!activeView) return;
+        const id = activeView.id;
+        if (id === 'view-usuarios') abrirModalUsuario();
+        else if (id === 'view-medicamentos') abrirModalMedicamento();
+        else if (id === 'view-agenda') openEventModal();
+      });
+
+      // Botão "+ Novo Usuário" na seção usuarios
+      document.querySelectorAll('#view-usuarios .btn-primary').forEach(btn => {
+        btn.onclick = abrirModalUsuario;
+      });
+      // Botão "+ Novo Medicamento"
+      document.querySelectorAll('#view-medicamentos .btn-primary').forEach(btn => {
+        btn.onclick = abrirModalMedicamento;
+      });
+      // Botão "+ Nova Tarefa"
+      document.querySelectorAll('#view-agenda .btn-primary').forEach(btn => {
+        btn.onclick = openEventModal;
+      });
+
+      // Logout
+      function logout() {
+        sessionStorage.removeItem('jamesUser');
+        window.location.href = '/Loguin.html';
+      }
     </script>
+
+    <!-- Modal Criar Usuário -->
+    <div class="modal-overlay" id="modal-usuario">
+      <div class="modal-content">
+        <div class="modal-header"><span class="modal-title">Novo Usuário</span><button class="modal-close" onclick="fecharModalUsuario()">×</button></div>
+        <div class="modal-field"><label>Nome completo</label><input type="text" id="u-nome" placeholder="Nome do usuário"></div>
+        <div class="modal-field"><label>E-mail</label><input type="email" id="u-email" placeholder="email@exemplo.com"></div>
+        <div class="modal-field"><label>Senha</label><input type="password" id="u-senha" placeholder="Mínimo 6 caracteres"></div>
+        <div class="modal-field"><label>Perfil</label>
+          <select id="u-role">
+            <option value="IDOSO">Idoso</option>
+            <option value="CUIDADOR">Cuidador</option>
+            <option value="PARENTE">Parente / Responsável</option>
+          </select>
+        </div>
+        <div id="u-erro" style="color:#c0392b;font-size:13px;display:none;margin-bottom:8px;"></div>
+        <div class="modal-actions"><button class="btn-cancel" onclick="fecharModalUsuario()">Cancelar</button><button class="btn-save" onclick="salvarUsuario()">Salvar</button></div>
+      </div>
+    </div>
+
+    <!-- Modal Criar Medicamento -->
+    <div class="modal-overlay" id="modal-med">
+      <div class="modal-content">
+        <div class="modal-header"><span class="modal-title">Novo Medicamento</span><button class="modal-close" onclick="fecharModalMedicamento()">×</button></div>
+        <div class="modal-field"><label>Nome do medicamento</label><input type="text" id="m-nome" placeholder="Ex: Insulina NPH 100UI"></div>
+        <div class="modal-field"><label>Horário</label><input type="text" id="m-horario" placeholder="Ex: 08:00 e 20:00"></div>
+        <div class="modal-field"><label>Unidades em estoque</label><input type="number" id="m-unidades" placeholder="Ex: 10" min="0"></div>
+        <div class="modal-field"><label>Paciente (Idoso)</label>
+          <select id="m-paciente"><option value="">Nenhum</option></select>
+        </div>
+        <div id="m-erro" style="color:#c0392b;font-size:13px;display:none;margin-bottom:8px;"></div>
+        <div class="modal-actions"><button class="btn-cancel" onclick="fecharModalMedicamento()">Cancelar</button><button class="btn-save" onclick="salvarMedicamento()">Salvar</button></div>
+      </div>
+    </div>
 
     <!-- Modal de Criar Evento -->
     <div class="modal-overlay" id="event-modal">

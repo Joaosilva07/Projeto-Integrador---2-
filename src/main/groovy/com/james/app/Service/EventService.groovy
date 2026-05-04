@@ -29,7 +29,7 @@ class EventService {
         return eventRepository.save(event)
     }
     void deleteEvent(Long id){
-        Event event = EventRepository.findById(id).orElseThrow(
+        Event event = eventRepository.findById(id).orElseThrow(
                 ()-> new RuntimeException("Evento não encontrado")
         )
         eventRepository.delete(event)
@@ -42,5 +42,4 @@ class EventService {
                 ()-> new RuntimeException("Evento não encontrado")
         );
     }
-
 }

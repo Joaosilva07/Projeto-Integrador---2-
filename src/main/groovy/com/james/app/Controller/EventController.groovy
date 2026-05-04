@@ -32,15 +32,15 @@ class EventController {
         return eventService.getAllEvent()
     }
     @GetMapping("/{id}")
-    Event Evento(@PathVariable Event event){
-        return eventService.findById(event);
+    Event Evento(@PathVariable Long id){
+        return eventService.findById(id);
     }
     @PutMapping("/{id}")
-    Event updateEvent(@PathVariable Event event){
-        return eventService.updateEvent(event);
+    Event updateEvent(@PathVariable Long id, @RequestBody Event event){
+        return eventService.updateEvent(id, event);
     }
     @DeleteMapping("/{id}")
-    void deleteEvent(@PathVariable Event event){
-        eventService.deleteEvent(event);
+    void deleteEvent(@PathVariable Long id){
+        eventService.deleteEvent(id);
     }
 }

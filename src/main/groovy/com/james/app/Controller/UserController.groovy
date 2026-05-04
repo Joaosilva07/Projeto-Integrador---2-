@@ -4,6 +4,7 @@ import com.james.app.Service.UserService
 import com.james.app.model.User.User
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus
+import java.util.Map
 
 @RestController
 @RequestMapping("/api/user")
@@ -42,5 +43,10 @@ class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void link(@PathVariable("idosoId") Long idosoId, @PathVariable("responsavelId") Long responsavelId) {
         userService.addResponsavel(idosoId, responsavelId)
+    }
+
+    @PostMapping("/login")
+    User login(@RequestBody Map<String, String> body) {
+        userService.login(body.get("email"), body.get("senha"))
     }
 }

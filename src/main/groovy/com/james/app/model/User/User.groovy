@@ -19,6 +19,9 @@ class User {
     @Column(unique = true, nullable = false)
     String email
 
+    @Column
+    String senha
+
     @Enumerated(EnumType.STRING)
     UserRole role
 

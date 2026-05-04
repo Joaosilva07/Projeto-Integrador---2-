@@ -21,14 +21,12 @@ class MedicineService {
 
 
     Medicine update(Long id, Medicine newMedicine) {
-
         Medicine medicine = medicineRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Medicamento não encontrado"));
-
-         medicine.setNomeMedicamento(newMedicine.getNomeMedicamento());
-         medicine.setDataValidade(newMedicine.getDataValidade());
-
-
+        medicine.Nome = newMedicine.Nome
+        medicine.Horario = newMedicine.Horario
+        medicine.Unidades = newMedicine.Unidades
+        medicine.Paciente = newMedicine.Paciente
         return medicineRepository.save(medicine);
     }
      void deleteMedicine(Long id) {

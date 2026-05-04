@@ -21,11 +21,19 @@ class UserService {
         userRepository.save(user)
     }
 
+    User login(String email, String senha) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow { new RuntimeException("E-mail não encontrado") }
+        if (user.senha != senha) throw new RuntimeException("Senha incorreta")
+        return user
+    }
+
     User update(Long id, User data) {
         User user = userRepository.findById(id).orElseThrow { new RuntimeException("Usuário não encontrado") }
         user.nome = data.nome
         user.email = data.email
         user.role = data.role
+        if (data.senha) user.senha = data.senha
         userRepository.save(user)
     }
 
