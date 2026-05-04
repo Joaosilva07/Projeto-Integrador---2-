@@ -197,7 +197,7 @@
                 </button>
               </div>
               <div class="table-wrap">
-                <div class="timeline" style="padding: 4px 20px">
+                <div class="timeline" id="timeline-cuidados" style="padding: 4px 20px">
                   <div class="tl-item">
                     <div class="tl-dot-wrap">
                       <div
@@ -296,43 +296,7 @@
                       <th>Estoque</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="name">Insulina NPH</div>
-                        <div class="sub">Dona Helena</div>
-                      </td>
-                      <td>
-                        <span class="badge badge-estoque-baixo">2 unid.</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="name">Losartana 50mg</div>
-                        <div class="sub">Sr. Geraldo</div>
-                      </td>
-                      <td>
-                        <span class="badge badge-estoque-baixo">4 unid.</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="name">Metformina 850mg</div>
-                        <div class="sub">Dona Irene</div>
-                      </td>
-                      <td>
-                        <span class="badge badge-estoque-ok">28 unid.</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="name">Atenolol 25mg</div>
-                        <div class="sub">Sr. Geraldo</div>
-                      </td>
-                      <td>
-                        <span class="badge badge-estoque-ok">15 unid.</span>
-                      </td>
-                    </tr>
+                  <tbody id="tbody-estoque-critico">
                   </tbody>
                 </table>
               </div>
@@ -341,40 +305,7 @@
                 <span class="section-title">Próximas Tarefas</span>
               </div>
               <div class="table-wrap">
-                <div style="padding: 6px 0">
-                  <div class="agenda-item">
-                    <div class="agenda-time">10:00</div>
-                    <div
-                      class="agenda-dot"
-                      style="background: var(--sage-500)"
-                    ></div>
-                    <div>
-                      <div class="agenda-desc">Fisioterapia</div>
-                      <div class="agenda-type">Dona Helena</div>
-                    </div>
-                  </div>
-                  <div class="agenda-item">
-                    <div class="agenda-time">11:30</div>
-                    <div
-                      class="agenda-dot"
-                      style="background: var(--blue-muted)"
-                    ></div>
-                    <div>
-                      <div class="agenda-desc">Consulta médica</div>
-                      <div class="agenda-type">Sr. Geraldo</div>
-                    </div>
-                  </div>
-                  <div class="agenda-item">
-                    <div class="agenda-time">14:00</div>
-                    <div
-                      class="agenda-dot"
-                      style="background: var(--amber)"
-                    ></div>
-                    <div>
-                      <div class="agenda-desc">Medicação da tarde</div>
-                      <div class="agenda-type">Dona Irene</div>
-                    </div>
-                  </div>
+                <div id="lista-proximas-tarefas" style="padding: 6px 0">
                 </div>
               </div>
             </div>
@@ -788,7 +719,7 @@
                   <th>Observação</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="tbody-historico">
                 <tr>
                   <td>
                     <div class="flex-cell">
@@ -1232,20 +1163,20 @@
           <!-- Calendário Semanal -->
           <div
             id="weekly-calendar-container"
-            style="display: none; margin-top: 20px"
+            style="display: block; margin-top: 20px"
           >
             <div class="section-header">
               <span class="section-title">Calendário Semanal</span>
               <div style="display: flex; gap: 12px; align-items: center">
                 <div class="view-toggle">
                   <button
-                    class="view-toggle-btn active"
+                    class="view-toggle-btn"
                     onclick="toggleWeeklyView('day')"
                   >
                     Dia
                   </button>
                   <button
-                    class="view-toggle-btn"
+                    class="view-toggle-btn active"
                     onclick="toggleWeeklyView('week')"
                   >
                     Semana
@@ -1307,7 +1238,8 @@
       // CALENDÁRIO SEMANAL - Integração Front-end
       // ═══════════════════════════════════════════════════════
 
-      let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+      let eventos = [];
+      let medicamentosGlobal = [];
       let currentWeekStart = getWeekStart(new Date());
 
       const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -1471,13 +1403,8 @@
       showView = function (name, navEl) {
         originalShowView(name, navEl);
         if (name === "agenda") {
-          // Verificar se deve mostrar o calendário semanal
-          const container = document.getElementById(
-            "weekly-calendar-container",
-          );
-          if (container && container.style.display === "block") {
-            renderWeeklyCalendar();
-          }
+          renderWeeklyCalendar();
+          carregarEventos();
         }
       };
 
@@ -1537,16 +1464,11 @@
       // ===============================
 
       function verificarAlertas() {
-        // Exemplo 1: estoque baixo
-        adicionarNotificacao("⚠️ Medicamento com estoque baixo");
-
-        // Exemplo 2: tarefa pendente
-        adicionarNotificacao("⏰ Você tem tarefas pendentes");
-      }
-
-      function verificarAlertas() {
-        adicionarNotificacao("⚠️ Medicamento com estoque baixo");
-        adicionarNotificacao("⏰ Você tem tarefas pendentes");
+        const baixoEstoque = medicamentosGlobal.filter(m => (m.Unidades || 0) <= 5);
+        if (baixoEstoque.length > 0) adicionarNotificacao(`⚠️ ${baixoEstoque.length} medicamento(s) com estoque baixo`);
+        const hoje = new Date().toISOString().split('T')[0];
+        const hojeEvs = eventos.filter(e => e.data === hoje);
+        if (hojeEvs.length > 0) adicionarNotificacao(`📅 ${hojeEvs.length} tarefa(s) para hoje`);
       }
 
       function atualizarDashboard() {
@@ -1566,6 +1488,14 @@
         // ── Notificações ───────────────────────────────────────
         renderNotificacoes();
         atualizarDashboard();
+
+        // ── Limpar mocks ───────────────────────────────────────
+        const tlMock = document.getElementById('timeline-cuidados');
+        if (tlMock) tlMock.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Carregando...</div>';
+        const agendaGrid = document.querySelector('#view-agenda .agenda-grid');
+        if (agendaGrid) agendaGrid.innerHTML = '';
+        const historicoTbody = document.getElementById('tbody-historico');
+        if (historicoTbody) historicoTbody.innerHTML = '';
 
         // ── Carregar dados da API ──────────────────────────────
         carregarUsuarios();
@@ -1658,7 +1588,9 @@
         try {
           const res = await fetch('/Medicines');
           const meds = await res.json();
+          medicamentosGlobal = meds;
           renderCardsMedicamentos(meds);
+          renderEstoqueCritico(meds);
           const dashMeds = document.querySelectorAll('#view-dashboard .stat-value')[3];
           if (dashMeds) dashMeds.textContent = meds.length;
         } catch(e) { console.error('Erro ao carregar medicamentos', e); }
@@ -1734,9 +1666,90 @@
         try {
           const res = await fetch('/Eventos/listaEventos');
           const evs = await res.json();
-          eventos = evs.map(e => ({ ...e, data: e.data, hora: e.hora, titulo: e.titulo, tipo: e.tipo || 'other' }));
+          eventos = evs.map(e => ({ ...e, tipo: e.tipo || 'other' }));
           renderAgendaLista(evs);
+          renderCuidadosRecentes(evs);
+          renderProximasTarefas(evs);
+          renderHistorico(evs);
+          const hoje = new Date().toISOString().split('T')[0];
+          const hojeEvs = evs.filter(e => e.data === hoje);
+          const dashPend = document.querySelectorAll('#view-dashboard .stat-value')[2];
+          const dashTar = document.querySelectorAll('#view-dashboard .stat-value')[4];
+          if (dashPend) dashPend.textContent = hojeEvs.length;
+          if (dashTar) dashTar.textContent = evs.length;
+          verificarAlertas();
+          renderWeeklyCalendar();
         } catch(e) { console.error('Erro ao carregar eventos', e); }
+      }
+
+      function renderEstoqueCritico(meds) {
+        const tbody = document.getElementById('tbody-estoque-critico');
+        if (!tbody) return;
+        const sorted = [...meds].sort((a, b) => (a.Unidades || 0) - (b.Unidades || 0)).slice(0, 6);
+        if (sorted.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted);padding:12px">Nenhum medicamento cadastrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = sorted.map(m => {
+          const baixo = (m.Unidades || 0) <= 5;
+          return `<tr><td><div class="name">${m.Nome || '—'}</div><div class="sub">${m.Paciente ? m.Paciente.nome : '—'}</div></td><td><span class="badge badge-estoque-${baixo ? 'baixo' : 'ok'}">${m.Unidades ?? '?'} unid.</span></td></tr>`;
+        }).join('');
+      }
+
+      function renderCuidadosRecentes(evs) {
+        const tl = document.getElementById('timeline-cuidados');
+        if (!tl) return;
+        const recentes = [...evs].reverse().slice(0, 4);
+        if (recentes.length === 0) {
+          tl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Nenhum evento registrado.</div>';
+          return;
+        }
+        const colors = { medication: 'var(--sage-500)', health: 'var(--blue-muted)', activity: 'var(--sage-500)', meal: 'var(--amber)', hygiene: 'var(--blue-muted)', other: 'var(--terracotta)' };
+        tl.innerHTML = recentes.map((e, i) => `
+          <div class="tl-item">
+            <div class="tl-dot-wrap">
+              <div class="tl-dot" style="background:${colors[e.tipo] || 'var(--sage-500)'}"></div>
+              ${i < recentes.length - 1 ? '<div class="tl-line"></div>' : ''}
+            </div>
+            <div class="tl-content">
+              <div class="tl-title">${e.titulo}</div>
+              <div class="tl-meta">${e.data || ''} ${e.hora || ''} <span class="badge badge-realizado" style="margin-left:6px">Registrado</span></div>
+            </div>
+          </div>`).join('');
+      }
+
+      function renderProximasTarefas(evs) {
+        const container = document.getElementById('lista-proximas-tarefas');
+        if (!container) return;
+        const hoje = new Date().toISOString().split('T')[0];
+        const hojeEvs = evs.filter(e => e.data === hoje).sort((a, b) => (a.hora || '').localeCompare(b.hora || '')).slice(0, 5);
+        if (hojeEvs.length === 0) {
+          container.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px">Nenhuma tarefa para hoje.</div>';
+          return;
+        }
+        const colors = { medication: 'var(--sage-500)', health: 'var(--blue-muted)', activity: 'var(--sage-500)', meal: 'var(--amber)', hygiene: 'var(--terracotta)', other: 'var(--terracotta)' };
+        container.innerHTML = hojeEvs.map(e => `
+          <div class="agenda-item">
+            <div class="agenda-time">${e.hora || '—'}</div>
+            <div class="agenda-dot" style="background:${colors[e.tipo] || 'var(--sage-500)'}"></div>
+            <div><div class="agenda-desc">${e.titulo}</div><div class="agenda-type">${e.tipo || 'Evento'}</div></div>
+          </div>`).join('');
+      }
+
+      function renderHistorico(evs) {
+        const tbody = document.getElementById('tbody-historico');
+        if (!tbody) return;
+        if (evs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum evento registrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = [...evs].reverse().map(e => `<tr>
+          <td>—</td><td>—</td>
+          <td><div class="name" style="font-size:13px">${e.data || '—'}</div><div class="sub">${e.hora || ''}</div></td>
+          <td>${e.titulo || '—'}</td>
+          <td><span class="badge badge-realizado">Registrado</span></td>
+          <td style="font-size:12.5px;font-style:italic;color:var(--text-muted)">${e.tipo || '—'}</td>
+        </tr>`).join('');
       }
 
       function renderAgendaLista(evs) {
@@ -1744,8 +1757,11 @@
         const container = document.querySelector('#view-agenda .agenda-grid');
         if (!container) return;
         const hojeEvs = evs.filter(e => e.data === hoje);
-        if (hojeEvs.length === 0) return;
         container.innerHTML = '';
+        if (hojeEvs.length === 0) {
+          container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Nenhum evento para hoje. Clique em "+ Nova Tarefa" para adicionar.</div>';
+          return;
+        }
         hojeEvs.forEach(e => {
           container.innerHTML += `<div class="agenda-card">
             <div class="agenda-card-header">
