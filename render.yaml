@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: Projeto-Integrador---2-
+    runtime: java
+    buildCommand: ./mvnw package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
