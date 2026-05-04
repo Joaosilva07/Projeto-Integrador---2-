@@ -353,6 +353,26 @@
   // ═══════════════════════════════════════
   let selectedRole = 'IDOSO';
 
+  function redirectAfterAuth(user) {
+    if (!user || !user.role) {
+      window.location.href = '/Index.html';
+      return;
+    }
+    if (user.role === 'CUIDADOR') {
+      window.location.href = '/intermediaria/idosos.html';
+      return;
+    }
+    if (user.role === 'IDOSO') {
+      window.location.href = '/idoso.html';
+      return;
+    }
+    if (user.role === 'PARENTE') {
+      window.location.href = '/parente.html';
+      return;
+    }
+    window.location.href = '/Index.html';
+  }
+
   function selectType(el) {
     el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
@@ -376,7 +396,7 @@
       if (!res.ok) throw new Error('E-mail ou senha incorretos.');
       const user = await res.json();
       sessionStorage.setItem('jamesUser', JSON.stringify(user));
-      window.location.href = '/Index.html';
+      redirectAfterAuth(user);
     } catch (err) {
       erroEl.textContent = err.message;
       erroEl.style.display = 'block';
@@ -406,7 +426,7 @@
       }
       const user = await res.json();
       sessionStorage.setItem('jamesUser', JSON.stringify(user));
-      window.location.href = '/Index.html';
+      redirectAfterAuth(user);
     } catch (err) {
       erroEl.textContent = err.message;
       erroEl.style.display = 'block';

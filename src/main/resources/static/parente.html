@@ -1,0 +1,157 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel do Parente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/role-pages.css" />
+    <link rel="stylesheet" href="css/parente.css" />
+  </head>
+  <body class="role-parente">
+    <div class="app">
+      <aside class="sidebar">
+        <div>
+          <div class="brand">JAMES</div>
+          <div class="tagline">Painel do Parente</div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Acompanhamento</div>
+          <button class="nav-btn active" onclick="location.hash='idosos-list'">Meus idosos</button>
+          <button class="nav-btn" onclick="location.hash='resumo-list'">Resumo do idoso</button>
+        </div>
+
+        <div class="user-box">
+          <div class="user-name" id="side-user-name">Parente</div>
+          <div class="user-role">Visualizacao familiar</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 class="page-title">Acompanhamento Familiar</h1>
+            <p class="page-sub" id="welcome">Carregando...</p>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="init()">Atualizar</button>
+            <button class="btn" onclick="logout()">Sair</button>
+          </div>
+        </header>
+
+        <section class="panel">
+          <aside class="card">
+            <h3 class="section-title">Meus idosos</h3>
+            <div id="idosos-list"></div>
+          </aside>
+
+          <main class="card">
+            <h3 class="section-title" id="idoso-title">Selecione um idoso</h3>
+            <div class="list" id="resumo-list"></div>
+          </main>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      let allMedicines = [];
+      let allEvents = [];
+      let meusIdosos = [];
+      let selectedIdosoId = null;
+
+      function routeByRole(user) {
+        if (!user) { window.location.href = '/Loguin.html'; return false; }
+        if (user.role === 'PARENTE') return true;
+        if (user.role === 'CUIDADOR') { window.location.href = '/intermediaria/idosos.html'; return false; }
+        if (user.role === 'IDOSO') { window.location.href = '/idoso.html'; return false; }
+        window.location.href = '/Index.html';
+        return false;
+      }
+
+      function logout() {
+        sessionStorage.removeItem('jamesUser');
+        window.location.href = '/Loguin.html';
+      }
+
+      function itemHtml(title, meta) {
+        return `<div class="item"><div class="item-title">${title}</div><div class="item-meta">${meta}</div></div>`;
+      }
+
+      function renderIdososList() {
+        const box = document.getElementById('idosos-list');
+        if (!meusIdosos.length) {
+          box.innerHTML = '<div class="empty">Nenhum idoso vinculado a voce.</div>';
+          return;
+        }
+        box.innerHTML = meusIdosos.map(i => `
+          <div class="idoso-item ${String(i.id) === String(selectedIdosoId) ? 'active' : ''}" onclick="selectIdoso(${i.id})">
+            <div class="item-title">${i.nome || 'Sem nome'}</div>
+            <div class="item-meta">${i.email || ''}</div>
+          </div>
+        `).join('');
+      }
+
+      function renderResumo() {
+        const title = document.getElementById('idoso-title');
+        const list = document.getElementById('resumo-list');
+        const idoso = meusIdosos.find(i => String(i.id) === String(selectedIdosoId));
+        if (!idoso) {
+          title.textContent = 'Selecione um idoso';
+          list.innerHTML = '<div class="empty">Escolha um idoso na coluna ao lado.</div>';
+          return;
+        }
+
+        title.textContent = `Resumo de ${idoso.nome}`;
+        const meds = allMedicines.filter(m => m.Paciente && String(m.Paciente.id) === String(idoso.id));
+        const events = allEvents.filter(e => e.paciente && String(e.paciente.id) === String(idoso.id));
+        const hoje = new Date().toISOString().split('T')[0];
+        const hojeEventos = events.filter(e => e.data === hoje).sort((a,b) => (a.hora || '').localeCompare(b.hora || ''));
+
+        const blocos = [];
+        blocos.push(itemHtml('Medicamentos ativos', `${meds.length} cadastrado(s)`));
+        blocos.push(itemHtml('Eventos de hoje', `${hojeEventos.length} compromisso(s)`));
+        meds.slice(0, 5).forEach(m => blocos.push(itemHtml(m.Nome || 'Medicamento', `${m.Horario || '--:--'} - ${m.Unidades ?? 0} unid.`)));
+        hojeEventos.slice(0, 8).forEach(e => blocos.push(itemHtml(e.titulo || 'Evento', `${e.hora || '--:--'} - ${e.tipo || 'outro'}`)));
+
+        if (blocos.length === 2) blocos.push('<div class="empty">Sem detalhes cadastrados para este idoso.</div>');
+        list.innerHTML = blocos.join('');
+      }
+
+      function selectIdoso(id) {
+        selectedIdosoId = id;
+        renderIdososList();
+        renderResumo();
+      }
+
+      async function init() {
+        const raw = sessionStorage.getItem('jamesUser');
+        const me = raw ? JSON.parse(raw) : null;
+        if (!routeByRole(me)) return;
+
+        document.getElementById('welcome').textContent = `${me.nome || 'Parente'} - visualizacao somente leitura`;
+        document.getElementById('side-user-name').textContent = me.nome || 'Parente';
+
+        const [usersRes, medsRes, eventsRes] = await Promise.all([
+          fetch('/api/user'),
+          fetch('/Medicines'),
+          fetch('/Eventos/listaEventos')
+        ]);
+
+        const users = await usersRes.json();
+        allMedicines = await medsRes.json();
+        allEvents = await eventsRes.json();
+
+        meusIdosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
+        selectedIdosoId = meusIdosos.length ? meusIdosos[0].id : null;
+
+        renderIdososList();
+        renderResumo();
+      }
+
+      init().catch(() => {
+        document.getElementById('welcome').textContent = 'Erro ao carregar dados.';
+      });
+    </script>
+  </body>
+</html>

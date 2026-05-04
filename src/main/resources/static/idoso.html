@@ -1,0 +1,123 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel do Idoso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/role-pages.css" />
+    <link rel="stylesheet" href="css/idoso.css" />
+  </head>
+  <body class="role-idoso">
+    <div class="app">
+      <aside class="sidebar">
+        <div>
+          <div class="brand">JAMES</div>
+          <div class="tagline">Painel do Idoso</div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Visualizacao</div>
+          <button class="nav-btn active" onclick="location.hash='medicamentos'">Medicamentos</button>
+          <button class="nav-btn" onclick="location.hash='hoje'">Agenda de hoje</button>
+          <button class="nav-btn" onclick="location.hash='proximos'">Proximos eventos</button>
+        </div>
+
+        <div class="user-box">
+          <div class="user-name" id="side-user-name">Idoso</div>
+          <div class="user-role">Apenas leitura</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 class="page-title">Minha Rotina</h1>
+            <p class="page-sub" id="welcome">Carregando...</p>
+          </div>
+          <button class="btn" onclick="logout()">Sair</button>
+        </header>
+
+        <section class="grid-3">
+          <article class="card" id="medicamentos">
+            <h3 class="section-title">Medicamentos</h3>
+            <div id="med-list" class="list"></div>
+          </article>
+
+          <article class="card" id="hoje">
+            <h3 class="section-title">Agenda de hoje</h3>
+            <div id="today-list" class="list"></div>
+          </article>
+
+          <article class="card" id="proximos">
+            <h3 class="section-title">Proximos eventos</h3>
+            <div id="next-list" class="list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      function routeByRole(user) {
+        if (!user) { window.location.href = '/Loguin.html'; return false; }
+        if (user.role === 'IDOSO') return true;
+        if (user.role === 'CUIDADOR') { window.location.href = '/intermediaria/idosos.html'; return false; }
+        if (user.role === 'PARENTE') { window.location.href = '/parente.html'; return false; }
+        window.location.href = '/Index.html';
+        return false;
+      }
+
+      function logout() {
+        sessionStorage.removeItem('jamesUser');
+        window.location.href = '/Loguin.html';
+      }
+
+      function itemHtml(title, meta) {
+        return `<div class="item"><div class="item-title">${title}</div><div class="item-meta">${meta}</div></div>`;
+      }
+
+      async function init() {
+        const raw = sessionStorage.getItem('jamesUser');
+        const me = raw ? JSON.parse(raw) : null;
+        if (!routeByRole(me)) return;
+
+        document.getElementById('welcome').textContent = `${me.nome || 'Idoso'} - visualizacao somente leitura`;
+        document.getElementById('side-user-name').textContent = me.nome || 'Idoso';
+
+        const [medsRes, eventsRes] = await Promise.all([
+          fetch('/Medicines'),
+          fetch('/Eventos/listaEventos')
+        ]);
+        const meds = await medsRes.json();
+        const events = await eventsRes.json();
+
+        const myMeds = meds.filter(m => m.Paciente && String(m.Paciente.id) === String(me.id));
+        const myEvents = events.filter(e => e.paciente && String(e.paciente.id) === String(me.id));
+
+        const medEl = document.getElementById('med-list');
+        medEl.innerHTML = myMeds.length
+          ? myMeds.map(m => itemHtml(m.Nome || 'Medicamento', `${m.Horario || 'Sem horario'} - ${m.Unidades ?? 0} unid.`)).join('')
+          : '<div class="empty">Nenhum medicamento cadastrado.</div>';
+
+        const hoje = new Date().toISOString().split('T')[0];
+        const todayEvents = myEvents.filter(e => e.data === hoje).sort((a,b) => (a.hora || '').localeCompare(b.hora || ''));
+        const todayEl = document.getElementById('today-list');
+        todayEl.innerHTML = todayEvents.length
+          ? todayEvents.map(e => itemHtml(e.titulo || 'Evento', `${e.hora || '--:--'} - ${e.tipo || 'outro'}`)).join('')
+          : '<div class="empty">Sem eventos para hoje.</div>';
+
+        const nextEvents = [...myEvents]
+          .sort((a,b) => `${a.data || ''} ${a.hora || ''}`.localeCompare(`${b.data || ''} ${b.hora || ''}`))
+          .slice(0, 8);
+        const nextEl = document.getElementById('next-list');
+        nextEl.innerHTML = nextEvents.length
+          ? nextEvents.map(e => itemHtml(e.titulo || 'Evento', `${e.data || ''} ${e.hora || ''}`)).join('')
+          : '<div class="empty">Sem proximos eventos.</div>';
+      }
+
+      init().catch(() => {
+        document.getElementById('welcome').textContent = 'Erro ao carregar dados.';
+      });
+    </script>
+  </body>
+</html>

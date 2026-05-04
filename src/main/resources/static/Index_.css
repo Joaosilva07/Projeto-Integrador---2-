@@ -838,7 +838,7 @@ td .sub {
   flex: 1;
   border-right: 1px solid var(--sand-100);
   position: relative;
-  min-height: 500px;
+  min-height: 716px;
 }
 
 .weekly-day-column:last-child {
@@ -876,7 +876,7 @@ td .sub {
 
 .weekly-grid-lines {
   position: absolute;
-  top: 0;
+  top: 56px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -893,6 +893,7 @@ td .sub {
   position: absolute;
   left: 4px;
   right: 4px;
+  min-height: 30px;
   padding: 4px 6px;
   border-radius: 4px;
   font-size: 11px;

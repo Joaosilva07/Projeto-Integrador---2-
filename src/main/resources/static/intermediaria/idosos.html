@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selecionar Idoso</title>
+    <style>
+      :root {
+        --bg: #f7f5f1;
+        --card: #ffffff;
+        --primary: #3f6f52;
+        --primary-dark: #2f5540;
+        --text: #2d2d2d;
+        --muted: #7f7f7f;
+        --border: #e6dfd6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: radial-gradient(circle at top left, #fcfaf7 0%, var(--bg) 50%, #f2ede6 100%);
+        color: var(--text);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .wrap {
+        width: min(900px, 100%);
+      }
+
+      .header {
+        margin-bottom: 16px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      .sub {
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .name {
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .meta {
+        color: var(--muted);
+        margin-top: 6px;
+        font-size: 13px;
+        min-height: 18px;
+      }
+
+      .actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .state {
+        border: 1px dashed var(--border);
+        padding: 24px;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="header">
+        <h1 class="title">Escolha o idoso para gerenciar</h1>
+        <p class="sub">Voce pode trocar de idoso depois no painel. Esse passo ajuda a entrar direto no contexto certo.</p>
+      </header>
+
+      <section id="state" class="state">Carregando idosos vinculados...</section>
+      <section id="grid" class="grid" style="display:none"></section>
+    </main>
+
+    <script>
+      function redirectByRole(user) {
+        if (!user || !user.role) {
+          window.location.href = '/Loguin.html';
+          return;
+        }
+        if (user.role === 'IDOSO') {
+          window.location.href = '/idoso.html';
+          return;
+        }
+        if (user.role === 'PARENTE') {
+          window.location.href = '/parente.html';
+          return;
+        }
+        if (user.role === 'CUIDADOR') {
+          return;
+        }
+        window.location.href = '/Index.html';
+      }
+
+      function logout() {
+        sessionStorage.removeItem('jamesUser');
+        window.location.href = '/Loguin.html';
+      }
+
+      function openDashboard(idosoId) {
+        window.location.href = `/Index.html?idosoId=${encodeURIComponent(idosoId)}`;
+      }
+
+      function renderCards(idosos) {
+        const state = document.getElementById('state');
+        const grid = document.getElementById('grid');
+
+        if (!idosos.length) {
+          state.innerHTML = 'Nenhum idoso vinculado a este cuidador. Peca para um admin vincular no painel de usuarios.';
+          grid.style.display = 'none';
+          return;
+        }
+
+        state.style.display = 'none';
+        grid.style.display = 'grid';
+        grid.innerHTML = idosos.map(i => `
+          <article class="card">
+            <div class="name">${i.nome || 'Sem nome'}</div>
+            <div class="meta">${i.email || ''}</div>
+            <div class="actions">
+              <button class="btn btn-primary" onclick="openDashboard(${i.id})">Entrar no painel</button>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      async function init() {
+        const userRaw = sessionStorage.getItem('jamesUser');
+        const state = document.getElementById('state');
+
+        if (!userRaw) {
+          window.location.href = '/Loguin.html';
+          return;
+        }
+
+        const me = JSON.parse(userRaw);
+        redirectByRole(me);
+        if (me.role !== 'CUIDADOR') return;
+
+        try {
+          const res = await fetch('/api/user');
+          const users = await res.json();
+          const idosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
+          renderCards(idosos);
+        } catch (e) {
+          state.textContent = 'Erro ao carregar idosos vinculados.';
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>
