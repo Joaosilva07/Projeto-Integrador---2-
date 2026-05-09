@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JAMES — Perfil do Idoso</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../CSS/Index_.css" />
+
+    <style>
+      .idoso-page {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .idoso-top {
+        background: white;
+        border-radius: 22px;
+        padding: 26px;
+        border: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .idoso-profile {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .idoso-avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: var(--blue-light);
+        color: var(--blue-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .idoso-name {
+        font-size: 30px;
+        font-family: "Lora", serif;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .idoso-sub {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-bottom: 14px;
+      }
+
+      .idoso-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .idoso-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 22px;
+      }
+
+      .idoso-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 22px;
+      }
+
+      .idoso-section-title {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 18px;
+        color: var(--text-primary);
+      }
+
+      .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+      }
+
+      .info-label {
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
+
+      .info-value {
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .timeline-mini {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .timeline-item {
+        display: flex;
+        gap: 14px;
+      }
+
+      .timeline-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--sage-500);
+        margin-top: 6px;
+      }
+
+      .timeline-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .timeline-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      .med-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .med-item {
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--sand-50);
+        border: 1px solid var(--border);
+      }
+
+      .med-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .med-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .med-time {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .med-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .agenda-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .agenda-box {
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--sand-50);
+        border: 1px solid var(--border);
+      }
+
+      .agenda-hour {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--terracotta);
+        margin-bottom: 6px;
+      }
+
+      .agenda-task {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .agenda-type {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      @media (max-width: 950px) {
+        .idoso-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .idoso-top {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="idoso-page">
+      <!-- TOPO -->
+      <section class="idoso-top">
+        <div class="idoso-profile">
+          <div class="idoso-avatar">HM</div>
+
+          <div>
+            <h1 class="idoso-name">Helena Martins</h1>
+
+            <div class="idoso-sub">82 anos • Diabetes • Hipertensão</div>
+
+            <div class="idoso-tags">
+              <span class="badge badge-idoso">Paciente ativa</span>
+
+              <span class="badge badge-realizado"> Cuidados em dia </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRID -->
+      <section class="idoso-grid">
+        <!-- ESQUERDA -->
+        <div style="display: flex; flex-direction: column; gap: 22px">
+          <!-- MEDICAMENTOS -->
+          <div class="idoso-card">
+            <div class="idoso-section-title">Medicamentos Ativos</div>
+
+            <div class="med-list">
+              <div class="med-item">
+                <div class="med-header">
+                  <div class="med-name">Insulina NPH 100UI</div>
+
+                  <div class="med-time">08:00 / 20:00</div>
+                </div>
+
+                <div class="med-desc">Aplicação subcutânea • 20UI</div>
+              </div>
+
+              <div class="med-item">
+                <div class="med-header">
+                  <div class="med-name">Metformina 850mg</div>
+
+                  <div class="med-time">12:00</div>
+                </div>
+
+                <div class="med-desc">Tomar após almoço</div>
+              </div>
+
+              <div class="med-item">
+                <div class="med-header">
+                  <div class="med-name">Losartana 50mg</div>
+
+                  <div class="med-time">07:30</div>
+                </div>
+
+                <div class="med-desc">Controle da pressão arterial</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HISTÓRICO -->
+          <div class="idoso-card">
+            <div class="idoso-section-title">Últimos Cuidados</div>
+
+            <div class="timeline-mini">
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+
+                <div>
+                  <div class="timeline-title">Insulina aplicada</div>
+
+                  <div class="timeline-meta">Hoje • 08:00 • Maria Clara</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div
+                  class="timeline-dot"
+                  style="background: var(--blue-muted)"
+                ></div>
+
+                <div>
+                  <div class="timeline-title">Caminhada de 20 minutos</div>
+
+                  <div class="timeline-meta">Hoje • 07:30 • Maria Clara</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div
+                  class="timeline-dot"
+                  style="background: var(--amber)"
+                ></div>
+
+                <div>
+                  <div class="timeline-title">Pressão arterial aferida</div>
+
+                  <div class="timeline-meta">Ontem • 19:00 • João Pedro</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIREITA -->
+        <div style="display: flex; flex-direction: column; gap: 22px">
+          <!-- INFORMAÇÕES -->
+          <div class="idoso-card">
+            <div class="idoso-section-title">Informações Gerais</div>
+
+            <div class="info-list">
+              <div class="info-item">
+                <span class="info-label"> Tipo sanguíneo </span>
+
+                <span class="info-value">O+</span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label"> Alergias </span>
+
+                <span class="info-value"> Penicilina </span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label"> Responsável </span>
+
+                <span class="info-value"> Roberto Martins </span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label"> Telefone </span>
+
+                <span class="info-value"> (11) 99876-5432 </span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label"> Cuidadora </span>
+
+                <span class="info-value"> Maria Clara </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AGENDA -->
+          <div class="idoso-card">
+            <div class="idoso-section-title">Agenda de Hoje</div>
+
+            <div class="agenda-list">
+              <div class="agenda-box">
+                <div class="agenda-hour">10:00</div>
+
+                <div class="agenda-task">Sessão de fisioterapia</div>
+
+                <div class="agenda-type">Saúde</div>
+              </div>
+
+              <div class="agenda-box">
+                <div class="agenda-hour">12:30</div>
+
+                <div class="agenda-task">Almoço + Medicação</div>
+
+                <div class="agenda-type">Alimentação</div>
+              </div>
+
+              <div class="agenda-box">
+                <div class="agenda-hour">15:00</div>
+
+                <div class="agenda-task">Exercícios cognitivos</div>
+
+                <div class="agenda-type">Mental</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
