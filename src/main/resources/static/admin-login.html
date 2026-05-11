@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAMES — Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Loguin_.css" />
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<aside class="left-panel">
+  <div class="left-brand">
+    <div class="brand-name">JAMES</div>
+    <div class="brand-tagline">Gestão de Cuidados</div>
+  </div>
+
+  <div class="left-middle">
+    <h1 class="left-headline">Painel de <em>Administração</em></h1>
+    <div class="left-features">
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Gerencie usuários, permissões e configurações do sistema</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Monitore atividades e gere relatórios de uso</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Controle de acesso centralizado para toda a plataforma</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        <div class="feature-text">Manutenção de dados e integrações</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-footer">© 2026 JAMES · Todos os direitos reservados</div>
+</aside>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+    <div class="form-title">Acesso Administrativo</div>
+    <div class="form-subtitle">Entre como administrador do sistema</div>
+
+    <form onsubmit="loginAdmin(event)">
+      <div class="field">
+        <label>E-mail do Administrador</label>
+        <input type="email" id="adminEmail" placeholder="admin@james.com" required>
+      </div>
+
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="adminSenha" placeholder="••••••••" required>
+      </div>
+
+      <div id="adminErro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
+
+      <button type="submit" class="btn-submit">Entrar no Painel Admin</button>
+    </form>
+
+    <span class="form-link">Não é administrador? <a href="Loguin.html">Voltar para login</a></span>
+  </div>
+</div>
+
+<script>
+  async function loginAdmin(e) {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value;
+    const senha = document.getElementById('adminSenha').value;
+    const erroEl = document.getElementById('adminErro');
+    erroEl.style.display = 'none';
+    
+    try {
+      const res = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (!res.ok) throw new Error('E-mail ou senha incorretos.');
+      const user = await res.json();
+      
+      if (user.role !== 'ADMIN') {
+        throw new Error('Acesso apenas para administradores.');
+      }
+      
+      sessionStorage.setItem('jamesUser', JSON.stringify(user));
+      window.location.href = '/Index.html';
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>

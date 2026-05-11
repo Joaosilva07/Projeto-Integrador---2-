@@ -173,10 +173,6 @@
             <span class="type-label">Parente</span>
           </div>
         </div>
-          <div class="type-option" onclick="selectType(this)">
-            <span class="type-emoji">👑</span>
-            <span class="type-label">Admin</span>
-          </div>
       </div>
 
       <div class="field">
@@ -232,46 +228,35 @@
 
         <div class="field">
           <label>Seu e-mail</label>
-          <input type="email" placeholder="seu@email.com">
+          <input type="email" id="vincular-step1-email" placeholder="seu@email.com">
         </div>
         <div class="field">
           <label>Sua senha</label>
-          <input type="password" placeholder="••••••••">
+          <input type="password" id="vincular-step1-senha" placeholder="••••••••">
         </div>
 
-        <button class="btn-submit" onclick="vincularNext(2)">Continuar →</button>
+        <div id="vincular-step1-erro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
+
+        <button class="btn-submit" onclick="vincularStep1()">Continuar →</button>
       </div>
 
       <!-- Step 2: find person -->
       <div class="vstep-content" id="vstep-content-2">
         <div class="alert-info">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Informe o e-mail ou código da pessoa com quem deseja se vincular.
+          Informe o e-mail da pessoa com quem deseja se vincular.
         </div>
 
         <div class="field">
-          <label>E-mail ou código do paciente / cuidador</label>
-          <input type="text" placeholder="email@exemplo.com ou #CUIDAR-1234">
+          <label>E-mail do idoso / cuidador</label>
+          <input type="email" id="vincular-step2-email" placeholder="email@exemplo.com">
         </div>
 
-        <div class="field">
-          <label>Tipo de vínculo</label>
-          <select>
-            <option value="">Selecione o tipo de relação…</option>
-            <option>Sou cuidador deste idoso</option>
-            <option>Sou parente / responsável deste idoso</option>
-            <option>Sou o próprio idoso</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Mensagem (opcional)</label>
-          <input type="text" placeholder="Ex: Sou filho(a) e quero acompanhar os cuidados">
-        </div>
+        <div id="vincular-step2-erro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
 
         <div style="display:flex; gap:10px;">
           <button class="btn-submit btn-ghost-green" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); flex:1;" onclick="vincularNext(1)">← Voltar</button>
-          <button class="btn-submit" style="flex:2;" onclick="vincularNext(3)">Enviar solicitação →</button>
+          <button class="btn-submit" style="flex:2;" onclick="vincularStep2()">Encontrar →</button>
         </div>
       </div>
 
@@ -279,9 +264,9 @@
       <div class="vstep-content" id="vstep-content-3">
         <div style="text-align:center; padding: 8px 0 20px;">
           <div style="width:56px; height:56px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">✉️</div>
-          <div style="font-family:'Lora',serif; font-size:18px; font-weight:500; color:var(--text-primary); margin-bottom:8px;">Código de confirmação</div>
+          <div style="font-family:'Lora',serif; font-size:18px; font-weight:500; color:var(--text-primary); margin-bottom:8px;">Confirmar vínculo</div>
           <div style="font-size:13px; color:var(--text-muted); line-height:1.6; max-width:300px; margin:0 auto;">
-            Enviamos um código de 4 dígitos para o e-mail da outra pessoa. Peça que ela compartilhe com você.
+            Confirme o código de 4 dígitos enviado para <strong id="vincular-step3-email">seu@email.com</strong>
           </div>
         </div>
 
@@ -292,17 +277,23 @@
           <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[2], null)">
         </div>
 
-        <button class="btn-submit terra" onclick="vincularDone()">Confirmar vínculo</button>
+        <button class="btn-submit terra" onclick="vincularConfirm()">Confirmar vínculo</button>
 
         <div style="display:flex; gap:10px; margin-top:10px;">
           <button class="btn-submit" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); font-size:12.5px;" onclick="vincularNext(2)">← Voltar</button>
-          <button class="btn-submit" style="background:transparent; color:var(--sage-600); border:1px solid var(--border); font-size:12.5px;">Reenviar código</button>
         </div>
       </div>
 
     </div>
     <!-- / vincular -->
 
+  </div>
+
+  <!-- Admin Link -->
+  <div style="text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+    <span style="font-size:12px; color:var(--text-muted);">
+      É administrador? <a href="admin-login.html" style="color:var(--sage-600); text-decoration:none; font-weight:500;">Acesso Admin</a>
+    </span>
   </div>
 </div>
 
@@ -329,7 +320,110 @@
     });
   }
 
-  function vincularDone() {
+  async function vincularStep1() {
+    const email = document.getElementById('vincular-step1-email').value;
+    const senha = document.getElementById('vincular-step1-senha').value;
+    const erroEl = document.getElementById('vincular-step1-erro');
+    erroEl.style.display = 'none';
+
+    if (!email || !senha) {
+      erroEl.textContent = 'Preencha e-mail e senha.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (!res.ok) throw new Error('E-mail ou senha incorretos.');
+      const user = await res.json();
+      vincularState.userEmail = email;
+      vincularState.userId = user.id;
+      vincularNext(2);
+      document.getElementById('vincular-step2-email').focus();
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.style.display = 'block';
+    }
+  }
+
+  async function vincularStep2() {
+    const email = document.getElementById('vincular-step2-email').value;
+    const erroEl = document.getElementById('vincular-step2-erro');
+    erroEl.style.display = 'none';
+
+    if (!email) {
+      erroEl.textContent = 'Informe o e-mail da pessoa.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/user', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) throw new Error('Erro ao buscar usuários.');
+      const users = await res.json();
+      const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!found) throw new Error('Usuário não encontrado.');
+      
+      vincularState.targetEmail = email;
+      vincularState.targetId = found.id;
+      vincularState.targetNome = found.nome;
+      vincularState.targetRole = found.role;
+      
+      vincularNext(3);
+    } catch (err) {
+      erroEl.textContent = err.message;
+      erroEl.style.display = 'block';
+    }
+  }
+
+  function generateCode() {
+    return Math.random().toString().substr(2, 4);
+  }
+
+  async function vincularConfirm() {
+    const code = document.querySelectorAll('.code-inputs input').map(i => i.value).join('');
+    const erroEl = document.getElementById('vincular-step3-erro');
+    
+    if (code.length !== 4) {
+      if (!erroEl) {
+        const newErr = document.createElement('div');
+        newErr.id = 'vincular-step3-erro';
+        newErr.style.cssText = 'color:#c0392b; font-size:13px; margin-top:8px; text-align:center;';
+        document.querySelector('.code-inputs').after(newErr);
+      }
+      document.getElementById('vincular-step3-erro').textContent = 'Digite todos os 4 dígitos.';
+      document.getElementById('vincular-step3-erro').style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/user/${vincularState.targetId}/link/${vincularState.userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || 'Erro ao vincular.');
+      }
+      vincularDone();
+    } catch (err) {
+      if (!erroEl) {
+        const newErr = document.createElement('div');
+        newErr.id = 'vincular-step3-erro';
+        newErr.style.cssText = 'color:#c0392b; font-size:13px; margin-top:8px; text-align:center;';
+        document.querySelector('.btn-submit.terra').before(newErr);
+      }
+      document.getElementById('vincular-step3-erro').textContent = err.message;
+      document.getElementById('vincular-step3-erro').style.display = 'block';
+    }
+  }
     const content = document.getElementById('vstep-content-3');
     content.innerHTML = `
       <div style="text-align:center; padding: 20px 0 10px;">
@@ -352,6 +446,14 @@
   // INTEGRAÇÃO COM A API
   // ═══════════════════════════════════════
   let selectedRole = 'IDOSO';
+  let vincularState = {
+    userEmail: null,
+    userId: null,
+    targetEmail: null,
+    targetId: null,
+    targetNome: null,
+    targetRole: null
+  };
 
   function redirectAfterAuth(user) {
     if (!user || !user.role) {

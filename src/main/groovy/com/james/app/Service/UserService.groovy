@@ -14,6 +14,10 @@ class UserService {
 
     User save(User user) {
         if (user.id == null) {
+            // Evitar criação de ADMIN via registro público
+            if (user.role == UserRole.ADMIN) {
+                throw new IllegalArgumentException("Contas Admin não podem ser criadas via registro público.")
+            }
             userRepository.findByEmail(user.email).ifPresent {
                 throw new IllegalArgumentException("E-mail já cadastrado!")
             }

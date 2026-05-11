@@ -17,6 +17,22 @@ class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     User create(@RequestBody User u) { userService.save(u) }
 
+    @PostMapping("/admin")
+    @ResponseStatus(HttpStatus.CREATED)
+    User createAdmin(@RequestBody Map<String, String> body, @RequestHeader(value = "X-Admin-Secret", required = false) String secret) {
+        // Validação simples: secret deve corresponder a uma variável de ambiente
+        final String ADMIN_SECRET = System.getenv("JAMES_ADMIN_SECRET") ?: "dev-secret-change-me"
+        if (secret == null || secret != ADMIN_SECRET) {
+            throw new IllegalArgumentException("Código de administrador inválido.")
+        }
+        User u = new User()
+        u.nome = body.get("nome")
+        u.email = body.get("email")
+        u.senha = body.get("senha")
+        u.role = UserRole.ADMIN
+        userService.save(u)
+    }
+
     @GetMapping
     List<User> list() { userService.userRepository.findAll() }
 
