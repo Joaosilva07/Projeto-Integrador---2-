@@ -376,6 +376,17 @@
       vincularState.targetNome = found.nome;
       vincularState.targetRole = found.role;
       
+      // Solicitar confirmação por email
+      const response = await fetch(`/api/user/${vincularState.userId}/request-link/${found.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error('Erro ao enviar código.');
+      const linkData = await response.json();
+      
+      // Atualizar Step 3 com email do alvo
+      document.getElementById('vincular-step3-email').textContent = linkData.targetEmail;
+      
       vincularNext(3);
     } catch (err) {
       erroEl.textContent = err.message;
@@ -404,13 +415,14 @@
     }
 
     try {
-      const res = await fetch(`/api/user/${vincularState.targetId}/link/${vincularState.userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
+      const res = await fetch(`/api/user/${vincularState.userId}/confirm-link/${vincularState.targetId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
       });
       if (!res.ok) {
         const msg = await res.text();
-        throw new Error(msg || 'Erro ao vincular.');
+        throw new Error(msg || 'Erro ao confirmar.');
       }
       vincularDone();
     } catch (err) {

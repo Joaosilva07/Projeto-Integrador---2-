@@ -65,4 +65,16 @@ class UserController {
     User login(@RequestBody Map<String, String> body) {
         userService.login(body.get("email"), body.get("senha"))
     }
+
+    @PostMapping("/{userId}/request-link/{targetUserId}")
+    Map<String, Object> requestLink(@PathVariable("userId") Long userId, @PathVariable("targetUserId") Long targetUserId) {
+        userService.requestLinkConfirmation(userId, targetUserId)
+    }
+
+    @PostMapping("/{userId}/confirm-link/{targetUserId}")
+    Map<String, Object> confirmLink(@PathVariable("userId") Long userId, @PathVariable("targetUserId") Long targetUserId, @RequestBody Map<String, String> body) {
+        String code = body.get("code")
+        userService.confirmLink(userId, targetUserId, code)
+        [message: "Vínculo confirmado com sucesso"]
+    }
 }

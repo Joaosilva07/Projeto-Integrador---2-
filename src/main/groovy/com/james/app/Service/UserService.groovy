@@ -1,16 +1,26 @@
 package com.james.app.Service
 
 import com.james.app.Repository.UserRepository
+import com.james.app.Repository.ConfirmationCodeRepository
 import com.james.app.model.User.*
+import com.james.app.model.ConfirmationCode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
 class UserService {
 
     private final UserRepository userRepository
-    UserService(UserRepository userRepository) { this.userRepository = userRepository }
+    private final ConfirmationCodeRepository confirmationCodeRepository
+    private final EmailService emailService
+    
+    UserService(UserRepository userRepository, ConfirmationCodeRepository confirmationCodeRepository, EmailService emailService) { 
+        this.userRepository = userRepository
+        this.confirmationCodeRepository = confirmationCodeRepository
+        this.emailService = emailService
+    }
 
     User save(User user) {
         if (user.id == null) {
@@ -63,5 +73,54 @@ class UserService {
             idoso.responsaveis.add(resp)
             userRepository.save(idoso)
         }
+    }
+
+    Map<String, Object> requestLinkConfirmation(Long userId, Long targetUserId) {
+        User user = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
+        User target = userRepository.findById(targetUserId).orElseThrow { new RuntimeException("Usuário alvo não encontrado") }
+        
+        // Limpar código anterior se houver
+        confirmationCodeRepository.findByUserIdAndTargetUserIdAndUsedFalse(userId, targetUserId).ifPresent {
+            confirmationCodeRepository.delete(it)
+        }
+        
+        // Gerar novo código
+        String code = (Math.random() * 10000).toInteger().toString().padLeft(4, '0')
+        ConfirmationCode confirmCode = new ConfirmationCode(
+            code: code,
+            userId: userId,
+            targetUserId: targetUserId,
+            expiresAt: LocalDateTime.now().plusMinutes(15)
+        )
+        confirmationCodeRepository.save(confirmCode)
+        
+        // Enviar email para o usuário alvo
+        emailService.sendConfirmationCode(target.email, target.nome, code)
+        
+        return [
+            message: "Código de confirmação enviado para ${target.email}",
+            targetNome: target.nome,
+            targetEmail: target.email
+        ]
+    }
+
+    void confirmLink(Long userId, Long targetUserId, String code) {
+        ConfirmationCode confirmCode = confirmationCodeRepository.findByCodeAndUserIdAndUsedFalse(code, userId)
+            .orElseThrow { new RuntimeException("Código inválido ou expirado") }
+        
+        if (confirmCode.targetUserId != targetUserId) {
+            throw new IllegalArgumentException("Código não corresponde ao usuário alvo")
+        }
+        
+        if (confirmCode.expiresAt.isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Código expirou")
+        }
+        
+        // Marcar como usado
+        confirmCode.used = true
+        confirmationCodeRepository.save(confirmCode)
+        
+        // Vincular usuários
+        addResponsavel(targetUserId, userId)
     }
 }
