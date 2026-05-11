@@ -493,9 +493,9 @@ td .name { font-weight: 500; color: var(--text-primary); }
 
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="user-avatar" style="background: var(--amber)">RM</div>
+      <div class="user-avatar" style="background: var(--amber)" id="sidebar-avatar-initials">--</div>
       <div>
-        <div class="user-name">Roberto Martins</div>
+        <div class="user-name" id="sidebar-nome">Carregando...</div>
         <div class="user-role">Parente vinculado</div>
       </div>
     </div>
@@ -512,96 +512,52 @@ td .name { font-weight: 500; color: var(--text-primary); }
 
   <div class="content">
 
-    <div class="patient-banner">
+    <div class="patient-banner" id="patient-banner">
       <div style="display: flex; align-items: center; gap: 16px;">
-        <div class="avatar av-blue" style="width: 56px; height: 56px; font-size: 20px;">HM</div>
+        <div class="avatar av-blue" style="width: 56px; height: 56px; font-size: 20px;" id="patient-avatar">-</div>
         <div>
-          <h2 style="font-family: 'Lora', serif; font-size: 22px; color: var(--text-primary); font-weight: 500; margin-bottom: 4px;">Dona Helena Martins</h2>
-          <div style="font-size: 13.5px; color: var(--text-secondary);">Cuidadora: <strong>Maria Clara</strong></div>
+          <h2 style="font-family: 'Lora', serif; font-size: 22px; color: var(--text-primary); font-weight: 500; margin-bottom: 4px;" id="patient-name">Carregando...</h2>
+          <div style="font-size: 13.5px; color: var(--text-secondary);" id="patient-caregiver">Carregando...</div>
         </div>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Progresso de Hoje: 8/10 Tarefas</div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill"></div>
-        </div>
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;" id="patient-progress"></div>
+        <button onclick="logout()" style="margin-top:8px; background:none; border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--text-muted); cursor:pointer;">Sair</button>
       </div>
     </div>
 
     <div class="view active" id="view-dashboard">
-      <div class="stats-grid">
+      <div class="stats-grid" id="stats-grid">
         <div class="stat-card blue">
-          <div class="stat-label">Total de Tarefas</div>
-          <div class="stat-value">10</div>
-          <div class="stat-sub">Programadas para hoje</div>
+          <div class="stat-label">Medicamentos</div>
+          <div class="stat-value" id="stat-meds">-</div>
+          <div class="stat-sub" id="stat-meds-sub">Carregando...</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-label">Concluídas</div>
-          <div class="stat-value">8</div>
-          <div class="stat-sub"><span class="up">Tudo no horário</span></div>
+          <div class="stat-label">Eventos Hoje</div>
+          <div class="stat-value" id="stat-eventos">-</div>
+          <div class="stat-sub" id="stat-eventos-sub">Carregando...</div>
         </div>
         <div class="stat-card terra">
-          <div class="stat-label">Pendentes</div>
-          <div class="stat-value">2</div>
-          <div class="stat-sub">Próxima em 40 min</div>
+          <div class="stat-label">Estoque Baixo</div>
+          <div class="stat-value" id="stat-estoque">-</div>
+          <div class="stat-sub">Remédios com menos de 5 unidades</div>
         </div>
         <div class="stat-card amber">
-          <div class="stat-label">Bem-estar relatado</div>
-          <div class="stat-value" style="font-size: 24px;">Animada</div>
-          <div class="stat-sub">Nota da cuidadora</div>
+          <div class="stat-label">Notificações</div>
+          <div class="stat-value" id="stat-notifs">-</div>
+          <div class="stat-sub" id="stat-notifs-sub">Não lidas</div>
         </div>
       </div>
 
       <div class="two-col">
         <div>
           <div class="section-header">
-            <span class="section-title">Acompanhamento da Rotina (Hoje)</span>
+            <span class="section-title">Agenda de Hoje</span>
           </div>
           <div class="table-wrap" style="padding: 16px 20px;">
-            <div class="timeline">
-              <div class="tl-item">
-                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sage-500)"></div><div class="tl-line"></div></div>
-                <div class="tl-content">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div class="tl-title">Café da manhã</div>
-                    <span class="badge badge-realizado">07:00 - Realizado</span>
-                  </div>
-                  <div class="tl-meta">Registrado por Maria Clara</div>
-                  <div class="tl-obs">"Comeu todas as frutas e o pão."</div>
-                </div>
-              </div>
-
-              <div class="tl-item">
-                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sage-500)"></div><div class="tl-line"></div></div>
-                <div class="tl-content">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div class="tl-title">Insulina NPH 20UI</div>
-                    <span class="badge badge-realizado">08:00 - Realizado</span>
-                  </div>
-                  <div class="tl-meta">Registrado por Maria Clara</div>
-                </div>
-              </div>
-
-              <div class="tl-item">
-                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--terracotta)"></div><div class="tl-line"></div></div>
-                <div class="tl-content">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div class="tl-title">Fisioterapia (Exercícios em casa)</div>
-                    <span class="badge badge-pendente">10:00 - Pendente</span>
-                  </div>
-                  <div class="tl-meta">Atribuído a: Maria Clara</div>
-                </div>
-              </div>
-
-              <div class="tl-item">
-                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sand-300)"></div></div>
-                <div class="tl-content">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div class="tl-title" style="color: var(--text-muted)">Almoço + Insulina</div>
-                    <span class="badge" style="background: var(--sand-100); color: var(--text-secondary)">12:30 - Programado</span>
-                  </div>
-                </div>
-              </div>
+            <div class="timeline" id="timeline-hoje">
+              <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Carregando agenda...</div>
             </div>
           </div>
         </div>
@@ -610,36 +566,16 @@ td .name { font-weight: 500; color: var(--text-primary); }
           <div class="section-header">
             <span class="section-title">Avisos e Alertas</span>
           </div>
-          <div class="agenda-card" style="margin-bottom: 20px;">
-            <div class="agenda-item" style="background: var(--terracotta-light);">
-              <div class="agenda-dot" style="background: var(--terracotta)"></div>
-              <div>
-                <div class="agenda-desc" style="color: var(--terracotta); font-weight: 500;">Estoque Baixo</div>
-                <div class="agenda-type">Insulina NPH (Restam 2 unidades). Providenciar compra.</div>
-              </div>
-            </div>
-            
-            <div class="agenda-item">
-              <div class="agenda-dot" style="background: var(--blue-muted)"></div>
-              <div>
-                <div class="agenda-desc">Recado da Cuidadora (Ontem, 18:00)</div>
-                <div class="agenda-type" style="line-height: 1.4;">"Dona Helena reclamou de um pouco de dor na lombar. Coloquei bolsa de água quente."</div>
-              </div>
-            </div>
+          <div class="agenda-card" style="margin-bottom: 20px;" id="alertas-container">
+            <div class="agenda-item"><div class="agenda-desc" style="color:var(--text-muted); font-size:12px;">Carregando...</div></div>
           </div>
 
           <div class="section-header">
-            <span class="section-title">Cuidadora</span>
+            <span class="section-title">Cuidadores Vinculados</span>
           </div>
           <div class="table-wrap">
-            <div style="padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div class="flex-cell">
-                <div class="avatar av-green">MC</div>
-                <div>
-                  <div class="name">Maria Clara</div>
-                  <div class="sub">Cuidadora de Plantão</div>
-                </div>
-              </div>
+            <div id="cuidadores-container" style="padding: 16px;">
+              <div style="font-size:13px; color:var(--text-muted);">Carregando...</div>
             </div>
           </div>
         </div>
@@ -650,57 +586,16 @@ td .name { font-weight: 500; color: var(--text-primary); }
       <div class="section-header">
         <span class="section-title">Prescrições e Controle de Estoque</span>
       </div>
-
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-icon" style="background: var(--terracotta-light); font-size:18px; margin-bottom:8px;">💊</div>
-              <div class="card-name">Insulina NPH 100UI</div>
-              <div class="card-detail">Aplicação subcutânea</div>
-            </div>
-            <span class="badge badge-estoque-baixo">Comprar Urgente</span>
-          </div>
-          <div class="card-row"><span class="card-row-label">Dosagem</span><span class="card-row-value">20UI</span></div>
-          <div class="card-row"><span class="card-row-label">Próximo Horário</span><span class="card-row-value">20:00</span></div>
-          <div class="card-row">
-            <span class="card-row-label">Estoque Atual</span>
-            <span class="card-row-value" style="color:var(--terracotta); font-weight: 600;">2 unidades</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-icon" style="background: var(--blue-light); font-size:18px; margin-bottom:8px;">💊</div>
-              <div class="card-name">Losartana 50mg</div>
-              <div class="card-detail">Via oral (Pressão)</div>
-            </div>
-            <span class="badge badge-estoque-ok">Estoque OK</span>
-          </div>
-          <div class="card-row"><span class="card-row-label">Dosagem</span><span class="card-row-value">1 comp.</span></div>
-          <div class="card-row"><span class="card-row-label">Próximo Horário</span><span class="card-row-value">Amanhã, 07:30</span></div>
-          <div class="card-row">
-            <span class="card-row-label">Estoque Atual</span>
-            <span class="card-row-value" style="color:var(--sage-600); font-weight: 600;">22 unidades</span>
-          </div>
-        </div>
-
-        <div class="card" style="background: var(--sand-100); border: 1.5px dashed var(--border); display: flex; align-items: center; justify-content: center; text-align: center;">
-          <div style="padding: 10px;">
-            <div style="font-size: 24px; margin-bottom: 8px;">ℹ️</div>
-            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Dúvidas sobre a receita?</div>
-            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Entre em contato com o cuidador ou o médico responsável.</div>
-          </div>
-        </div>
+      <div class="cards-grid" id="meds-grid">
+        <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:13px;">Carregando medicamentos...</div>
       </div>
     </div>
 
     <div class="view" id="view-historico">
       <div class="section-header">
-        <span class="section-title">Histórico de Cuidados Diários</span>
+        <span class="section-title">Histórico de Eventos</span>
         <div style="display:flex; gap:8px;">
-          <input type="date" id="filtro-data" onchange="validarDataHistorico()" style="font-family:'DM Sans',sans-serif; font-size:13px; padding:7px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); outline:none; color: var(--text-primary);">
+          <input type="date" id="filtro-data" onchange="filtrarHistorico()" style="font-family:'DM Sans',sans-serif; font-size:13px; padding:7px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); outline:none; color: var(--text-primary);">
         </div>
       </div>
 
@@ -708,100 +603,268 @@ td .name { font-weight: 500; color: var(--text-primary); }
         <table>
           <thead>
             <tr>
-              <th>Horário</th>
-              <th>Atividade</th>
-              <th>Responsável</th>
-              <th>Status</th>
-              <th>Observações do Cuidador</th>
+              <th>Data / Hora</th>
+              <th>Evento</th>
+              <th>Tipo</th>
+              <th>Observação</th>
             </tr>
           </thead>
           <tbody id="corpo-historico">
-            <tr>
-              <td><div class="name">08:00</div></td>
-              <td>Insulina NPH 20UI</td>
-              <td>Maria Clara</td>
-              <td><span class="badge badge-realizado">Concluído</span></td>
-              <td style="font-size:12px; color:var(--text-muted);">Administrado sem intercorrências.</td>
-            </tr>
-            <tr>
-              <td><div class="name">07:30</div></td>
-              <td>Caminhada 20min</td>
-              <td>Maria Clara</td>
-              <td><span class="badge badge-realizado">Concluído</span></td>
-              <td style="font-size:12px; color:var(--text-muted);">Dona Helena estava bem disposta.</td>
-            </tr>
-            <tr>
-              <td><div class="name">07:00</div></td>
-              <td>Café da Manhã</td>
-              <td>Maria Clara</td>
-              <td><span class="badge badge-realizado">Concluído</span></td>
-              <td style="font-size:12px; color:var(--text-muted);">Comeu tudo.</td>
-            </tr>
+            <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div id="msg-indisponivel">
-        <h3>📅 Histórico não disponível</h3>
-        <p>Ainda não há registros para a data selecionada. O histórico é gerado conforme as tarefas são realizadas.</p>
+      <div id="msg-indisponivel" style="display:none; text-align:center; padding:40px;">
+        <h3>📅 Nenhum evento nesta data</h3>
+        <p style="color:var(--text-muted); margin-top:8px;">Ainda não há registros para a data selecionada.</p>
       </div>
     </div>
 
-  </div>
+</div>
 </main>
 
 <script>
-  window.onload = function() {
-    
-    const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
-    const hojeLocal = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
-    
-    document.getElementById('filtro-data').value = hojeLocal;
-    validarDataHistorico(); 
-  };
+    // ─── Estado Global ────────────────────────────────────────
+    let currentUser = null;
+    let idosoData = null;
+    let todosEventos = [];
+    let todosMedicamentos = [];
 
-  function showView(name, navEl) {
-  
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + name).classList.add('active');
-    
-    
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    if (navEl) navEl.classList.add('active');
-    
-  
-    const titles = {
-      dashboard: 'Visão Geral do Dia',
-      medicamentos: 'Medicamentos & Estoque',
-      historico: 'Histórico de Cuidados'
-    };
-    document.getElementById('topbar-title').textContent = titles[name];
-  }
+    // ─── Init ─────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      const raw = sessionStorage.getItem('jamesUser');
+      if (!raw) { window.location.href = '/Loguin.html'; return; }
+      currentUser = JSON.parse(raw);
 
-  
-  function validarDataHistorico() {
-    const inputData = document.getElementById('filtro-data').value;
-    if (!inputData) return;
+      const nome = currentUser.nome || 'Parente';
+      document.getElementById('sidebar-nome').textContent = nome;
+      const iniciais = nome.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('sidebar-avatar-initials').textContent = iniciais;
 
-    
-    const dataSelecionada = new Date(inputData + "T00:00:00");
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+      await carregarIdoso();
+      if (idosoData) {
+        await Promise.all([carregarMedicamentos(), carregarEventos(), carregarNotificacoes()]);
+      }
+    });
 
-    const containerTabela = document.getElementById('container-tabela-historico');
-    const msgIndisponivel = document.getElementById('msg-indisponivel');
-
-    if (dataSelecionada > hoje) {
-      
-      containerTabela.style.display = 'none';
-      msgIndisponivel.style.display = 'block';
-    } else {
-      
-      containerTabela.style.display = 'block';
-      msgIndisponivel.style.display = 'none';
-      
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = '/Loguin.html';
     }
-  }
+
+    // ─── Carregar idoso vinculado ──────────────────────────────
+    async function carregarIdoso() {
+      try {
+        const resp = await fetch(`/api/user/${currentUser.id}/idosos`);
+        const lista = await resp.json();
+        if (!lista || lista.length === 0) {
+          document.getElementById('patient-name').textContent = 'Nenhum idoso vinculado';
+          document.getElementById('patient-caregiver').textContent = 'Entre em contato com o administrador.';
+          return;
+        }
+        idosoData = lista[0];
+        const iniciais = idosoData.nome.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('patient-avatar').textContent = iniciais;
+        document.getElementById('patient-name').textContent = idosoData.nome;
+
+        const cuidadores = idosoData.cuidadores || [];
+        document.getElementById('patient-caregiver').textContent =
+          cuidadores.length > 0
+            ? 'Cuidador(es): ' + cuidadores.map(c => c.nome).join(', ')
+            : 'Sem cuidador vinculado';
+
+        const cont = document.getElementById('cuidadores-container');
+        if (cuidadores.length === 0) {
+          cont.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:8px 0;">Nenhum cuidador vinculado.</div>';
+        } else {
+          cont.innerHTML = cuidadores.map(c => {
+            const ini = c.nome.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            return `<div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--sand-100);">
+              <div class="avatar av-green">${ini}</div>
+              <div>
+                <div style="font-size:13.5px; color:var(--text-primary); font-weight:500;">${c.nome}</div>
+                <div style="font-size:11.5px; color:var(--text-muted);">Cuidador</div>
+              </div>
+            </div>`;
+          }).join('');
+        }
+      } catch (e) {
+        document.getElementById('patient-name').textContent = 'Erro ao carregar';
+      }
+    }
+
+    // ─── Medicamentos ─────────────────────────────────────────
+    async function carregarMedicamentos() {
+      try {
+        const resp = await fetch(`/Medicines?pacienteId=${idosoData.id}`);
+        todosMedicamentos = await resp.json();
+        const grid = document.getElementById('meds-grid');
+
+        if (!todosMedicamentos || todosMedicamentos.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:13px;">Nenhum medicamento cadastrado.</div>';
+          document.getElementById('stat-meds').textContent = '0';
+          document.getElementById('stat-meds-sub').textContent = 'Nenhum prescrito';
+          document.getElementById('stat-estoque').textContent = '0';
+          return;
+        }
+
+        const baixos = todosMedicamentos.filter(m => (m.Unidades || m.unidades || 0) < 5);
+        document.getElementById('stat-meds').textContent = todosMedicamentos.length;
+        document.getElementById('stat-meds-sub').textContent = todosMedicamentos.length + ' prescrições ativas';
+        document.getElementById('stat-estoque').textContent = baixos.length;
+
+        grid.innerHTML = todosMedicamentos.map(m => {
+          const unidades = m.Unidades ?? m.unidades ?? 0;
+          const nome = m.Nome || m.nome || 'Medicamento';
+          const horario = m.Horario || m.horario || '--:--';
+          const obs = m.observacao || '';
+          const estoqueBaixo = unidades < 5;
+          return `<div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-icon" style="background:${estoqueBaixo ? 'var(--terracotta-light)' : 'var(--blue-light)'}; font-size:18px; margin-bottom:8px;">💊</div>
+                <div class="card-name">${nome}</div>
+                ${obs ? `<div class="card-detail">${obs}</div>` : ''}
+              </div>
+              <span class="badge ${estoqueBaixo ? 'badge-estoque-baixo' : 'badge-estoque-ok'}">${estoqueBaixo ? 'Comprar Urgente' : 'Estoque OK'}</span>
+            </div>
+            <div class="card-row"><span class="card-row-label">Horário</span><span class="card-row-value">${horario}</span></div>
+            <div class="card-row">
+              <span class="card-row-label">Estoque</span>
+              <span class="card-row-value" style="color:${estoqueBaixo ? 'var(--terracotta)' : 'var(--sage-600)'}; font-weight:600;">${unidades} unidades</span>
+            </div>
+          </div>`;
+        }).join('');
+      } catch (e) {
+        document.getElementById('meds-grid').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-muted);">Erro ao carregar medicamentos.</div>';
+      }
+    }
+
+    // ─── Eventos ──────────────────────────────────────────────
+    async function carregarEventos() {
+      try {
+        const resp = await fetch(`/Eventos/listaEventos?pacienteId=${idosoData.id}`);
+        todosEventos = await resp.json();
+
+        const hoje = new Date().toISOString().substring(0, 10);
+        const eventosHoje = todosEventos.filter(e => (e.data || '').substring(0, 10) === hoje);
+
+        document.getElementById('stat-eventos').textContent = eventosHoje.length;
+        document.getElementById('stat-eventos-sub').textContent = eventosHoje.length === 0 ? 'Nenhum hoje' : 'Programados hoje';
+
+        renderTimeline(eventosHoje);
+        renderHistorico(todosEventos);
+      } catch (e) {
+        document.getElementById('timeline-hoje').innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Erro ao carregar eventos.</div>';
+      }
+    }
+
+    function renderTimeline(eventos) {
+      const container = document.getElementById('timeline-hoje');
+      if (!eventos || eventos.length === 0) {
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Sem eventos programados para hoje.</div>';
+        return;
+      }
+      container.innerHTML = `<div class="timeline">` +
+        eventos.map((e, i) => {
+          const isLast = i === eventos.length - 1;
+          const obs = e.observacao ? `<div class="tl-obs">"${e.observacao}"</div>` : '';
+          const tipo = (e.tipo || '').toLowerCase();
+          const dotColor = tipo === 'realizado' || tipo === 'concluido' ? 'var(--sage-500)' :
+                           tipo === 'pendente' ? 'var(--terracotta)' : 'var(--sand-300)';
+          const badgeClass = tipo === 'realizado' || tipo === 'concluido' ? 'badge-realizado' :
+                             tipo === 'pendente' ? 'badge-pendente' : '';
+          const badgeStyle = badgeClass ? '' : 'background:var(--sand-100); color:var(--text-secondary);';
+          return `<div class="tl-item">
+            <div class="tl-dot-wrap">
+              <div class="tl-dot" style="background:${dotColor}"></div>
+              ${!isLast ? '<div class="tl-line"></div>' : ''}
+            </div>
+            <div class="tl-content">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="tl-title">${e.titulo || 'Evento'}</div>
+                <span class="badge ${badgeClass}" style="${badgeStyle}">${e.hora || '--'} - ${e.tipo || 'Programado'}</span>
+              </div>
+              ${obs}
+            </div>
+          </div>`;
+        }).join('') + `</div>`;
+    }
+
+    function renderHistorico(eventos) {
+      const tbody = document.getElementById('corpo-historico');
+      if (!eventos || eventos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sem eventos registrados.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = eventos.map(e => {
+        const tipo = e.tipo || 'Programado';
+        const badgeClass = tipo.toLowerCase() === 'realizado' || tipo.toLowerCase() === 'concluido' ? 'badge-realizado' :
+                           tipo.toLowerCase() === 'pendente' ? 'badge-pendente' : '';
+        const badgeStyle = badgeClass ? '' : 'background:var(--sand-100); color:var(--text-secondary);';
+        return `<tr>
+          <td><div style="font-weight:500;">${e.data || '--'} ${e.hora || ''}</div></td>
+          <td>${e.titulo || '--'}</td>
+          <td><span class="badge ${badgeClass}" style="${badgeStyle}">${tipo}</span></td>
+          <td style="font-size:12px; color:var(--text-muted);">${e.observacao || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filtrarHistorico() {
+      const data = document.getElementById('filtro-data').value;
+      if (!data) { renderHistorico(todosEventos); return; }
+      const filtrados = todosEventos.filter(e => (e.data || '').substring(0, 10) === data);
+      renderHistorico(filtrados);
+    }
+
+    // ─── Notificações (Recados) ───────────────────────────────
+    async function carregarNotificacoes() {
+      try {
+        const resp = await fetch(`/api/notifications?userId=${currentUser.id}`);
+        const notifs = await resp.json();
+        const arr = Array.isArray(notifs) ? notifs : [];
+
+        document.getElementById('stat-notifs').textContent = arr.length;
+
+        const alertas = document.getElementById('alertas-container');
+        const baixos = todosMedicamentos.filter(m => (m.Unidades ?? m.unidades ?? 0) < 5);
+
+        let alertasHtml = baixos.map(m =>
+          `<div class="agenda-item" style="background:var(--terracotta-light);">
+            <div class="agenda-dot" style="background:var(--terracotta)"></div>
+            <div>
+              <div class="agenda-desc" style="color:var(--terracotta); font-weight:500;">Estoque Baixo</div>
+              <div class="agenda-type">${m.Nome || m.nome} (Restam ${m.Unidades ?? m.unidades ?? 0} unidades)</div>
+            </div>
+          </div>`
+        ).join('');
+
+        alertasHtml += arr.map(n => {
+          const isUrgente = n.tipo === 'ajuda-urgente';
+          return `<div class="agenda-item" style="${isUrgente ? 'background:var(--terracotta-light);' : ''}">
+            <div class="agenda-dot" style="background:${isUrgente ? 'var(--terracotta)' : 'var(--blue-muted)'}"></div>
+            <div>
+              <div class="agenda-desc" style="${isUrgente ? 'color:var(--terracotta); font-weight:500;' : ''}">${isUrgente ? '🚨 Pedido de Ajuda' : 'Recado do Cuidador'}</div>
+              <div class="agenda-type" style="line-height:1.4;">${n.mensagem || ''}</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        alertas.innerHTML = alertasHtml || '<div class="agenda-item"><div class="agenda-desc" style="color:var(--text-muted); font-size:12px;">Nenhum aviso no momento.</div></div>';
+      } catch (e) { /* silencioso */ }
+    }
+
+    // ─── Navegação ────────────────────────────────────────────
+    function showView(name, navEl) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + name).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (navEl) navEl.classList.add('active');
+      const titles = { dashboard: 'Visão Geral do Dia', medicamentos: 'Medicamentos & Estoque', historico: 'Histórico de Eventos' };
+      document.getElementById('topbar-title').textContent = titles[name] || '';
+    }
 </script>
 
 </body>

@@ -3,404 +3,555 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JAMES — Perfil do Idoso</title>
-
+    <title>JAMES — Meu Painel</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-
-    <link rel="stylesheet" href="../CSS/Index_.css" />
-
     <style>
-      .idoso-page {
-        padding: 28px;
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
+      :root {
+        --bg: #ffffff;
+        --card: #ffffff;
+        --border: #111111;
+        --text: #000000;
+        --muted: #222222;
+        --green: #1f7a46;
+        --amber: #9c5d00;
+        --red: #c7332f;
+        --blue: #2f5f99;
+        --radius: 16px;
       }
 
-      .idoso-top {
-        background: white;
-        border-radius: 22px;
-        padding: 26px;
-        border: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+      * {
+        box-sizing: border-box;
       }
 
-      .idoso-profile {
-        display: flex;
-        align-items: center;
-        gap: 22px;
+      body {
+        margin: 0;
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
       }
 
-      .idoso-avatar {
-        width: 88px;
-        height: 88px;
-        border-radius: 50%;
-        background: var(--blue-light);
-        color: var(--blue-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        font-weight: 700;
-      }
-
-      .idoso-name {
-        font-size: 30px;
-        font-family: "Lora", serif;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-      }
-
-      .idoso-sub {
-        color: var(--text-secondary);
-        font-size: 14px;
-        margin-bottom: 14px;
-      }
-
-      .idoso-tags {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .idoso-grid {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 22px;
-      }
-
-      .idoso-card {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 22px;
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
         padding: 22px;
-      }
-
-      .idoso-section-title {
-        font-size: 17px;
-        font-weight: 600;
-        margin-bottom: 18px;
-        color: var(--text-primary);
-      }
-
-      .info-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .info-item {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 10px;
-      }
-
-      .info-label {
-        color: var(--text-secondary);
-        font-size: 13px;
-      }
-
-      .info-value {
-        color: var(--text-primary);
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .timeline-mini {
         display: flex;
         flex-direction: column;
         gap: 16px;
       }
 
-      .timeline-item {
-        display: flex;
-        gap: 14px;
-      }
-
-      .timeline-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--sage-500);
-        margin-top: 6px;
-      }
-
-      .timeline-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-primary);
-      }
-
-      .timeline-meta {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 4px;
-      }
-
-      .med-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .med-item {
-        padding: 14px;
-        border-radius: 14px;
-        background: var(--sand-50);
-        border: 1px solid var(--border);
-      }
-
-      .med-header {
+      .topbar {
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 8px;
-      }
-
-      .med-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-primary);
-      }
-
-      .med-time {
-        font-size: 12px;
-        color: var(--text-secondary);
-      }
-
-      .med-desc {
-        font-size: 12px;
-        color: var(--text-muted);
-      }
-
-      .agenda-list {
-        display: flex;
-        flex-direction: column;
+        align-items: center;
         gap: 12px;
       }
 
-      .agenda-box {
-        padding: 14px;
-        border-radius: 14px;
-        background: var(--sand-50);
-        border: 1px solid var(--border);
+      .perfil {
+        display: flex;
+        gap: 12px;
+        align-items: center;
       }
 
-      .agenda-hour {
-        font-size: 13px;
+      .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: #efe6d6;
+        color: #5d4e37;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-weight: 700;
-        color: var(--terracotta);
-        margin-bottom: 6px;
+        font-size: 20px;
+        background-size: cover;
+        background-position: center;
       }
 
-      .agenda-task {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-primary);
+      h1 {
+        margin: 0;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.1;
       }
 
-      .agenda-type {
-        font-size: 12px;
-        color: var(--text-muted);
+      .sub {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 22px;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        border: 2px solid var(--border);
+        background: #fff;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .btn-danger {
+        background: var(--red);
+        border-color: var(--red);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .btn-link {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .summary-card {
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+
+      .summary-title {
+        font-size: 18px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .summary-value {
+        margin-top: 8px;
+        font-size: 36px;
+        font-weight: 700;
+      }
+
+      .ok {
+        color: var(--green);
+      }
+
+      .warn {
+        color: var(--amber);
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 12px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 32px;
+        font-weight: 700;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .item {
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn-med {
+        align-self: flex-start;
+        border: 2px solid var(--green);
+        background: var(--green);
+        color: #fff;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
         margin-top: 4px;
       }
 
-      @media (max-width: 950px) {
-        .idoso-grid {
+      .btn-med:hover {
+        opacity: 0.9;
+      }
+
+      .btn-med.tomado {
+        background: #888;
+        border-color: #888;
+        cursor: default;
+        font-size: 20px;
+        padding: 10px 14px;
+      }
+
+      .item-title {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .item-meta {
+        margin-top: 6px;
+        font-size: 20px;
+        color: var(--muted);
+      }
+
+      .help-fab {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 100;
+        border: none;
+        background: var(--red);
+        color: #fff;
+        font-size: 24px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 16px 22px;
+        box-shadow: 0 10px 24px rgba(173, 35, 31, 0.32);
+        cursor: pointer;
+      }
+
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      .high-contrast {
+        --bg: #000000;
+        --card: #000000;
+        --text: #ffffff;
+        --muted: #ffffff;
+        --border: #ffffff;
+      }
+
+      .high-contrast .btn {
+        background: #000000;
+        color: #ffffff;
+      }
+
+      .high-contrast .item,
+      .high-contrast .summary-card,
+      .high-contrast .card,
+      .high-contrast .topbar {
+        background: #000000;
+      }
+
+      .large-text {
+        font-size: 20px;
+      }
+
+      .large-text h1 {
+        font-size: 46px;
+      }
+
+      .large-text .item-title {
+        font-size: 30px;
+      }
+
+      @media (max-width: 920px) {
+        .summary {
           grid-template-columns: 1fr;
         }
 
-        .idoso-top {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
           flex-direction: column;
           align-items: flex-start;
-          gap: 18px;
         }
       }
     </style>
   </head>
-
   <body>
-    <main class="idoso-page">
-      <!-- TOPO -->
-      <section class="idoso-top">
-        <div class="idoso-profile">
-          <div class="idoso-avatar">HM</div>
-
+    <main class="page" role="main" aria-label="Painel do idoso">
+      <header class="topbar" aria-label="Topo do painel">
+        <div class="perfil">
+          <div class="avatar" id="idoso-avatar" aria-hidden="true">--</div>
           <div>
-            <h1 class="idoso-name">Helena Martins</h1>
-
-            <div class="idoso-sub">82 anos • Diabetes • Hipertensão</div>
-
-            <div class="idoso-tags">
-              <span class="badge badge-idoso">Paciente ativa</span>
-
-              <span class="badge badge-realizado"> Cuidados em dia </span>
-            </div>
+            <h1 id="idoso-nome">Olá!</h1>
+            <div class="sub" id="idoso-sub">Aqui você vê sua rotina com letras grandes e leitura fácil.</div>
           </div>
         </div>
+        <div class="top-actions">
+          <button class="btn" onclick="toggleLargeText()" aria-label="Aumentar ou reduzir texto">Texto grande</button>
+          <button class="btn" onclick="toggleContrast()" aria-label="Ativar ou desativar alto contraste">Alto contraste</button>
+          <button class="btn" onclick="logout()" aria-label="Sair da conta">Sair</button>
+        </div>
+      </header>
+
+      <section class="summary" aria-label="Resumo do dia">
+        <article class="summary-card">
+          <div class="summary-title">Próximo medicamento</div>
+          <div class="summary-value" id="resumo-prox-med">--</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-title">Próxima atividade</div>
+          <div class="summary-value" id="resumo-prox-evento">--</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-title">Situação de hoje</div>
+          <div class="summary-value ok" id="resumo-status">Tudo certo</div>
+        </article>
       </section>
 
-      <!-- GRID -->
-      <section class="idoso-grid">
-        <!-- ESQUERDA -->
-        <div style="display: flex; flex-direction: column; gap: 22px">
-          <!-- MEDICAMENTOS -->
-          <div class="idoso-card">
-            <div class="idoso-section-title">Medicamentos Ativos</div>
-
-            <div class="med-list">
-              <div class="med-item">
-                <div class="med-header">
-                  <div class="med-name">Insulina NPH 100UI</div>
-
-                  <div class="med-time">08:00 / 20:00</div>
-                </div>
-
-                <div class="med-desc">Aplicação subcutânea • 20UI</div>
-              </div>
-
-              <div class="med-item">
-                <div class="med-header">
-                  <div class="med-name">Metformina 850mg</div>
-
-                  <div class="med-time">12:00</div>
-                </div>
-
-                <div class="med-desc">Tomar após almoço</div>
-              </div>
-
-              <div class="med-item">
-                <div class="med-header">
-                  <div class="med-name">Losartana 50mg</div>
-
-                  <div class="med-time">07:30</div>
-                </div>
-
-                <div class="med-desc">Controle da pressão arterial</div>
-              </div>
-            </div>
+      <section class="content-grid" aria-label="Informações principais">
+        <article class="card" aria-labelledby="tit-remedios">
+          <h2 id="tit-remedios">Meus remédios de hoje</h2>
+          <div class="list" id="med-list">
+            <div class="item"><div class="item-meta">Carregando medicamentos...</div></div>
           </div>
+        </article>
 
-          <!-- HISTÓRICO -->
-          <div class="idoso-card">
-            <div class="idoso-section-title">Últimos Cuidados</div>
-
-            <div class="timeline-mini">
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div>
-                  <div class="timeline-title">Insulina aplicada</div>
-
-                  <div class="timeline-meta">Hoje • 08:00 • Maria Clara</div>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div
-                  class="timeline-dot"
-                  style="background: var(--blue-muted)"
-                ></div>
-
-                <div>
-                  <div class="timeline-title">Caminhada de 20 minutos</div>
-
-                  <div class="timeline-meta">Hoje • 07:30 • Maria Clara</div>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div
-                  class="timeline-dot"
-                  style="background: var(--amber)"
-                ></div>
-
-                <div>
-                  <div class="timeline-title">Pressão arterial aferida</div>
-
-                  <div class="timeline-meta">Ontem • 19:00 • João Pedro</div>
-                </div>
-              </div>
-            </div>
+        <article class="card" aria-labelledby="tit-agenda">
+          <h2 id="tit-agenda">Minha agenda de hoje</h2>
+          <div class="list" id="agenda-list">
+            <div class="item"><div class="item-meta">Carregando agenda...</div></div>
           </div>
-        </div>
-
-        <!-- DIREITA -->
-        <div style="display: flex; flex-direction: column; gap: 22px">
-          <!-- INFORMAÇÕES -->
-          <div class="idoso-card">
-            <div class="idoso-section-title">Informações Gerais</div>
-
-            <div class="info-list">
-              <div class="info-item">
-                <span class="info-label"> Tipo sanguíneo </span>
-
-                <span class="info-value">O+</span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label"> Alergias </span>
-
-                <span class="info-value"> Penicilina </span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label"> Responsável </span>
-
-                <span class="info-value"> Roberto Martins </span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label"> Telefone </span>
-
-                <span class="info-value"> (11) 99876-5432 </span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label"> Cuidadora </span>
-
-                <span class="info-value"> Maria Clara </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- AGENDA -->
-          <div class="idoso-card">
-            <div class="idoso-section-title">Agenda de Hoje</div>
-
-            <div class="agenda-list">
-              <div class="agenda-box">
-                <div class="agenda-hour">10:00</div>
-
-                <div class="agenda-task">Sessão de fisioterapia</div>
-
-                <div class="agenda-type">Saúde</div>
-              </div>
-
-              <div class="agenda-box">
-                <div class="agenda-hour">12:30</div>
-
-                <div class="agenda-task">Almoço + Medicação</div>
-
-                <div class="agenda-type">Alimentação</div>
-              </div>
-
-              <div class="agenda-box">
-                <div class="agenda-hour">15:00</div>
-
-                <div class="agenda-task">Exercícios cognitivos</div>
-
-                <div class="agenda-type">Mental</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </article>
       </section>
     </main>
+
+    <button class="help-fab" onclick="pedirAjuda()" aria-label="Pedir ajuda urgente">Ajuda urgente</button>
+    <div id="a11y-status" class="sr" aria-live="polite"></div>
+
+    <script>
+      let usuarioAtual = null;
+
+      function logout() {
+        sessionStorage.removeItem('jamesUser');
+        window.location.href = '/Loguin.html';
+      }
+
+      function setA11yMessage(msg) {
+        const el = document.getElementById('a11y-status');
+        if (el) el.textContent = msg;
+      }
+
+      function toggleLargeText() {
+        document.body.classList.toggle('large-text');
+        setA11yMessage(document.body.classList.contains('large-text') ? 'Texto grande ativado' : 'Texto grande desativado');
+      }
+
+      function toggleContrast() {
+        document.body.classList.toggle('high-contrast');
+        setA11yMessage(document.body.classList.contains('high-contrast') ? 'Alto contraste ativado' : 'Alto contraste desativado');
+      }
+
+      function formatHora(hora) {
+        if (!hora) return '--:--';
+        return String(hora).slice(0, 5);
+      }
+
+      function initials(nome) {
+        return (nome || 'U')
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((p) => p[0])
+          .join('')
+          .toUpperCase();
+      }
+
+      async function carregarAvatar() {
+        if (!usuarioAtual?.id) return;
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(usuarioAtual.id)}/avatar`);
+          if (!res.ok) return;
+          const blob = await res.blob();
+          if (!blob || blob.size === 0) return;
+          const url = URL.createObjectURL(blob);
+          const av = document.getElementById('idoso-avatar');
+          if (av) {
+            av.style.backgroundImage = `url('${url}')`;
+            av.textContent = '';
+          }
+        } catch (_) {
+          // Sem avatar salvo, mantém iniciais.
+        }
+      }
+
+      function renderMedicamentos(meds) {
+        const list = document.getElementById('med-list');
+        if (!list) return;
+        if (!Array.isArray(meds) || meds.length === 0) {
+          list.innerHTML = '<div class="item"><div class="item-title">Sem remédios cadastrados</div><div class="item-meta">Peça ao cuidador para atualizar.</div></div>';
+          document.getElementById('resumo-prox-med').textContent = 'Nenhum';
+          return;
+        }
+        const ordenados = [...meds].sort((a, b) => String(a.Horario || '').localeCompare(String(b.Horario || '')));
+        document.getElementById('resumo-prox-med').textContent = `${formatHora(ordenados[0].Horario)} • ${ordenados[0].Nome || 'Remédio'}`;
+        list.innerHTML = ordenados.map((m) => `
+          <div class="item">
+            <div class="item-title">${m.Nome || 'Remédio'}</div>
+            <div class="item-meta">Horário: ${formatHora(m.Horario)} • Estoque: ${m.Unidades ?? '--'} unidades</div>
+            <button class="btn-med" onclick="notificarMedicamento(${m.id}, '${(m.Nome || 'Remédio').replace(/'/g, "\\'")}', '${formatHora(m.Horario)}', this)">Tomei ✓</button>
+          </div>
+        `).join('');
+      }
+
+      function renderEventos(evs) {
+        const agenda = document.getElementById('agenda-list');
+        if (!agenda) return;
+
+        const hoje = new Date().toISOString().split('T')[0];
+        const eventos = Array.isArray(evs) ? evs : [];
+        const hojeEvs = eventos
+          .filter((e) => e.data === hoje)
+          .sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || '')));
+
+        if (hojeEvs.length === 0) {
+          agenda.innerHTML = '<div class="item"><div class="item-title">Sem atividades para hoje</div><div class="item-meta">Tudo tranquilo no momento.</div></div>';
+          document.getElementById('resumo-prox-evento').textContent = 'Nenhuma';
+        } else {
+          document.getElementById('resumo-prox-evento').textContent = `${formatHora(hojeEvs[0].hora)} • ${hojeEvs[0].titulo || 'Atividade'}`;
+          agenda.innerHTML = hojeEvs.map((e) => `
+            <div class="item">
+              <div class="item-title">${e.titulo || 'Atividade'}</div>
+              <div class="item-meta">${formatHora(e.hora)} • ${e.tipo || 'Rotina'}</div>
+            </div>
+          `).join('');
+        }
+
+        const status = document.getElementById('resumo-status');
+        if (status) {
+          status.textContent = hojeEvs.length > 0 ? 'Acompanhando' : 'Tudo certo';
+          status.className = `summary-value ${hojeEvs.length > 0 ? 'warn' : 'ok'}`;
+        }
+      }
+
+      async function pedirAjuda() {
+        if (!usuarioAtual?.id) {
+          alert('Usuário não identificado. Por favor, faça login novamente.');
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/notifications/ajuda-urgente?idosoId=${encodeURIComponent(usuarioAtual.id)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          const data = await res.json();
+          
+          if (res.ok) {
+            setA11yMessage('Ajuda solicitada com sucesso. Os responsáveis foram notificados.');
+          }
+        } catch (e) {
+          console.error('Erro ao solicitar ajuda:', e);
+        }
+      }
+
+      async function notificarMedicamento(medId, medNome, hora, btn) {
+        if (!usuarioAtual?.id) return;
+        if (btn) {
+          btn.disabled = true;
+          btn.classList.add('tomado');
+          btn.textContent = '✓';
+        }
+        try {
+          await fetch(`/api/notifications/medicamento-tomado`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              idosoId: usuarioAtual.id,
+              medicamentoId: medId,
+              medicamentoNome: medNome,
+              hora: hora
+            })
+          });
+          setA11yMessage(`${medNome} marcado como tomado às ${hora}.`);
+        } catch (e) {
+          console.error('Erro ao notificar medicamento:', e);
+        }
+      }
+
+      async function init() {
+        const sessao = sessionStorage.getItem('jamesUser');
+        if (!sessao) {
+          window.location.href = '/Loguin.html';
+          return;
+        }
+
+        let user;
+        try {
+          user = JSON.parse(sessao);
+        } catch (_) {
+          sessionStorage.removeItem('jamesUser');
+          window.location.href = '/Loguin.html';
+          return;
+        }
+
+        const resUser = await fetch(`/api/user/${encodeURIComponent(user.id)}`);
+        if (!resUser.ok) {
+          sessionStorage.removeItem('jamesUser');
+          window.location.href = '/Loguin.html';
+          return;
+        }
+        usuarioAtual = await resUser.json();
+        sessionStorage.setItem('jamesUser', JSON.stringify(usuarioAtual));
+
+        if (usuarioAtual.role !== 'IDOSO') {
+          window.location.href = '/Index.html';
+          return;
+        }
+
+        const nomeEl = document.getElementById('idoso-nome');
+        const subEl = document.getElementById('idoso-sub');
+        const avatarEl = document.getElementById('idoso-avatar');
+        if (nomeEl) nomeEl.textContent = `Olá, ${usuarioAtual.nome || 'usuário'}`;
+        if (subEl) subEl.textContent = 'Aqui você acompanha seus remédios e sua rotina.';
+        if (avatarEl) avatarEl.textContent = initials(usuarioAtual.nome);
+
+        await carregarAvatar();
+
+        const [medRes, evRes] = await Promise.all([
+          fetch(`/Medicines?pacienteId=${encodeURIComponent(usuarioAtual.id)}`),
+          fetch(`/Eventos/listaEventos?pacienteId=${encodeURIComponent(usuarioAtual.id)}`),
+        ]);
+
+        const meds = medRes.ok ? await medRes.json() : [];
+        const evs = evRes.ok ? await evRes.json() : [];
+
+        renderMedicamentos(Array.isArray(meds) ? meds : []);
+        renderEventos(Array.isArray(evs) ? evs : []);
+      }
+
+      init();
+    </script>
   </body>
 </html>

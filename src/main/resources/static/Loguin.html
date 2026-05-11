@@ -256,7 +256,7 @@
 
         <div style="display:flex; gap:10px;">
           <button class="btn-submit btn-ghost-green" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); flex:1;" onclick="vincularNext(1)">← Voltar</button>
-          <button class="btn-submit" style="flex:2;" onclick="vincularStep2()">Encontrar →</button>
+          <button id="vincular-step2-btn" class="btn-submit" style="flex:2;" onclick="vincularStep2()">Encontrar →</button>
         </div>
       </div>
 
@@ -289,12 +289,6 @@
 
   </div>
 
-  <!-- Admin Link -->
-  <div style="text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
-    <span style="font-size:12px; color:var(--text-muted);">
-      É administrador? <a href="admin-login.html" style="color:var(--sage-600); text-decoration:none; font-weight:500;">Acesso Admin</a>
-    </span>
-  </div>
 </div>
 
 <script>
@@ -338,8 +332,15 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
       });
-      if (!res.ok) throw new Error('E-mail ou senha incorretos.');
-      const user = await res.json();
+        if (!res.ok) {
+          let errorMsg = 'E-mail ou senha incorretos.';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
+        const user = await res.json();
       vincularState.userEmail = email;
       vincularState.userId = user.id;
       vincularNext(2);
@@ -353,7 +354,10 @@
   async function vincularStep2() {
     const email = document.getElementById('vincular-step2-email').value;
     const erroEl = document.getElementById('vincular-step2-erro');
+    const btnEl = document.getElementById('vincular-step2-btn');
     erroEl.style.display = 'none';
+
+    if (vincularStep2Loading) return;
 
     if (!email) {
       erroEl.textContent = 'Informe o e-mail da pessoa.';
@@ -361,36 +365,65 @@
       return;
     }
 
+    vincularStep2Loading = true;
+    if (btnEl) {
+      btnEl.disabled = true;
+      btnEl.textContent = 'Enviando...';
+      btnEl.style.opacity = '0.75';
+      btnEl.style.cursor = 'not-allowed';
+    }
+
     try {
       const res = await fetch('/api/user', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
-      if (!res.ok) throw new Error('Erro ao buscar usuários.');
+        if (!res.ok) {
+          let errorMsg = 'Erro ao buscar usuários.';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
       const users = await res.json();
       const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (!found) throw new Error('Usuário não encontrado.');
-      
       vincularState.targetEmail = email;
       vincularState.targetId = found.id;
       vincularState.targetNome = found.nome;
       vincularState.targetRole = found.role;
-      
+
       // Solicitar confirmação por email
       const response = await fetch(`/api/user/${vincularState.userId}/request-link/${found.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-      if (!response.ok) throw new Error('Erro ao enviar código.');
+        if (!response.ok) {
+          let errorMsg = 'Erro ao enviar código.';
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
       const linkData = await response.json();
-      
+
       // Atualizar Step 3 com email do alvo
       document.getElementById('vincular-step3-email').textContent = linkData.targetEmail;
-      
+
       vincularNext(3);
     } catch (err) {
       erroEl.textContent = err.message;
       erroEl.style.display = 'block';
+    } finally {
+      vincularStep2Loading = false;
+      if (btnEl) {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Encontrar →';
+        btnEl.style.opacity = '';
+        btnEl.style.cursor = '';
+      }
     }
   }
 
@@ -399,17 +432,19 @@
   }
 
   async function vincularConfirm() {
-    const code = document.querySelectorAll('.code-inputs input').map(i => i.value).join('');
+    const code = Array.from(document.querySelectorAll('.code-inputs input'))
+      .map(i => (i.value || '').trim())
+      .join('');
     const erroEl = document.getElementById('vincular-step3-erro');
     
-    if (code.length !== 4) {
+    if (code.length !== 4 || !/^\d{4}$/.test(code)) {
       if (!erroEl) {
         const newErr = document.createElement('div');
         newErr.id = 'vincular-step3-erro';
         newErr.style.cssText = 'color:#c0392b; font-size:13px; margin-top:8px; text-align:center;';
         document.querySelector('.code-inputs').after(newErr);
       }
-      document.getElementById('vincular-step3-erro').textContent = 'Digite todos os 4 dígitos.';
+      document.getElementById('vincular-step3-erro').textContent = 'Digite um código válido de 4 dígitos.';
       document.getElementById('vincular-step3-erro').style.display = 'block';
       return;
     }
@@ -421,8 +456,14 @@
         body: JSON.stringify({ code })
       });
       if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || 'Erro ao confirmar.');
+          let errorMsg = 'Erro ao confirmar.';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {
+            errorMsg = await res.text() || errorMsg;
+          }
+          throw new Error(errorMsg);
       }
       vincularDone();
     } catch (err) {
@@ -436,6 +477,8 @@
       document.getElementById('vincular-step3-erro').style.display = 'block';
     }
   }
+
+  function vincularDone() {
     const content = document.getElementById('vstep-content-3');
     content.innerHTML = `
       <div style="text-align:center; padding: 20px 0 10px;">
@@ -466,6 +509,7 @@
     targetNome: null,
     targetRole: null
   };
+  let vincularStep2Loading = false;
 
   function redirectAfterAuth(user) {
     if (!user || !user.role) {
@@ -507,7 +551,14 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
       });
-      if (!res.ok) throw new Error('E-mail ou senha incorretos.');
+        if (!res.ok) {
+          let errorMsg = 'E-mail ou senha incorretos.';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
       const user = await res.json();
       sessionStorage.setItem('jamesUser', JSON.stringify(user));
       redirectAfterAuth(user);
@@ -535,8 +586,14 @@
         body: JSON.stringify({ nome, email, senha, role: selectedRole })
       });
       if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || 'Erro ao criar conta.');
+          let errorMsg = 'Erro ao criar conta.';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch {
+            errorMsg = await res.text() || errorMsg;
+          }
+          throw new Error(errorMsg);
       }
       const user = await res.json();
       sessionStorage.setItem('jamesUser', JSON.stringify(user));

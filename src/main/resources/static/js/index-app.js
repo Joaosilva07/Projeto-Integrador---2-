@@ -4,6 +4,7 @@
         medicamentos: "Medicamentos & Prescrições",
         historico: "Histórico de Cuidados",
         agenda: "Agenda de Tarefas",
+        config: "Configurações",
       };
 
       const btnLabels = {
@@ -11,7 +12,8 @@
         usuarios: "+ Novo Usuário",
         medicamentos: "+ Novo Medicamento",
         historico: "+ Novo Registro",
-        agenda: "+ Nova Tarefa",
+        agenda: "+ Novo Evento",
+        config: "",
       };
 
       // ═══════════════════════════════════════════════════════
@@ -57,6 +59,20 @@
       function getAgendaPacienteSelecionado() {
         const sel = document.getElementById('agenda-filtro-idoso');
         return sel ? sel.value : '';
+      }
+
+      function buildScopeQuery() {
+        if (!usuarioLogado || !usuarioLogado.id) return '';
+        if (usuarioLogado.role === 'ADMIN') return '';
+        if (usuarioLogado.role === 'IDOSO') return `?pacienteId=${encodeURIComponent(usuarioLogado.id)}`;
+        return `?responsavelId=${encodeURIComponent(usuarioLogado.id)}`;
+      }
+
+      function getIdososPermitidos(users) {
+        const idosos = users.filter((u) => u.role === 'IDOSO');
+        if (!usuarioLogado || usuarioLogado.role === 'ADMIN') return idosos;
+        if (usuarioLogado.role === 'IDOSO') return idosos.filter((u) => String(u.id) === String(usuarioLogado.id));
+        return idosos.filter((u) => (u.responsaveis || []).some((r) => String(r.id) === String(usuarioLogado.id)));
       }
 
       function renderWeeklyCalendar() {
@@ -227,6 +243,9 @@
           renderWeeklyCalendar();
           carregarEventos();
         }
+        if (name === 'config') {
+          carregarConfiguracoesUsuario();
+        }
       };
 
       function showView(name, navEl) {
@@ -239,41 +258,269 @@
           .forEach((n) => n.classList.remove("active"));
         if (navEl) navEl.classList.add("active");
         document.getElementById("topbar-title").textContent = titles[name];
-        document.getElementById("topbar-btn").textContent = btnLabels[name];
+        const topBtn = document.getElementById("topbar-btn");
+        if (topBtn) {
+          topBtn.textContent = btnLabels[name] || '';
+          topBtn.style.display = (name === 'agenda' || name === 'config') ? 'none' : 'inline-flex';
+        }
+      }
+
+      async function carregarAvatarDoBackend() {
+        if (!usuarioLogado?.id) return null;
+        try {
+          const res = await fetch(`/api/user/${usuarioLogado.id}/avatar`);
+          if (!res.ok) return null;
+          const blob = await res.blob();
+          if (blob.size === 0) return null;
+          const url = URL.createObjectURL(blob);
+          return url;
+        } catch (e) {
+          console.error('Erro ao carregar avatar:', e);
+          return null;
+        }
+      }
+
+      function aplicarFotoPerfilUI(dataUrl) {
+        const preview = document.getElementById('cfg-avatar-preview');
+        const profileBtn = document.getElementById('topbar-profile-btn');
+        const initials = (usuarioLogado?.nome || 'U').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        
+        if (preview) {
+          if (dataUrl) {
+            preview.style.backgroundImage = `url('${dataUrl}')`;
+            preview.style.backgroundSize = 'cover';
+            preview.style.backgroundPosition = 'center';
+            preview.textContent = '';
+          } else {
+            preview.style.backgroundImage = '';
+            preview.textContent = initials;
+          }
+        }
+
+        if (profileBtn) {
+          if (dataUrl) {
+            profileBtn.style.backgroundImage = `url('${dataUrl}')`;
+            profileBtn.style.backgroundSize = 'cover';
+            profileBtn.style.backgroundPosition = 'center';
+            profileBtn.textContent = '';
+          } else {
+            profileBtn.style.backgroundImage = '';
+            profileBtn.textContent = initials;
+          }
+        }
+
+        document.querySelectorAll('.user-avatar').forEach((el) => {
+          if (dataUrl) {
+            el.style.backgroundImage = `url('${dataUrl}')`;
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+            el.textContent = '';
+          } else {
+            el.style.backgroundImage = '';
+            el.textContent = initials;
+          }
+        });
+      }
+
+      async function atualizarFotoPerfil(event) {
+        const file = event?.target?.files?.[0];
+        if (!file || !usuarioLogado?.id) return;
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+          const res = await fetch(`/api/user/${usuarioLogado.id}/avatar`, {
+            method: 'POST',
+            body: formData
+          });
+          if (!res.ok) {
+            throw new Error('Erro ao fazer upload do avatar');
+          }
+          const avatarUrl = await carregarAvatarDoBackend();
+          if (avatarUrl) {
+            aplicarFotoPerfilUI(avatarUrl);
+          }
+        } catch (e) {
+          console.error('Erro ao salvar avatar:', e);
+          alert('Erro ao salvar a foto. Tente novamente.');
+        }
+      }
+
+      function renderMeusIdososConfig() {
+        const container = document.getElementById('cfg-idosos-list');
+        if (!container) return;
+        const idosos = getIdososPermitidos(usuariosGlobal || []);
+        if (!idosos.length) {
+          container.innerHTML = '<div style="padding:12px;border:1px solid var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;">Nenhum idoso vinculado.</div>';
+          return;
+        }
+        container.innerHTML = idosos.map((i) => `
+          <div style="padding:12px;border:1px solid var(--border);border-radius:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;">
+            <div>
+              <div style="font-weight:600;color:var(--text-primary);font-size:13px;">${i.nome || 'Sem nome'}</div>
+              <div style="color:var(--text-muted);font-size:12px;">${i.email || 'Sem e-mail'}</div>
+            </div>
+            <span class="badge badge-idoso">IDOSO</span>
+          </div>
+        `).join('');
+      }
+
+      async function carregarConfiguracoesUsuario() {
+        if (!usuarioLogado) return;
+        const nomeEl = document.getElementById('cfg-nome');
+        const emailEl = document.getElementById('cfg-email');
+        const roleEl = document.getElementById('cfg-role');
+        const senhaEl = document.getElementById('cfg-senha');
+        const erroEl = document.getElementById('cfg-erro');
+        const okEl = document.getElementById('cfg-ok');
+
+        if (nomeEl) nomeEl.value = usuarioLogado.nome || '';
+        if (emailEl) emailEl.value = usuarioLogado.email || '';
+        if (roleEl) roleEl.value = usuarioLogado.role || '';
+        if (senhaEl) senhaEl.value = '';
+        if (erroEl) erroEl.style.display = 'none';
+        if (okEl) okEl.style.display = 'none';
+
+        const avatarUrl = await carregarAvatarDoBackend();
+        aplicarFotoPerfilUI(avatarUrl || '');
+        renderMeusIdososConfig();
+      }
+
+      async function salvarConfiguracoesUsuario() {
+        if (!usuarioLogado?.id) return;
+        const nome = document.getElementById('cfg-nome')?.value?.trim();
+        const email = document.getElementById('cfg-email')?.value?.trim();
+        const novaSenha = document.getElementById('cfg-senha')?.value?.trim();
+        const erroEl = document.getElementById('cfg-erro');
+        const okEl = document.getElementById('cfg-ok');
+
+        if (erroEl) erroEl.style.display = 'none';
+        if (okEl) okEl.style.display = 'none';
+
+        if (!nome || !email) {
+          if (erroEl) {
+            erroEl.textContent = 'Nome e e-mail são obrigatórios.';
+            erroEl.style.display = 'block';
+          }
+          return;
+        }
+
+        const payload = {
+          nome,
+          email,
+          role: usuarioLogado.role,
+          senha: novaSenha || usuarioLogado.senha || undefined,
+        };
+
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(usuarioLogado.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) {
+            throw new Error(await extrairMensagemErro(res, 'Erro ao salvar configurações.'));
+          }
+          const updated = await res.json();
+          usuarioLogado = updated;
+          sessionStorage.setItem('jamesUser', JSON.stringify(updated));
+          document.querySelectorAll('.user-name').forEach((el) => { el.textContent = updated.nome || 'Usuário'; });
+          document.querySelectorAll('.user-role').forEach((el) => { el.textContent = updated.role || ''; });
+          const avatarUrl = await carregarAvatarDoBackend();
+          aplicarFotoPerfilUI(avatarUrl || '');
+          if (okEl) {
+            okEl.textContent = 'Configurações salvas com sucesso.';
+            okEl.style.display = 'block';
+          }
+        } catch (e) {
+          if (erroEl) {
+            erroEl.textContent = e.message || 'Erro ao salvar configurações.';
+            erroEl.style.display = 'block';
+          }
+        }
+      }
+
+      async function extrairMensagemErro(res, fallbackMsg) {
+        try {
+          const data = await res.json();
+          if (data?.message) return data.message;
+          if (data?.erro) return data.erro;
+          if (data?.error) return data.error;
+        } catch (_) {
+          try {
+            const txt = await res.text();
+            if (txt) return txt;
+          } catch (_) {}
+        }
+        return fallbackMsg;
+      }
+
+      function atualizarBadgeHistorico(total) {
+        const badge = document.getElementById('historico-nav-badge');
+        if (!badge) return;
+        const valor = Number.isFinite(total) ? total : 0;
+        badge.textContent = String(valor);
+        badge.style.display = valor > 0 ? 'inline-flex' : 'none';
       }
 
       // ===============================
       // SISTEMA DE NOTIFICAÇÕES
       // ===============================
 
-      let notificacoes = JSON.parse(localStorage.getItem("notificacoes")) || [];
+      let notificacoes = [];
+      let notifPollTimer = null;
 
-      function adicionarNotificacao(msg) {
-        notificacoes.unshift({
-          mensagem: msg,
-          data: new Date().toLocaleTimeString(),
-        });
+      async function carregarNotificacoesDoBackend() {
+        if (!usuarioLogado || !usuarioLogado.id) return;
+        try {
+          const res = await fetch(`/api/notifications?userId=${encodeURIComponent(usuarioLogado.id)}`);
+          if (!res.ok) return;
+          const data = await res.json();
+          notificacoes = Array.isArray(data) ? data : [];
+          renderNotificacoes();
+          atualizarDashboard();
+        } catch (e) {
+          console.error('Erro ao carregar notificações', e);
+        }
+      }
 
-        localStorage.setItem("notificacoes", JSON.stringify(notificacoes));
-        renderNotificacoes();
+      async function fecharNotificacao(id) {
+        if (!usuarioLogado || !usuarioLogado.id) return;
+        try {
+          await fetch(`/api/notifications/${encodeURIComponent(id)}?userId=${encodeURIComponent(usuarioLogado.id)}`, {
+            method: 'DELETE'
+          });
+          carregarNotificacoesDoBackend();
+        } catch (e) {
+          console.error('Erro ao remover notificação', e);
+        }
       }
 
       function renderNotificacoes() {
         const list = document.getElementById("notif-list");
         const count = document.getElementById("notif-count");
+        if (!list || !count) return;
 
         list.innerHTML = "";
 
-        notificacoes.slice(0, 5).forEach((n) => {
+        const naoLidas = notificacoes.filter((n) => !n.isRead);
+        const exibidas = (naoLidas.length > 0 ? naoLidas : notificacoes).slice(0, 5);
+
+        exibidas.forEach((n) => {
+          const horario = n.criadoEm ? new Date(n.criadoEm).toLocaleTimeString() : '';
           list.innerHTML += `
       <div class="notif-item">
-        ${n.mensagem}<br>
-        <small>${n.data}</small>
+        <div>${n.mensagem || ''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:8px;">
+          <small>${horario}</small>
+          <button class="btn btn-ghost" style="padding:2px 6px;font-size:11px;" onclick="fecharNotificacao(${n.id})">Fechar</button>
+        </div>
       </div>
     `;
         });
 
-        count.textContent = notificacoes.length;
+        count.textContent = naoLidas.length;
       }
 
       function toggleNotifications() {
@@ -285,30 +532,67 @@
       // ===============================
 
       function verificarAlertas() {
-        const baixoEstoque = medicamentosGlobal.filter(m => (m.Unidades || 0) <= 5);
-        if (baixoEstoque.length > 0) adicionarNotificacao(`⚠️ ${baixoEstoque.length} medicamento(s) com estoque baixo`);
-        const hoje = new Date().toISOString().split('T')[0];
-        const hojeEvs = eventos.filter(e => e.data === hoje);
-        if (hojeEvs.length > 0) adicionarNotificacao(`📅 ${hojeEvs.length} tarefa(s) para hoje`);
+        // As notificações são persistidas no backend ao criar/alterar dados.
+        // Aqui só sincronizamos a interface para evitar duplicatas no refresh.
+        carregarNotificacoesDoBackend();
       }
 
       function atualizarDashboard() {
-        document.getElementById("alert-count").textContent = notificacoes.length;
+        const alertEl = document.getElementById("alert-count");
+        if (!alertEl) return;
+        const naoLidas = notificacoes.filter((n) => !n.isRead);
+        alertEl.textContent = naoLidas.length;
       }
 
-      window.onload = () => {
+      async function obterUsuarioAtualizado(sessaoUsuario) {
+        if (!sessaoUsuario || !sessaoUsuario.id) return null;
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(sessaoUsuario.id)}`);
+          if (!res.ok) return null;
+          const userDb = await res.json();
+          if (!userDb || !userDb.id) return null;
+          return userDb;
+        } catch (e) {
+          console.error('Erro ao validar sessão do usuário', e);
+          return null;
+        }
+      }
+
+      window.onload = async () => {
         // ── Auth ──────────────────────────────────────────────
         const userJson = sessionStorage.getItem('jamesUser');
         if (!userJson) { window.location.href = '/Loguin.html'; return; }
-        const me = JSON.parse(userJson);
+        let me = null;
+        try {
+          me = JSON.parse(userJson);
+        } catch (_) {
+          sessionStorage.removeItem('jamesUser');
+          window.location.href = '/Loguin.html';
+          return;
+        }
+
+        const userAtualizado = await obterUsuarioAtualizado(me);
+        if (!userAtualizado) {
+          sessionStorage.removeItem('jamesUser');
+          window.location.href = '/Loguin.html';
+          return;
+        }
+        me = userAtualizado;
+        sessionStorage.setItem('jamesUser', JSON.stringify(me));
 
         if (me.role === 'IDOSO') { window.location.href = '/idoso.html'; return; }
         if (me.role === 'PARENTE') { window.location.href = '/parente.html'; return; }
         usuarioLogado = me;
-        document.querySelector('.user-name').textContent = me.nome || 'Usuário';
-        document.querySelector('.user-role').textContent = me.role || '';
+        localStorage.removeItem('notificacoes'); // limpar legado antigo que causava números errados
+        if (typeof setUsuarioLogado === 'function') {
+          setUsuarioLogado(me);  // Inicializar notificações do backend, se disponível
+        }
+        document.querySelectorAll('.user-name').forEach((el) => { el.textContent = me.nome || 'Usuário'; });
+        document.querySelectorAll('.user-role').forEach((el) => { el.textContent = me.role || ''; });
         const initials = (me.nome || 'U').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-        document.querySelector('.user-avatar').textContent = initials;
+        document.querySelectorAll('.user-avatar').forEach((el) => { el.textContent = initials; });
+        const avatarUrl = await carregarAvatarDoBackend();
+        if (avatarUrl) aplicarFotoPerfilUI(avatarUrl);
 
         // ── Controle de acesso por role (só ADMIN gerencia usuários) ──
         if (me.role !== 'ADMIN') {
@@ -323,8 +607,10 @@
         }
 
         // ── Notificações ───────────────────────────────────────
-        renderNotificacoes();
-        atualizarDashboard();
+        carregarNotificacoesDoBackend();
+        if (!notifPollTimer) {
+          notifPollTimer = setInterval(() => carregarNotificacoesDoBackend(), 30000);
+        }
 
         // ── Limpar mocks ───────────────────────────────────────
         const tlMock = document.getElementById('timeline-cuidados');
@@ -338,6 +624,7 @@
         carregarUsuarios();
         carregarMedicamentos();
         carregarEventos();
+        carregarConfiguracoesUsuario();
       };
 
       // ═══════════════════════════════════════════════════════
@@ -357,7 +644,7 @@
       }
 
       function preencherFiltrosPacientes(users) {
-        const idosos = users.filter(u => u.role === 'IDOSO');
+        const idosos = getIdososPermitidos(users);
         const historicoSel = document.getElementById('historico-filtro-paciente');
         const agendaSel = document.getElementById('agenda-filtro-idoso');
 
@@ -387,7 +674,8 @@
       }
 
       function atualizarStatsUsuarios(users) {
-        const idosos = users.filter(u => u.role === 'IDOSO').length;
+        // Contar apenas idosos que o usuário tem acesso
+        const idosos = getIdososPermitidos(users).length;
         const cuidadores = users.filter(u => u.role === 'CUIDADOR').length;
         const parentes = users.filter(u => u.role === 'PARENTE').length;
         const statsCards = document.querySelectorAll('#view-usuarios .stat-card .stat-value');
@@ -448,11 +736,13 @@
             method: 'POST', headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ nome, email, senha, role })
           });
-          if (!res.ok) { const t = await res.text(); throw new Error(t); }
+          if (!res.ok) {
+            throw new Error(await extrairMensagemErro(res, 'Erro ao salvar usuário.'));
+          }
           fecharModalUsuario();
           document.getElementById('u-nome').value=''; document.getElementById('u-email').value='';
           document.getElementById('u-senha').value='';
-          carregarUsuarios();
+          await carregarUsuarios();
         } catch(e) { erroEl.textContent = e.message; erroEl.style.display='block'; }
       }
 
@@ -461,7 +751,7 @@
       // ═══════════════════════════════════════════════════════
       async function carregarMedicamentos() {
         try {
-          const res = await fetch('/Medicines');
+          const res = await fetch('/Medicines' + buildScopeQuery());
           const meds = await res.json();
           medicamentosGlobal = meds;
           renderCardsMedicamentos(meds);
@@ -471,6 +761,7 @@
           if (dashMeds) dashMeds.textContent = meds.length;
           const baixoCount = meds.filter(m => (m.Unidades || 0) <= 5).length;
           if (dashMedsSub) dashMedsSub.textContent = baixoCount > 0 ? `${baixoCount} com estoque baixo` : '';
+          verificarAlertas();
         } catch(e) { console.error('Erro ao carregar medicamentos', e); }
       }
 
@@ -479,10 +770,10 @@
         if (!grid) return;
         // Manter o card "+" no final
         const addCard = grid.querySelector('[style*="dashed"]');
-        grid.innerHTML = '';
+        let html = '';
         meds.forEach(m => {
           const baixo = (m.Unidades || 0) <= 5;
-          grid.innerHTML += `<div class="card">
+          html += `<div class="card">
             <div class="card-header">
               <div>
                 <div class="card-icon" style="background:var(--terracotta-light);font-size:18px;margin-bottom:8px;">💊</div>
@@ -497,8 +788,13 @@
             <button class="btn btn-ghost" style="margin-top:8px;width:100%;font-size:12px;color:var(--terracotta)" onclick="excluirMedicamento(${m.id})">Excluir</button>
           </div>`;
         });
-        if (addCard) grid.appendChild(addCard);
-        else grid.innerHTML += `<div class="card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:200px;cursor:pointer;background:var(--sand-50);" onclick="abrirModalMedicamento()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">Adicionar medicamento</div></div></div>`;
+        if (addCard) {
+          grid.innerHTML = html;
+          grid.appendChild(addCard);
+        } else {
+          html += `<div class="card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:200px;cursor:pointer;background:var(--sand-50);" onclick="abrirModalMedicamento()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">Adicionar medicamento</div></div></div>`;
+          grid.innerHTML = html;
+        }
       }
 
       async function excluirMedicamento(id) {
@@ -522,18 +818,21 @@
         const erroEl = document.getElementById('m-erro');
         erroEl.style.display = 'none';
         if (!nome) { erroEl.textContent = 'Informe o nome do medicamento.'; erroEl.style.display='block'; return; }
-        const body = { Nome: nome, Horario: horario, Unidades: unidades };
-        if (pacienteId) body.Paciente = { id: parseInt(pacienteId) };
+        if (!pacienteId) { erroEl.textContent = 'Selecione o idoso para este medicamento.'; erroEl.style.display='block'; return; }
+        const body = { Nome: nome, Horario: horario, Unidades: unidades, Paciente: { id: parseInt(pacienteId) } };
         try {
           const res = await fetch('/Medicines/create_medicine', {
             method: 'POST', headers: {'Content-Type':'application/json'},
             body: JSON.stringify(body)
           });
-          if (!res.ok) throw new Error('Erro ao salvar.');
+          if (!res.ok) {
+            throw new Error(await extrairMensagemErro(res, 'Erro ao salvar medicamento.'));
+          }
           fecharModalMedicamento();
           document.getElementById('m-nome').value=''; document.getElementById('m-horario').value='';
           document.getElementById('m-unidades').value=''; document.getElementById('m-paciente').value='';
-          carregarMedicamentos();
+          await carregarMedicamentos();
+          await carregarEventos();
         } catch(e) { erroEl.textContent = e.message; erroEl.style.display='block'; }
       }
 
@@ -542,12 +841,13 @@
       // ═══════════════════════════════════════════════════════
       async function carregarEventos() {
         try {
-          const res = await fetch('/Eventos/listaEventos');
+          const res = await fetch('/Eventos/listaEventos' + buildScopeQuery());
           const evs = await res.json();
           eventos = evs.map(e => ({ ...e, tipo: e.tipo || 'other' }));
           renderAgendaLista(evs);
           renderCuidadosRecentes(evs);
           renderProximasTarefas(evs);
+          atualizarBadgeHistorico(evs.length);
           renderHistorico(evs);
           const hoje = new Date().toISOString().split('T')[0];
           const hojeEvs = evs.filter(e => e.data === hoje);
@@ -619,6 +919,7 @@
         if (!tbody) return;
         const pacienteId = document.getElementById('historico-filtro-paciente')?.value || '';
         const filtrados = filtrarEventosPorPaciente(evs, pacienteId);
+        atualizarBadgeHistorico(filtrados.length);
         if (filtrados.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum evento registrado.</td></tr>';
           return;
@@ -640,11 +941,13 @@
         const hojeEvs = filtrarEventosPorPaciente(evs, pacienteId).filter(e => e.data === hoje);
         container.innerHTML = '';
         if (hojeEvs.length === 0) {
-          container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Nenhum evento para hoje. Clique em "+ Nova Tarefa" para adicionar.</div>';
+          container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Nenhum evento para hoje. Clique em "+ Novo Evento" para adicionar.</div>';
+          container.innerHTML += `<div class="agenda-card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;background:var(--sand-50);" onclick="openEventModal()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">+ Novo Evento</div></div></div>`;
           return;
         }
+        let html = '';
         hojeEvs.forEach(e => {
-          container.innerHTML += `<div class="agenda-card">
+          html += `<div class="agenda-card">
             <div class="agenda-card-header">
               <div class="agenda-patient-dot" style="background:var(--sage-500)"></div>
               <div>
@@ -657,7 +960,8 @@
             </div>
           </div>`;
         });
-        container.innerHTML += `<div class="agenda-card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;background:var(--sand-50);" onclick="openEventModal()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">Adicionar evento</div></div></div>`;
+        html += `<div class="agenda-card" style="border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;background:var(--sand-50);" onclick="openEventModal()"><div style="text-align:center;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">+</div><div style="font-size:13px;font-weight:500">+ Novo Evento</div></div></div>`;
+        container.innerHTML = html;
       }
 
       async function excluirEvento(id) {
@@ -675,7 +979,7 @@
         const tipo = document.getElementById('event-type').value;
         const pacienteId = document.getElementById('event-paciente').value;
         if (!titulo || !data || !hora) { alert('Preencha todos os campos!'); return; }
-        if (usuarioLogado && usuarioLogado.role === 'CUIDADOR' && !pacienteId) { alert('Selecione o idoso para criar o evento.'); return; }
+        if (!pacienteId) { alert('Selecione o idoso para criar o evento.'); return; }
         try {
           const body = { titulo, data, hora, tipo };
           if (pacienteId) body.paciente = { id: parseInt(pacienteId) };
@@ -683,24 +987,25 @@
             method: 'POST', headers: {'Content-Type':'application/json'},
             body: JSON.stringify(body)
           });
-          if (res.ok) {
-            closeEventModal();
-            document.getElementById('event-title').value='';
-            document.getElementById('event-date').value='';
-            document.getElementById('event-time').value='';
-            document.getElementById('event-type').value='medication';
-            document.getElementById('event-paciente').value='';
-            carregarEventos();
+          if (!res.ok) {
+            throw new Error(await extrairMensagemErro(res, 'Erro ao salvar evento.'));
           }
-        } catch(e) { alert('Erro ao salvar evento.'); }
+          closeEventModal();
+          document.getElementById('event-title').value='';
+          document.getElementById('event-date').value='';
+          document.getElementById('event-time').value='';
+          document.getElementById('event-type').value='medication';
+          document.getElementById('event-paciente').value='';
+          await carregarEventos();
+        } catch(e) { alert(e.message || 'Erro ao salvar evento.'); }
       };
 
       // Carregar lista de pacientes no select do modal de medicamentos
       function preencherSelectPacientes() {
         const sel = document.getElementById('m-paciente');
         if (!sel) return;
-        sel.innerHTML = '<option value="">Nenhum</option>';
-        usuariosGlobal.filter(u => u.role === 'IDOSO').forEach(u => {
+        sel.innerHTML = '<option value="">Selecione o idoso</option>';
+        getIdososPermitidos(usuariosGlobal).forEach(u => {
           sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
         });
       }
@@ -709,11 +1014,12 @@
         const sel = document.getElementById('event-paciente');
         if (!sel) return;
         const atual = sel.value;
+        const idososPermitidos = getIdososPermitidos(usuariosGlobal);
         sel.innerHTML = '<option value="">Selecione o idoso</option>';
-        usuariosGlobal.filter(u => u.role === 'IDOSO').forEach(u => {
+        idososPermitidos.forEach(u => {
           sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
         });
-        sel.value = usuariosGlobal.some(u => u.role === 'IDOSO' && String(u.id) === String(atual)) ? atual : '';
+        sel.value = idososPermitidos.some(u => String(u.id) === String(atual)) ? atual : '';
       }
 
       // Sobrescrever abrirModalMedicamento para preencher select
@@ -723,15 +1029,7 @@
         document.getElementById('modal-med').classList.add('active');
       };
 
-      // Botão "topbar-btn" chama ação da view ativa
-      document.getElementById('topbar-btn').addEventListener('click', () => {
-        const activeView = document.querySelector('.view.active');
-        if (!activeView) return;
-        const id = activeView.id;
-        if (id === 'view-usuarios') abrirModalUsuario();
-        else if (id === 'view-medicamentos') abrirModalMedicamento();
-        else if (id === 'view-agenda' || id === 'view-historico' || id === 'view-dashboard') openEventModal();
-      });
+      // Botão "topbar-btn" removido - agora usando avatar/perfil no topo
 
       // Botão "+ Novo Usuário" na seção usuarios
       document.querySelectorAll('#view-usuarios .btn-primary').forEach(btn => {
@@ -760,7 +1058,23 @@
       });
 
       // Logout
-      function logout() {
+      function logout(e) {
+        if (e) e.preventDefault();
         sessionStorage.removeItem('jamesUser');
         window.location.href = '/Loguin.html';
       }
+
+      function toggleProfileMenu() {
+        const menu = document.getElementById('topbar-profile-menu');
+        if (menu) {
+          menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        const menu = document.getElementById('topbar-profile-menu');
+        const btn = document.getElementById('topbar-profile-btn');
+        if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.style.display = 'none';
+        }
+      });

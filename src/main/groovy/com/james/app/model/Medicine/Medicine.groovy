@@ -30,4 +30,7 @@ class Medicine {
 
     @Column
     Integer Unidades;
+
+    @Column(length = 1000)
+    String observacao;
 }

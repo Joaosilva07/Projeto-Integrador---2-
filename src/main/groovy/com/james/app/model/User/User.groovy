@@ -3,6 +3,7 @@ package com.james.app.model.User
 import jakarta.persistence.*
 import groovy.transform.Canonical
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 @Entity
 @Table(name = "user_table")
@@ -33,4 +34,8 @@ class User {
     )
     @JsonIgnoreProperties("responsaveis")
     List<User> responsaveis = []
+
+    @Transient
+    @JsonIgnore
+    byte[] avatar
 }

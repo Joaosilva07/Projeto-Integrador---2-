@@ -32,7 +32,7 @@ class UserService {
                 throw new IllegalArgumentException("E-mail já cadastrado!")
             }
         }
-        userRepository.save(user)
+        return userRepository.save(user)
     }
 
     User login(String email, String senha) {
@@ -78,6 +78,22 @@ class UserService {
     Map<String, Object> requestLinkConfirmation(Long userId, Long targetUserId) {
         User user = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
         User target = userRepository.findById(targetUserId).orElseThrow { new RuntimeException("Usuário alvo não encontrado") }
+
+        LocalDateTime now = LocalDateTime.now()
+        LocalDateTime resendCooldown = now.minusSeconds(45)
+
+        // Evitar envios duplicados em sequência (duplo clique/requisição repetida)
+        def existingCode = confirmationCodeRepository.findByUserIdAndTargetUserIdAndUsedFalse(userId, targetUserId)
+        if (existingCode.present) {
+            ConfirmationCode current = existingCode.get()
+            if (current.expiresAt.isAfter(now) && current.createdAt != null && current.createdAt.isAfter(resendCooldown)) {
+                return [
+                    message: "Código já enviado recentemente para ${target.email}. Aguarde alguns segundos.",
+                    targetNome: target.nome,
+                    targetEmail: target.email
+                ]
+            }
+        }
         
         // Limpar código anterior se houver
         confirmationCodeRepository.findByUserIdAndTargetUserIdAndUsedFalse(userId, targetUserId).ifPresent {
@@ -90,7 +106,7 @@ class UserService {
             code: code,
             userId: userId,
             targetUserId: targetUserId,
-            expiresAt: LocalDateTime.now().plusMinutes(15)
+            expiresAt: now.plusMinutes(15)
         )
         confirmationCodeRepository.save(confirmCode)
         

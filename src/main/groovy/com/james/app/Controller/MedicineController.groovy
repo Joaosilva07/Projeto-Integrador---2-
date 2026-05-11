@@ -9,40 +9,43 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/Medicines")
 class MedicineController {
-    private final MedicineService service;
+    private final MedicineService service
 
     MedicineController(MedicineService service) {
-        this.service = service;
+        this.service = service
     }
 
     @PostMapping("/create_medicine")
     Medicine create(@RequestBody Medicine medicine) {
-        return service.saveMedicine(medicine);
+        return service.saveMedicine(medicine)
     }
 
     @GetMapping
-    List<Medicine> getAll() {
-        return service.getAllMedicines();
+    List<Medicine> getAll(
+            @RequestParam(value = "pacienteId", required = false) Long pacienteId,
+            @RequestParam(value = "responsavelId", required = false) Long responsavelId
+    ) {
+        return service.getAllMedicines(pacienteId, responsavelId)
     }
 
     @GetMapping("/{id}")
     Medicine getById(@PathVariable Long id) {
-        return service.getById(id);
+        return service.getById(id)
     }
 
     @PutMapping("/{id}")
     Medicine update(@PathVariable Long id, @RequestBody Medicine medicine) {
-        return service.update(id, medicine);
+        return service.update(id, medicine)
     }
 
     @DeleteMapping("/{id}")
     void delete(@PathVariable Long id) {
-        service.deleteMedicine(id);
+        service.deleteMedicine(id)
     }
-
 }

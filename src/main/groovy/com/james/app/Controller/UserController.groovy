@@ -2,8 +2,13 @@ package com.james.app.Controller
 
 import com.james.app.Service.UserService
 import com.james.app.model.User.User
+import com.james.app.model.User.UserLoginResponse
+import com.james.app.model.User.UserSimple
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.http.MediaType
+import org.springframework.web.multipart.MultipartFile
 import java.util.Map
 
 @RestController
@@ -61,9 +66,36 @@ class UserController {
         userService.addResponsavel(idosoId, responsavelId)
     }
 
+    @GetMapping("/{id}/idosos")
+    ResponseEntity<?> getIdososDoResponsavel(@PathVariable("id") Long id) {
+        def responsavel = userService.userRepository.findById(id).orElse(null)
+        if (!responsavel) return ResponseEntity.status(HttpStatus.NOT_FOUND).body([erro: 'Usuário não encontrado'])
+        def idosos = userService.userRepository.findByResponsaveis_Id(id)
+        def result = idosos.collect { idoso ->
+            def cuidadores = idoso.responsaveis.findAll { r -> r.role?.name() == 'CUIDADOR' }
+            [
+                id: idoso.id,
+                nome: idoso.nome,
+                email: idoso.email,
+                role: idoso.role,
+                cuidadores: cuidadores.collect { c -> [id: c.id, nome: c.nome, email: c.email] }
+            ]
+        }
+        ResponseEntity.ok(result)
+    }
+
     @PostMapping("/login")
-    User login(@RequestBody Map<String, String> body) {
-        userService.login(body.get("email"), body.get("senha"))
+    UserLoginResponse login(@RequestBody Map<String, String> body) {
+        User user = userService.login(body.get("email"), body.get("senha"))
+        new UserLoginResponse(
+            id: user.id,
+            nome: user.nome,
+            email: user.email,
+            role: user.role,
+            responsaveis: user.responsaveis?.collect { r ->
+                new UserSimple(id: r.id, nome: r.nome, email: r.email, role: r.role)
+            }
+        )
     }
 
     @PostMapping("/{userId}/request-link/{targetUserId}")
@@ -76,5 +108,39 @@ class UserController {
         String code = body.get("code")
         userService.confirmLink(userId, targetUserId, code)
         [message: "Vínculo confirmado com sucesso"]
+    }
+
+    @PostMapping("/{id}/avatar")
+    ResponseEntity<?> uploadAvatar(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body([erro: "Arquivo vazio"])
+            }
+            byte[] avatarData = file.bytes
+            User user = userService.userRepository.findById(id).orElse(null)
+            if (!user) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body([erro: "Usuário não encontrado"])
+            }
+            user.avatar = avatarData
+            userService.save(user)
+            return ResponseEntity.ok([message: "Avatar salvo com sucesso", id: user.id])
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body([erro: e.message ?: "Erro ao salvar avatar"])
+        }
+    }
+
+    @GetMapping("/{id}/avatar")
+    ResponseEntity<?> getAvatar(@PathVariable("id") Long id) {
+        try {
+            User user = userService.userRepository.findById(id).orElse(null)
+            if (!user || !user.avatar) {
+                return ResponseEntity.noContent().build()
+            }
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(user.avatar)
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body([erro: e.message ?: "Erro ao recuperar avatar"])
+        }
     }
 }
