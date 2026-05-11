@@ -1,157 +1,808 @@
-﻿<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel do Parente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/role-pages.css" />
-    <link rel="stylesheet" href="css/parente.css" />
-  </head>
-  <body class="role-parente">
-    <div class="app">
-      <aside class="sidebar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAMES — Acompanhamento Familiar</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../CSS/Index_.css" />
+</head>
+<style>
+:root {
+  --sand-50: #FAF8F4;
+  --sand-100: #F2EDE3;
+  --sand-200: #E4D9C8;
+  --sand-300: #C8B89A;
+  --sage-400: #7A9E87;
+  --sage-500: #5C8268;
+  --sage-600: #3E6449;
+  --terracotta: #C06B4A;
+  --terracotta-light: #F0E0D8;
+  --blue-muted: #4A6FA5;
+  --blue-light: #E0E8F4;
+  --amber: #D4882A;
+  --amber-light: #FDF0DC;
+  --text-primary: #2A2318;
+  --text-secondary: #6B5E4E;
+  --text-muted: #9B8E80;
+  --border: #E4D9C8;
+  --white: #FFFFFF;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--sand-50);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--sage-600);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-logo .brand {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
+}
+
+.sidebar-logo .tagline {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-nav {
+  padding: 16px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  padding: 12px 12px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  color: rgba(255,255,255,0.7);
+  font-size: 13.5px;
+  font-weight: 400;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-item.active { background: rgba(255,255,255,0.15); color: white; font-weight: 500; }
+
+.nav-icon {
+  width: 18px; height: 18px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--sage-400);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-name { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; }
+.user-role { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+/* MAIN */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-family: 'Lora', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* CONTENT */
+.content {
+  padding: 32px;
+  flex: 1;
+}
+
+/* ESTILOS ESPECÍFICOS DO PARENTE */
+.patient-banner {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.progress-bar-bg {
+    width: 200px;
+    height: 8px;
+    background: var(--sand-100);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--sage-500);
+    width: 80%; 
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+#msg-indisponivel {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    margin-top: 16px;
+}
+
+#msg-indisponivel h3 {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+/* VIEWS E ANIMAÇÕES */
+.view { display: none; animation: fadeIn 0.2s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ESTATÍSTICAS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.stat-card.green::before { background: var(--sage-500); }
+.stat-card.terra::before { background: var(--terracotta); }
+.stat-card.blue::before { background: var(--blue-muted); }
+.stat-card.amber::before { background: var(--amber); }
+
+.stat-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: 'Lora', serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.stat-sub .up { color: var(--sage-500); }
+
+/* SEÇÕES */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.two-col { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+
+/* TABELAS E BADGES */
+.table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--sand-50); border-bottom: 1px solid var(--border); }
+
+th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+td {
+  padding: 13px 16px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--sand-100);
+}
+
+tr:last-child td { border-bottom: none; }
+td .name { font-weight: 500; color: var(--text-primary); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 99px;
+}
+
+.badge-realizado { background: #E8F4EC; color: var(--sage-600); }
+.badge-pendente { background: var(--terracotta-light); color: var(--terracotta); }
+.badge-estoque-ok { background: #E8F4EC; color: var(--sage-600); }
+.badge-estoque-baixo { background: var(--terracotta-light); color: var(--terracotta); }
+
+/* AVATAR */
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 500;
+  flex-shrink: 0;
+}
+
+.av-blue { background: var(--blue-light); color: var(--blue-muted); }
+.av-green { background: #E8F4EC; color: var(--sage-600); }
+.flex-cell { display: flex; align-items: center; gap: 10px; }
+
+/* CARTÕES (MEDICAMENTOS) */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.card-name { font-weight: 500; font-size: 14px; color: var(--text-primary); }
+.card-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid var(--sand-100);
+  font-size: 12.5px;
+}
+
+.card-row-label { color: var(--text-muted); }
+.card-row-value { color: var(--text-primary); font-weight: 500; }
+
+/* LINHA DO TEMPO (TIMELINE) */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-item {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sand-100);
+}
+.tl-item:last-child { border-bottom: none; }
+
+.tl-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding-top: 2px;
+}
+.tl-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tl-line {
+  width: 1px;
+  flex: 1;
+  background: var(--border);
+  margin-top: 4px;
+}
+
+.tl-content { flex: 1; }
+.tl-title { font-size: 13.5px; font-weight: 500; color: var(--text-primary); }
+.tl-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.tl-obs { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-style: italic; }
+
+/* ALERTAS */
+.agenda-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.agenda-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--sand-100);
+}
+
+.agenda-item:last-child { border-bottom: none; }
+
+.agenda-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.agenda-desc { font-size: 13px; color: var(--text-primary); margin-bottom: 2px; }
+.agenda-type { font-size: 12px; color: var(--text-muted); }
+</style>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">JAMES</div>
+    <div class="tagline">Acompanhamento Familiar</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Acompanhar</div>
+    <button class="nav-item active" onclick="showView('dashboard', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+      Visão Geral do Dia
+    </button>
+    <button class="nav-item" onclick="showView('medicamentos', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v16M6 6h8M5 10h10M6 14h8"/><rect x="3" y="2" width="14" height="16" rx="2"/></svg>
+      Medicamentos
+    </button>
+    <button class="nav-item" onclick="showView('historico', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>
+      Histórico Completo
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="user-avatar" style="background: var(--amber)">RM</div>
+      <div>
+        <div class="user-name">Roberto Martins</div>
+        <div class="user-role">Parente vinculado</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <header class="topbar">
+    <span class="topbar-title" id="topbar-title">Visão Geral do Dia</span>
+    <div class="topbar-right">
+    </div>
+  </header>
+
+  <div class="content">
+
+    <div class="patient-banner">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="avatar av-blue" style="width: 56px; height: 56px; font-size: 20px;">HM</div>
         <div>
-          <div class="brand">JAMES</div>
-          <div class="tagline">Painel do Parente</div>
+          <h2 style="font-family: 'Lora', serif; font-size: 22px; color: var(--text-primary); font-weight: 500; margin-bottom: 4px;">Dona Helena Martins</h2>
+          <div style="font-size: 13.5px; color: var(--text-secondary);">Cuidadora: <strong>Maria Clara</strong></div>
         </div>
-
-        <div class="nav-group">
-          <div class="nav-title">Acompanhamento</div>
-          <button class="nav-btn active" onclick="location.hash='idosos-list'">Meus idosos</button>
-          <button class="nav-btn" onclick="location.hash='resumo-list'">Resumo do idoso</button>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Progresso de Hoje: 8/10 Tarefas</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill"></div>
         </div>
-
-        <div class="user-box">
-          <div class="user-name" id="side-user-name">Parente</div>
-          <div class="user-role">Visualizacao familiar</div>
-        </div>
-      </aside>
-
-      <main class="main">
-        <header class="topbar">
-          <div>
-            <h1 class="page-title">Acompanhamento Familiar</h1>
-            <p class="page-sub" id="welcome">Carregando...</p>
-          </div>
-          <div>
-            <button class="btn btn-primary" onclick="init()">Atualizar</button>
-            <button class="btn" onclick="logout()">Sair</button>
-          </div>
-        </header>
-
-        <section class="panel">
-          <aside class="card">
-            <h3 class="section-title">Meus idosos</h3>
-            <div id="idosos-list"></div>
-          </aside>
-
-          <main class="card">
-            <h3 class="section-title" id="idoso-title">Selecione um idoso</h3>
-            <div class="list" id="resumo-list"></div>
-          </main>
-        </section>
-      </main>
+      </div>
     </div>
 
-    <script>
-      let allMedicines = [];
-      let allEvents = [];
-      let meusIdosos = [];
-      let selectedIdosoId = null;
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Total de Tarefas</div>
+          <div class="stat-value">10</div>
+          <div class="stat-sub">Programadas para hoje</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Concluídas</div>
+          <div class="stat-value">8</div>
+          <div class="stat-sub"><span class="up">Tudo no horário</span></div>
+        </div>
+        <div class="stat-card terra">
+          <div class="stat-label">Pendentes</div>
+          <div class="stat-value">2</div>
+          <div class="stat-sub">Próxima em 40 min</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Bem-estar relatado</div>
+          <div class="stat-value" style="font-size: 24px;">Animada</div>
+          <div class="stat-sub">Nota da cuidadora</div>
+        </div>
+      </div>
 
-      function routeByRole(user) {
-        if (!user) { window.location.href = '/Loguin.html'; return false; }
-        if (user.role === 'PARENTE') return true;
-        if (user.role === 'CUIDADOR') { window.location.href = '/intermediaria/idosos.html'; return false; }
-        if (user.role === 'IDOSO') { window.location.href = '/idoso.html'; return false; }
-        window.location.href = '/Index.html';
-        return false;
-      }
-
-      function logout() {
-        sessionStorage.removeItem('jamesUser');
-        window.location.href = '/Loguin.html';
-      }
-
-      function itemHtml(title, meta) {
-        return `<div class="item"><div class="item-title">${title}</div><div class="item-meta">${meta}</div></div>`;
-      }
-
-      function renderIdososList() {
-        const box = document.getElementById('idosos-list');
-        if (!meusIdosos.length) {
-          box.innerHTML = '<div class="empty">Nenhum idoso vinculado a voce.</div>';
-          return;
-        }
-        box.innerHTML = meusIdosos.map(i => `
-          <div class="idoso-item ${String(i.id) === String(selectedIdosoId) ? 'active' : ''}" onclick="selectIdoso(${i.id})">
-            <div class="item-title">${i.nome || 'Sem nome'}</div>
-            <div class="item-meta">${i.email || ''}</div>
+      <div class="two-col">
+        <div>
+          <div class="section-header">
+            <span class="section-title">Acompanhamento da Rotina (Hoje)</span>
           </div>
-        `).join('');
-      }
+          <div class="table-wrap" style="padding: 16px 20px;">
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sage-500)"></div><div class="tl-line"></div></div>
+                <div class="tl-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="tl-title">Café da manhã</div>
+                    <span class="badge badge-realizado">07:00 - Realizado</span>
+                  </div>
+                  <div class="tl-meta">Registrado por Maria Clara</div>
+                  <div class="tl-obs">"Comeu todas as frutas e o pão."</div>
+                </div>
+              </div>
 
-      function renderResumo() {
-        const title = document.getElementById('idoso-title');
-        const list = document.getElementById('resumo-list');
-        const idoso = meusIdosos.find(i => String(i.id) === String(selectedIdosoId));
-        if (!idoso) {
-          title.textContent = 'Selecione um idoso';
-          list.innerHTML = '<div class="empty">Escolha um idoso na coluna ao lado.</div>';
-          return;
-        }
+              <div class="tl-item">
+                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sage-500)"></div><div class="tl-line"></div></div>
+                <div class="tl-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="tl-title">Insulina NPH 20UI</div>
+                    <span class="badge badge-realizado">08:00 - Realizado</span>
+                  </div>
+                  <div class="tl-meta">Registrado por Maria Clara</div>
+                </div>
+              </div>
 
-        title.textContent = `Resumo de ${idoso.nome}`;
-        const meds = allMedicines.filter(m => m.Paciente && String(m.Paciente.id) === String(idoso.id));
-        const events = allEvents.filter(e => e.paciente && String(e.paciente.id) === String(idoso.id));
-        const hoje = new Date().toISOString().split('T')[0];
-        const hojeEventos = events.filter(e => e.data === hoje).sort((a,b) => (a.hora || '').localeCompare(b.hora || ''));
+              <div class="tl-item">
+                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--terracotta)"></div><div class="tl-line"></div></div>
+                <div class="tl-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="tl-title">Fisioterapia (Exercícios em casa)</div>
+                    <span class="badge badge-pendente">10:00 - Pendente</span>
+                  </div>
+                  <div class="tl-meta">Atribuído a: Maria Clara</div>
+                </div>
+              </div>
 
-        const blocos = [];
-        blocos.push(itemHtml('Medicamentos ativos', `${meds.length} cadastrado(s)`));
-        blocos.push(itemHtml('Eventos de hoje', `${hojeEventos.length} compromisso(s)`));
-        meds.slice(0, 5).forEach(m => blocos.push(itemHtml(m.Nome || 'Medicamento', `${m.Horario || '--:--'} - ${m.Unidades ?? 0} unid.`)));
-        hojeEventos.slice(0, 8).forEach(e => blocos.push(itemHtml(e.titulo || 'Evento', `${e.hora || '--:--'} - ${e.tipo || 'outro'}`)));
+              <div class="tl-item">
+                <div class="tl-dot-wrap"><div class="tl-dot" style="background: var(--sand-300)"></div></div>
+                <div class="tl-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="tl-title" style="color: var(--text-muted)">Almoço + Insulina</div>
+                    <span class="badge" style="background: var(--sand-100); color: var(--text-secondary)">12:30 - Programado</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        if (blocos.length === 2) blocos.push('<div class="empty">Sem detalhes cadastrados para este idoso.</div>');
-        list.innerHTML = blocos.join('');
-      }
+        <div>
+          <div class="section-header">
+            <span class="section-title">Avisos e Alertas</span>
+          </div>
+          <div class="agenda-card" style="margin-bottom: 20px;">
+            <div class="agenda-item" style="background: var(--terracotta-light);">
+              <div class="agenda-dot" style="background: var(--terracotta)"></div>
+              <div>
+                <div class="agenda-desc" style="color: var(--terracotta); font-weight: 500;">Estoque Baixo</div>
+                <div class="agenda-type">Insulina NPH (Restam 2 unidades). Providenciar compra.</div>
+              </div>
+            </div>
+            
+            <div class="agenda-item">
+              <div class="agenda-dot" style="background: var(--blue-muted)"></div>
+              <div>
+                <div class="agenda-desc">Recado da Cuidadora (Ontem, 18:00)</div>
+                <div class="agenda-type" style="line-height: 1.4;">"Dona Helena reclamou de um pouco de dor na lombar. Coloquei bolsa de água quente."</div>
+              </div>
+            </div>
+          </div>
 
-      function selectIdoso(id) {
-        selectedIdosoId = id;
-        renderIdososList();
-        renderResumo();
-      }
+          <div class="section-header">
+            <span class="section-title">Cuidadora</span>
+          </div>
+          <div class="table-wrap">
+            <div style="padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <div class="flex-cell">
+                <div class="avatar av-green">MC</div>
+                <div>
+                  <div class="name">Maria Clara</div>
+                  <div class="sub">Cuidadora de Plantão</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      async function init() {
-        const raw = sessionStorage.getItem('jamesUser');
-        const me = raw ? JSON.parse(raw) : null;
-        if (!routeByRole(me)) return;
+    <div class="view" id="view-medicamentos">
+      <div class="section-header">
+        <span class="section-title">Prescrições e Controle de Estoque</span>
+      </div>
 
-        document.getElementById('welcome').textContent = `${me.nome || 'Parente'} - visualizacao somente leitura`;
-        document.getElementById('side-user-name').textContent = me.nome || 'Parente';
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-icon" style="background: var(--terracotta-light); font-size:18px; margin-bottom:8px;">💊</div>
+              <div class="card-name">Insulina NPH 100UI</div>
+              <div class="card-detail">Aplicação subcutânea</div>
+            </div>
+            <span class="badge badge-estoque-baixo">Comprar Urgente</span>
+          </div>
+          <div class="card-row"><span class="card-row-label">Dosagem</span><span class="card-row-value">20UI</span></div>
+          <div class="card-row"><span class="card-row-label">Próximo Horário</span><span class="card-row-value">20:00</span></div>
+          <div class="card-row">
+            <span class="card-row-label">Estoque Atual</span>
+            <span class="card-row-value" style="color:var(--terracotta); font-weight: 600;">2 unidades</span>
+          </div>
+        </div>
 
-        const [usersRes, medsRes, eventsRes] = await Promise.all([
-          fetch('/api/user'),
-          fetch('/Medicines'),
-          fetch('/Eventos/listaEventos')
-        ]);
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-icon" style="background: var(--blue-light); font-size:18px; margin-bottom:8px;">💊</div>
+              <div class="card-name">Losartana 50mg</div>
+              <div class="card-detail">Via oral (Pressão)</div>
+            </div>
+            <span class="badge badge-estoque-ok">Estoque OK</span>
+          </div>
+          <div class="card-row"><span class="card-row-label">Dosagem</span><span class="card-row-value">1 comp.</span></div>
+          <div class="card-row"><span class="card-row-label">Próximo Horário</span><span class="card-row-value">Amanhã, 07:30</span></div>
+          <div class="card-row">
+            <span class="card-row-label">Estoque Atual</span>
+            <span class="card-row-value" style="color:var(--sage-600); font-weight: 600;">22 unidades</span>
+          </div>
+        </div>
 
-        const users = await usersRes.json();
-        allMedicines = await medsRes.json();
-        allEvents = await eventsRes.json();
+        <div class="card" style="background: var(--sand-100); border: 1.5px dashed var(--border); display: flex; align-items: center; justify-content: center; text-align: center;">
+          <div style="padding: 10px;">
+            <div style="font-size: 24px; margin-bottom: 8px;">ℹ️</div>
+            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Dúvidas sobre a receita?</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Entre em contato com o cuidador ou o médico responsável.</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        meusIdosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
-        selectedIdosoId = meusIdosos.length ? meusIdosos[0].id : null;
+    <div class="view" id="view-historico">
+      <div class="section-header">
+        <span class="section-title">Histórico de Cuidados Diários</span>
+        <div style="display:flex; gap:8px;">
+          <input type="date" id="filtro-data" onchange="validarDataHistorico()" style="font-family:'DM Sans',sans-serif; font-size:13px; padding:7px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); outline:none; color: var(--text-primary);">
+        </div>
+      </div>
 
-        renderIdososList();
-        renderResumo();
-      }
+      <div class="table-wrap" id="container-tabela-historico">
+        <table>
+          <thead>
+            <tr>
+              <th>Horário</th>
+              <th>Atividade</th>
+              <th>Responsável</th>
+              <th>Status</th>
+              <th>Observações do Cuidador</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-historico">
+            <tr>
+              <td><div class="name">08:00</div></td>
+              <td>Insulina NPH 20UI</td>
+              <td>Maria Clara</td>
+              <td><span class="badge badge-realizado">Concluído</span></td>
+              <td style="font-size:12px; color:var(--text-muted);">Administrado sem intercorrências.</td>
+            </tr>
+            <tr>
+              <td><div class="name">07:30</div></td>
+              <td>Caminhada 20min</td>
+              <td>Maria Clara</td>
+              <td><span class="badge badge-realizado">Concluído</span></td>
+              <td style="font-size:12px; color:var(--text-muted);">Dona Helena estava bem disposta.</td>
+            </tr>
+            <tr>
+              <td><div class="name">07:00</div></td>
+              <td>Café da Manhã</td>
+              <td>Maria Clara</td>
+              <td><span class="badge badge-realizado">Concluído</span></td>
+              <td style="font-size:12px; color:var(--text-muted);">Comeu tudo.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      init().catch(() => {
-        document.getElementById('welcome').textContent = 'Erro ao carregar dados.';
-      });
-    </script>
-  </body>
+      <div id="msg-indisponivel">
+        <h3>📅 Histórico não disponível</h3>
+        <p>Ainda não há registros para a data selecionada. O histórico é gerado conforme as tarefas são realizadas.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  window.onload = function() {
+    
+    const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
+    const hojeLocal = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
+    
+    document.getElementById('filtro-data').value = hojeLocal;
+    validarDataHistorico(); 
+  };
+
+  function showView(name, navEl) {
+  
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    
+  
+    const titles = {
+      dashboard: 'Visão Geral do Dia',
+      medicamentos: 'Medicamentos & Estoque',
+      historico: 'Histórico de Cuidados'
+    };
+    document.getElementById('topbar-title').textContent = titles[name];
+  }
+
+  
+  function validarDataHistorico() {
+    const inputData = document.getElementById('filtro-data').value;
+    if (!inputData) return;
+
+    
+    const dataSelecionada = new Date(inputData + "T00:00:00");
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const containerTabela = document.getElementById('container-tabela-historico');
+    const msgIndisponivel = document.getElementById('msg-indisponivel');
+
+    if (dataSelecionada > hoje) {
+      
+      containerTabela.style.display = 'none';
+      msgIndisponivel.style.display = 'block';
+    } else {
+      
+      containerTabela.style.display = 'block';
+      msgIndisponivel.style.display = 'none';
+      
+    }
+  }
+</script>
+
+</body>
 </html>
