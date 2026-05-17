@@ -1146,3 +1146,17 @@ td .sub {
   padding: 6px;
   border-bottom: 1px solid #eee;
 }
+.btn-danger {
+  background: #c0392b;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.btn-danger:hover {
+  background: #a93226;
+}

@@ -304,13 +304,39 @@
           <div class="avatar" id="idoso-avatar" aria-hidden="true">--</div>
           <div>
             <h1 id="idoso-nome">Olá!</h1>
-            <div class="sub" id="idoso-sub">Aqui você vê sua rotina com letras grandes e leitura fácil.</div>
+            <div class="sub" id="idoso-sub">
+              Aqui você vê sua rotina com letras grandes e leitura fácil.
+            </div>
           </div>
         </div>
         <div class="top-actions">
-          <button class="btn" onclick="toggleLargeText()" aria-label="Aumentar ou reduzir texto">Texto grande</button>
-          <button class="btn" onclick="toggleContrast()" aria-label="Ativar ou desativar alto contraste">Alto contraste</button>
-          <button class="btn" onclick="logout()" aria-label="Sair da conta">Sair</button>
+          <button
+            class="btn"
+            onclick="toggleLargeText()"
+            aria-label="Aumentar ou reduzir texto"
+          >
+            Texto grande
+          </button>
+
+          <button
+            class="btn"
+            onclick="toggleContrast()"
+            aria-label="Ativar ou desativar alto contraste"
+          >
+            Alto contraste
+          </button>
+
+          <button class="btn" onclick="logout()" aria-label="Sair da conta">
+            Sair
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="abrirModalExcluirConta()"
+            aria-label="Excluir conta"
+          >
+            Excluir conta
+          </button>
         </div>
       </header>
 
@@ -333,72 +359,92 @@
         <article class="card" aria-labelledby="tit-remedios">
           <h2 id="tit-remedios">Meus remédios de hoje</h2>
           <div class="list" id="med-list">
-            <div class="item"><div class="item-meta">Carregando medicamentos...</div></div>
+            <div class="item">
+              <div class="item-meta">Carregando medicamentos...</div>
+            </div>
           </div>
         </article>
 
         <article class="card" aria-labelledby="tit-agenda">
           <h2 id="tit-agenda">Minha agenda de hoje</h2>
           <div class="list" id="agenda-list">
-            <div class="item"><div class="item-meta">Carregando agenda...</div></div>
+            <div class="item">
+              <div class="item-meta">Carregando agenda...</div>
+            </div>
           </div>
         </article>
       </section>
     </main>
 
-    <button class="help-fab" onclick="pedirAjuda()" aria-label="Pedir ajuda urgente">Ajuda urgente</button>
+    <button
+      class="help-fab"
+      onclick="pedirAjuda()"
+      aria-label="Pedir ajuda urgente"
+    >
+      Ajuda urgente
+    </button>
     <div id="a11y-status" class="sr" aria-live="polite"></div>
 
     <script>
       let usuarioAtual = null;
 
       function logout() {
-        sessionStorage.removeItem('jamesUser');
-        window.location.href = '/Loguin.html';
+        sessionStorage.removeItem("jamesUser");
+        window.location.href = "/Loguin.html";
       }
 
       function setA11yMessage(msg) {
-        const el = document.getElementById('a11y-status');
+        const el = document.getElementById("a11y-status");
         if (el) el.textContent = msg;
       }
 
       function toggleLargeText() {
-        document.body.classList.toggle('large-text');
-        setA11yMessage(document.body.classList.contains('large-text') ? 'Texto grande ativado' : 'Texto grande desativado');
+        document.body.classList.toggle("large-text");
+        setA11yMessage(
+          document.body.classList.contains("large-text")
+            ? "Texto grande ativado"
+            : "Texto grande desativado",
+        );
       }
 
       function toggleContrast() {
-        document.body.classList.toggle('high-contrast');
-        setA11yMessage(document.body.classList.contains('high-contrast') ? 'Alto contraste ativado' : 'Alto contraste desativado');
+        document.body.classList.toggle("high-contrast");
+        setA11yMessage(
+          document.body.classList.contains("high-contrast")
+            ? "Alto contraste ativado"
+            : "Alto contraste desativado",
+        );
       }
 
       function formatHora(hora) {
-        if (!hora) return '--:--';
+        if (!hora) return "--:--";
         return String(hora).slice(0, 5);
       }
 
       function initials(nome) {
-        return (nome || 'U')
-          .split(' ')
+        return (nome || "U")
+          .split(" ")
           .filter(Boolean)
           .slice(0, 2)
           .map((p) => p[0])
-          .join('')
+          .join("")
           .toUpperCase();
       }
 
       async function carregarAvatar() {
         if (!usuarioAtual?.id) return;
         try {
-          const res = await fetch(`/api/user/${encodeURIComponent(usuarioAtual.id)}/avatar`);
+          const res = await fetch(
+            `/api/user/${encodeURIComponent(usuarioAtual.id)}/avatar`,
+          );
           if (!res.ok) return;
           const blob = await res.blob();
           if (!blob || blob.size === 0) return;
           const url = URL.createObjectURL(blob);
-          const av = document.getElementById('idoso-avatar');
+          const av = document.getElementById("idoso-avatar");
           if (av) {
             av.style.backgroundImage = `url('${url}')`;
-            av.textContent = '';
+            av.textContent = "";
           }
         } catch (_) {
           // Sem avatar salvo, mantém iniciais.
@@ -406,73 +452,95 @@
       }
 
       function renderMedicamentos(meds) {
-        const list = document.getElementById('med-list');
+        const list = document.getElementById("med-list");
         if (!list) return;
         if (!Array.isArray(meds) || meds.length === 0) {
-          list.innerHTML = '<div class="item"><div class="item-title">Sem remédios cadastrados</div><div class="item-meta">Peça ao cuidador para atualizar.</div></div>';
-          document.getElementById('resumo-prox-med').textContent = 'Nenhum';
+          list.innerHTML =
+            '<div class="item"><div class="item-title">Sem remédios cadastrados</div><div class="item-meta">Peça ao cuidador para atualizar.</div></div>';
+          document.getElementById("resumo-prox-med").textContent = "Nenhum";
           return;
         }
-        const ordenados = [...meds].sort((a, b) => String(a.Horario || '').localeCompare(String(b.Horario || '')));
-        document.getElementById('resumo-prox-med').textContent = `${formatHora(ordenados[0].Horario)} • ${ordenados[0].Nome || 'Remédio'}`;
-        list.innerHTML = ordenados.map((m) => `
+        const ordenados = [...meds].sort((a, b) =>
+          String(a.Horario || "").localeCompare(String(b.Horario || "")),
+        );
+        document.getElementById("resumo-prox-med").textContent =
+          `${formatHora(ordenados[0].Horario)} • ${ordenados[0].Nome || "Remédio"}`;
+        list.innerHTML = ordenados
+          .map(
+            (m) => `
           <div class="item">
-            <div class="item-title">${m.Nome || 'Remédio'}</div>
-            <div class="item-meta">Horário: ${formatHora(m.Horario)} • Estoque: ${m.Unidades ?? '--'} unidades</div>
-            <button class="btn-med" onclick="notificarMedicamento(${m.id}, '${(m.Nome || 'Remédio').replace(/'/g, "\\'")}', '${formatHora(m.Horario)}', this)">Tomei ✓</button>
+            <div class="item-title">${m.Nome || "Remédio"}</div>
+            <div class="item-meta">Horário: ${formatHora(m.Horario)} • Estoque: ${m.Unidades ?? "--"} unidades</div>
+            <button class="btn-med" onclick="notificarMedicamento(${m.id}, '${(m.Nome || "Remédio").replace(/'/g, "\\'")}', '${formatHora(m.Horario)}', this)">Tomei ✓</button>
           </div>
-        `).join('');
+        `,
+          )
+          .join("");
       }
 
       function renderEventos(evs) {
-        const agenda = document.getElementById('agenda-list');
+        const agenda = document.getElementById("agenda-list");
         if (!agenda) return;
 
-        const hoje = new Date().toISOString().split('T')[0];
+        const hoje = new Date().toISOString().split("T")[0];
         const eventos = Array.isArray(evs) ? evs : [];
         const hojeEvs = eventos
           .filter((e) => e.data === hoje)
-          .sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || '')));
+          .sort((a, b) =>
+            String(a.hora || "").localeCompare(String(b.hora || "")),
+          );
 
         if (hojeEvs.length === 0) {
-          agenda.innerHTML = '<div class="item"><div class="item-title">Sem atividades para hoje</div><div class="item-meta">Tudo tranquilo no momento.</div></div>';
-          document.getElementById('resumo-prox-evento').textContent = 'Nenhuma';
+          agenda.innerHTML =
+            '<div class="item"><div class="item-title">Sem atividades para hoje</div><div class="item-meta">Tudo tranquilo no momento.</div></div>';
+          document.getElementById("resumo-prox-evento").textContent = "Nenhuma";
         } else {
-          document.getElementById('resumo-prox-evento').textContent = `${formatHora(hojeEvs[0].hora)} • ${hojeEvs[0].titulo || 'Atividade'}`;
-          agenda.innerHTML = hojeEvs.map((e) => `
+          document.getElementById("resumo-prox-evento").textContent =
+            `${formatHora(hojeEvs[0].hora)} • ${hojeEvs[0].titulo || "Atividade"}`;
+          agenda.innerHTML = hojeEvs
+            .map(
+              (e) => `
             <div class="item">
-              <div class="item-title">${e.titulo || 'Atividade'}</div>
-              <div class="item-meta">${formatHora(e.hora)} • ${e.tipo || 'Rotina'}</div>
+              <div class="item-title">${e.titulo || "Atividade"}</div>
+              <div class="item-meta">${formatHora(e.hora)} • ${e.tipo || "Rotina"}</div>
             </div>
-          `).join('');
+          `,
+            )
+            .join("");
         }
 
-        const status = document.getElementById('resumo-status');
+        const status = document.getElementById("resumo-status");
         if (status) {
-          status.textContent = hojeEvs.length > 0 ? 'Acompanhando' : 'Tudo certo';
-          status.className = `summary-value ${hojeEvs.length > 0 ? 'warn' : 'ok'}`;
+          status.textContent =
+            hojeEvs.length > 0 ? "Acompanhando" : "Tudo certo";
+          status.className = `summary-value ${hojeEvs.length > 0 ? "warn" : "ok"}`;
         }
       }
 
       async function pedirAjuda() {
         if (!usuarioAtual?.id) {
-          alert('Usuário não identificado. Por favor, faça login novamente.');
+          alert("Usuário não identificado. Por favor, faça login novamente.");
           return;
         }
 
         try {
-          const res = await fetch(`/api/notifications/ajuda-urgente?idosoId=${encodeURIComponent(usuarioAtual.id)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          });
+          const res = await fetch(
+            `/api/notifications/ajuda-urgente?idosoId=${encodeURIComponent(usuarioAtual.id)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            },
+          );
 
           const data = await res.json();
-          
+
           if (res.ok) {
-            setA11yMessage('Ajuda solicitada com sucesso. Os responsáveis foram notificados.');
+            setA11yMessage(
+              "Ajuda solicitada com sucesso. Os responsáveis foram notificados.",
+            );
           }
         } catch (e) {
-          console.error('Erro ao solicitar ajuda:', e);
+          console.error("Erro ao solicitar ajuda:", e);
         }
       }
 
@@ -480,30 +548,30 @@
         if (!usuarioAtual?.id) return;
         if (btn) {
           btn.disabled = true;
-          btn.classList.add('tomado');
-          btn.textContent = '✓';
+          btn.classList.add("tomado");
+          btn.textContent = "✓";
         }
         try {
           await fetch(`/api/notifications/medicamento-tomado`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               idosoId: usuarioAtual.id,
               medicamentoId: medId,
               medicamentoNome: medNome,
-              hora: hora
-            })
+              hora: hora,
+            }),
           });
           setA11yMessage(`${medNome} marcado como tomado às ${hora}.`);
         } catch (e) {
-          console.error('Erro ao notificar medicamento:', e);
+          console.error("Erro ao notificar medicamento:", e);
         }
       }
 
       async function init() {
-        const sessao = sessionStorage.getItem('jamesUser');
+        const sessao = sessionStorage.getItem("jamesUser");
         if (!sessao) {
-          window.location.href = '/Loguin.html';
+          window.location.href = "/Loguin.html";
           return;
         }
 
@@ -511,37 +579,41 @@
         try {
           user = JSON.parse(sessao);
         } catch (_) {
-          sessionStorage.removeItem('jamesUser');
-          window.location.href = '/Loguin.html';
+          sessionStorage.removeItem("jamesUser");
+          window.location.href = "/Loguin.html";
           return;
         }
 
         const resUser = await fetch(`/api/user/${encodeURIComponent(user.id)}`);
         if (!resUser.ok) {
-          sessionStorage.removeItem('jamesUser');
-          window.location.href = '/Loguin.html';
+          sessionStorage.removeItem("jamesUser");
+          window.location.href = "/Loguin.html";
           return;
         }
         usuarioAtual = await resUser.json();
-        sessionStorage.setItem('jamesUser', JSON.stringify(usuarioAtual));
+        sessionStorage.setItem("jamesUser", JSON.stringify(usuarioAtual));
 
-        if (usuarioAtual.role !== 'IDOSO') {
-          window.location.href = '/Index.html';
+        if (usuarioAtual.role !== "IDOSO") {
+          window.location.href = "/Index.html";
           return;
         }
 
-        const nomeEl = document.getElementById('idoso-nome');
-        const subEl = document.getElementById('idoso-sub');
-        const avatarEl = document.getElementById('idoso-avatar');
-        if (nomeEl) nomeEl.textContent = `Olá, ${usuarioAtual.nome || 'usuário'}`;
-        if (subEl) subEl.textContent = 'Aqui você acompanha seus remédios e sua rotina.';
+        const nomeEl = document.getElementById("idoso-nome");
+        const subEl = document.getElementById("idoso-sub");
+        const avatarEl = document.getElementById("idoso-avatar");
+        if (nomeEl)
+          nomeEl.textContent = `Olá, ${usuarioAtual.nome || "usuário"}`;
+        if (subEl)
+          subEl.textContent = "Aqui você acompanha seus remédios e sua rotina.";
         if (avatarEl) avatarEl.textContent = initials(usuarioAtual.nome);
 
         await carregarAvatar();
 
         const [medRes, evRes] = await Promise.all([
           fetch(`/Medicines?pacienteId=${encodeURIComponent(usuarioAtual.id)}`),
-          fetch(`/Eventos/listaEventos?pacienteId=${encodeURIComponent(usuarioAtual.id)}`),
+          fetch(
+            `/Eventos/listaEventos?pacienteId=${encodeURIComponent(usuarioAtual.id)}`,
+          ),
         ]);
 
         const meds = medRes.ok ? await medRes.json() : [];
@@ -550,8 +622,102 @@
         renderMedicamentos(Array.isArray(meds) ? meds : []);
         renderEventos(Array.isArray(evs) ? evs : []);
       }
+      function abrirModalExcluirConta() {
+        document.getElementById("modal-excluir-conta").style.display = "flex";
+      }
+
+      function fecharModalExcluirConta() {
+        document.getElementById("modal-excluir-conta").style.display = "none";
+      }
+
+      async function excluirConta() {
+        if (!usuarioAtual?.id) {
+          alert("Usuário não identificado.");
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            `/api/user/${encodeURIComponent(usuarioAtual.id)}`,
+            {
+              method: "DELETE",
+            },
+          );
+
+          if (!res.ok) {
+            throw new Error("Erro ao excluir");
+          }
+
+          sessionStorage.clear();
+
+          alert("Conta excluída com sucesso.");
+
+          window.location.href = "/Loguin.html";
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao excluir conta.");
+        }
+      }
 
       init();
     </script>
+    <!-- MODAL EXCLUIR CONTA -->
+    <div
+      id="modal-excluir-conta"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          width: 100%;
+          max-width: 420px;
+          border-radius: 14px;
+          padding: 24px;
+          border: 2px solid var(--border);
+        "
+      >
+        <div
+          style="
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 12px;
+          "
+        >
+          Excluir conta
+        </div>
+
+        <div
+          style="
+            font-size: 20px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 22px;
+          "
+        >
+          Tem certeza que deseja excluir sua conta?
+          <br /><br />
+          Essa ação não poderá ser desfeita.
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px">
+          <button onclick="fecharModalExcluirConta()" class="btn">
+            Cancelar
+          </button>
+
+          <button onclick="excluirConta()" class="btn btn-danger">
+            Sim, excluir
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
