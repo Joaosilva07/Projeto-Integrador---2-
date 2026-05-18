@@ -27,5 +27,6 @@ class Event {
     @JoinColumn(name = "paciente_id")
     User paciente;
 
-    
+    @Column(length = 1000)
+    String observacao;
 }

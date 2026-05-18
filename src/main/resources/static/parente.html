@@ -671,7 +671,7 @@
             --
           </div>
           <div>
-            <div class="user-name" id="sidebar-nome">Carregando...</div>
+            <div class="user-name" id="sidebar-nome">Buscando seu perfil...</div>
             <div class="user-role">Parente vinculado</div>
           </div>
         </div>
@@ -705,13 +705,13 @@
                 "
                 id="patient-name"
               >
-                Carregando...
+                Buscando paciente vinculado...
               </h2>
               <div
                 style="font-size: 13.5px; color: var(--text-secondary)"
                 id="patient-caregiver"
               >
-                Carregando...
+                Buscando informações do paciente...
               </div>
             </div>
           </div>
@@ -747,12 +747,12 @@
             <div class="stat-card blue">
               <div class="stat-label">Medicamentos</div>
               <div class="stat-value" id="stat-meds">-</div>
-              <div class="stat-sub" id="stat-meds-sub">Carregando...</div>
+              <div class="stat-sub" id="stat-meds-sub">Buscando medicamentos...</div>
             </div>
             <div class="stat-card green">
               <div class="stat-label">Eventos Hoje</div>
               <div class="stat-value" id="stat-eventos">-</div>
-              <div class="stat-sub" id="stat-eventos-sub">Carregando...</div>
+              <div class="stat-sub" id="stat-eventos-sub">Buscando atividades...</div>
             </div>
             <div class="stat-card terra">
               <div class="stat-label">Estoque Baixo</div>
@@ -781,7 +781,7 @@
                       font-size: 13px;
                     "
                   >
-                    Carregando agenda...
+                    Carregando a agenda do dia...
                   </div>
                 </div>
               </div>
@@ -801,7 +801,7 @@
                     class="agenda-desc"
                     style="color: var(--text-muted); font-size: 12px"
                   >
-                    Carregando...
+                    Buscando recados...
                   </div>
                 </div>
               </div>
@@ -812,7 +812,7 @@
               <div class="table-wrap">
                 <div id="cuidadores-container" style="padding: 16px">
                   <div style="font-size: 13px; color: var(--text-muted)">
-                    Carregando...
+                    Buscando vínculos...
                   </div>
                 </div>
               </div>
@@ -834,7 +834,7 @@
                 font-size: 13px;
               "
             >
-              Carregando medicamentos...
+              Buscando medicamentos...
             </div>
           </div>
         </div>
@@ -876,7 +876,7 @@
                     colspan="4"
                     style="text-align: center; color: var(--text-muted)"
                   >
-                    Carregando...
+                    Buscando histórico...
                   </td>
                 </tr>
               </tbody>
@@ -1043,7 +1043,7 @@
             document.getElementById("patient-name").textContent =
               "Nenhum idoso vinculado";
             document.getElementById("patient-caregiver").textContent =
-              "Entre em contato com o administrador.";
+              "Nenhum idoso vinculado no momento.";
             return;
           }
           idosoData = lista[0];

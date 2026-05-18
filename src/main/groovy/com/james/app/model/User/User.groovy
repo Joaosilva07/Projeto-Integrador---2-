@@ -20,6 +20,12 @@ class User {
     @Column(unique = true, nullable = false)
     String email
 
+    @Column(unique = true, nullable = true)
+    String usuario
+
+    @Column(unique = true, length = 4)
+    String codigoUsuario
+
     @Column
     String senha
 

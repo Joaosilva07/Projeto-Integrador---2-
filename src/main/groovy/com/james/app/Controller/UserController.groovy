@@ -66,6 +66,11 @@ class UserController {
         userService.addResponsavel(idosoId, responsavelId)
     }
 
+    @GetMapping("/codigo/{codigo}")
+    User getByCodigo(@PathVariable("codigo") String codigo) {
+        userService.findByCodigoUsuario(codigo)
+    }
+
     @GetMapping("/{id}/idosos")
     ResponseEntity<?> getIdososDoResponsavel(@PathVariable("id") Long id) {
         def responsavel = userService.userRepository.findById(id).orElse(null)
@@ -86,28 +91,14 @@ class UserController {
 
     @PostMapping("/login")
     UserLoginResponse login(@RequestBody Map<String, String> body) {
-        User user = userService.login(body.get("email"), body.get("senha"))
-        new UserLoginResponse(
-            id: user.id,
-            nome: user.nome,
-            email: user.email,
-            role: user.role,
-            responsaveis: user.responsaveis?.collect { r ->
-                new UserSimple(id: r.id, nome: r.nome, email: r.email, role: r.role)
-            }
-        )
+        String identificador = body.get("identificador") ?: body.get("email") ?: body.get("usuario")
+        User user = userService.login(identificador, body.get("senha"))
+        userService.toLoginResponse(user)
     }
 
-    @PostMapping("/{userId}/request-link/{targetUserId}")
-    Map<String, Object> requestLink(@PathVariable("userId") Long userId, @PathVariable("targetUserId") Long targetUserId) {
-        userService.requestLinkConfirmation(userId, targetUserId)
-    }
-
-    @PostMapping("/{userId}/confirm-link/{targetUserId}")
-    Map<String, Object> confirmLink(@PathVariable("userId") Long userId, @PathVariable("targetUserId") Long targetUserId, @RequestBody Map<String, String> body) {
-        String code = body.get("code")
-        userService.confirmLink(userId, targetUserId, code)
-        [message: "Vínculo confirmado com sucesso"]
+    @PostMapping("/{userId}/link-by-code/{codigo}")
+    Map<String, Object> linkByCode(@PathVariable("userId") Long userId, @PathVariable("codigo") String codigo) {
+        userService.linkByCodigoUsuario(userId, codigo)
     }
 
     @PostMapping("/{id}/avatar")

@@ -121,7 +121,7 @@
 
       .summary {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
       }
 
@@ -353,24 +353,24 @@
           <div class="summary-title">Situação de hoje</div>
           <div class="summary-value ok" id="resumo-status">Tudo certo</div>
         </article>
+        <article class="summary-card">
+          <div class="summary-title">Meu código</div>
+          <div class="summary-value" id="resumo-meu-codigo">----</div>
+        </article>
       </section>
 
       <section class="content-grid" aria-label="Informações principais">
         <article class="card" aria-labelledby="tit-remedios">
           <h2 id="tit-remedios">Meus remédios de hoje</h2>
           <div class="list" id="med-list">
-            <div class="item">
-              <div class="item-meta">Carregando medicamentos...</div>
-            </div>
+            <div class="item"><div class="item-meta">Buscando seus remédios...</div></div>
           </div>
         </article>
 
         <article class="card" aria-labelledby="tit-agenda">
           <h2 id="tit-agenda">Minha agenda de hoje</h2>
           <div class="list" id="agenda-list">
-            <div class="item">
-              <div class="item-meta">Carregando agenda...</div>
-            </div>
+            <div class="item"><div class="item-meta">Buscando sua agenda...</div></div>
           </div>
         </article>
       </section>
@@ -606,6 +606,8 @@
         if (subEl)
           subEl.textContent = "Aqui você acompanha seus remédios e sua rotina.";
         if (avatarEl) avatarEl.textContent = initials(usuarioAtual.nome);
+        const codigoEl = document.getElementById('resumo-meu-codigo');
+        if (codigoEl) codigoEl.textContent = usuarioAtual.codigoUsuario || '----';
 
         await carregarAvatar();
 

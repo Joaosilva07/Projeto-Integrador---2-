@@ -1,25 +1,33 @@
 package com.james.app.Service
 
 import com.james.app.Repository.UserRepository
-import com.james.app.Repository.ConfirmationCodeRepository
 import com.james.app.model.User.*
-import com.james.app.model.ConfirmationCode
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
+import java.util.concurrent.ThreadLocalRandom
 
 @Service
 @Transactional
 class UserService {
 
     private final UserRepository userRepository
-    private final ConfirmationCodeRepository confirmationCodeRepository
-    private final EmailService emailService
     
-    UserService(UserRepository userRepository, ConfirmationCodeRepository confirmationCodeRepository, EmailService emailService) { 
+    UserService(UserRepository userRepository) {
         this.userRepository = userRepository
-        this.confirmationCodeRepository = confirmationCodeRepository
-        this.emailService = emailService
+    }
+
+    @PostConstruct
+    void garantirCodigosUsuarios() {
+        userRepository.findAll().each { user ->
+            if (!user.usuario) {
+                user.usuario = gerarUsuarioUnico(user)
+            }
+            if (!user.codigoUsuario) {
+                user.codigoUsuario = gerarCodigoUsuarioUnico()
+            }
+            userRepository.save(user)
+        }
     }
 
     User save(User user) {
@@ -31,15 +39,45 @@ class UserService {
             userRepository.findByEmail(user.email).ifPresent {
                 throw new IllegalArgumentException("E-mail já cadastrado!")
             }
+            if (user.usuario) {
+                userRepository.findByUsuarioIgnoreCase(user.usuario).ifPresent {
+                    throw new IllegalArgumentException("Usuário já cadastrado!")
+                }
+            }
+        }
+        if (!user.usuario?.trim()) {
+            user.usuario = gerarUsuarioUnico(user)
+        }
+        if (!user.codigoUsuario) {
+            user.codigoUsuario = gerarCodigoUsuarioUnico()
         }
         return userRepository.save(user)
     }
 
-    User login(String email, String senha) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow { new RuntimeException("E-mail não encontrado") }
+    User login(String identificador, String senha) {
+        String valor = identificador?.trim()
+        if (!valor) throw new RuntimeException("Informe usuário ou e-mail")
+
+        User user = valor.contains('@') ? userRepository.findByEmail(valor)
+                .orElseThrow { new RuntimeException("E-mail não encontrado") } :
+                userRepository.findByUsuarioIgnoreCase(valor)
+                .orElseThrow { new RuntimeException("Usuário não encontrado") }
         if (user.senha != senha) throw new RuntimeException("Senha incorreta")
         return user
+    }
+
+    UserLoginResponse toLoginResponse(User user) {
+        new UserLoginResponse(
+            id: user.id,
+            nome: user.nome,
+            email: user.email,
+            usuario: user.usuario,
+            codigoUsuario: user.codigoUsuario,
+            role: user.role,
+            responsaveis: user.responsaveis?.collect { r ->
+                new UserSimple(id: r.id, nome: r.nome, email: r.email, usuario: r.usuario, codigoUsuario: r.codigoUsuario, role: r.role)
+            }
+        )
     }
 
     User update(Long id, User data) {
@@ -48,6 +86,7 @@ class UserService {
         user.email = data.email
         user.role = data.role
         if (data.senha) user.senha = data.senha
+        if (!user.codigoUsuario) user.codigoUsuario = gerarCodigoUsuarioUnico()
         userRepository.save(user)
     }
 
@@ -75,68 +114,52 @@ class UserService {
         }
     }
 
-    Map<String, Object> requestLinkConfirmation(Long userId, Long targetUserId) {
-        User user = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
-        User target = userRepository.findById(targetUserId).orElseThrow { new RuntimeException("Usuário alvo não encontrado") }
+    User findByCodigoUsuario(String codigoUsuario) {
+        userRepository.findByCodigoUsuario(codigoUsuario)
+            .orElseThrow { new RuntimeException("Usuário não encontrado") }
+    }
 
-        LocalDateTime now = LocalDateTime.now()
-        LocalDateTime resendCooldown = now.minusSeconds(45)
+    private String gerarUsuarioUnico(User user) {
+        String base = (user.nome ?: user.email ?: 'usuario')
+                .toLowerCase()
+                .replaceAll(/[^a-z0-9]+/, '.')
+            .replaceAll(/^\.+|\.+$/, '')
+        if (!base) base = 'usuario'
 
-        // Evitar envios duplicados em sequência (duplo clique/requisição repetida)
-        def existingCode = confirmationCodeRepository.findByUserIdAndTargetUserIdAndUsedFalse(userId, targetUserId)
-        if (existingCode.present) {
-            ConfirmationCode current = existingCode.get()
-            if (current.expiresAt.isAfter(now) && current.createdAt != null && current.createdAt.isAfter(resendCooldown)) {
-                return [
-                    message: "Código já enviado recentemente para ${target.email}. Aguarde alguns segundos.",
-                    targetNome: target.nome,
-                    targetEmail: target.email
-                ]
-            }
+        String candidato = base
+        int sufixo = 1
+        while (userRepository.findByUsuarioIgnoreCase(candidato).present) {
+            candidato = "${base}${sufixo}"
+            sufixo++
         }
-        
-        // Limpar código anterior se houver
-        confirmationCodeRepository.findByUserIdAndTargetUserIdAndUsedFalse(userId, targetUserId).ifPresent {
-            confirmationCodeRepository.delete(it)
-        }
-        
-        // Gerar novo código
-        String code = (Math.random() * 10000).toInteger().toString().padLeft(4, '0')
-        ConfirmationCode confirmCode = new ConfirmationCode(
-            code: code,
-            userId: userId,
-            targetUserId: targetUserId,
-            expiresAt: now.plusMinutes(15)
-        )
-        confirmationCodeRepository.save(confirmCode)
-        
-        // Enviar email para o usuário alvo
-        emailService.sendConfirmationCode(target.email, target.nome, code)
-        
+        return candidato
+    }
+
+    Map<String, Object> linkByCodigoUsuario(Long userId, String codigoUsuario) {
+        User responsavel = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
+        User idoso = findByCodigoUsuario(codigoUsuario)
+
+        addResponsavel(idoso.id, responsavel.id)
+
         return [
-            message: "Código de confirmação enviado para ${target.email}",
-            targetNome: target.nome,
-            targetEmail: target.email
+            message: "Vínculo realizado com sucesso",
+            target: [
+                id: idoso.id,
+                nome: idoso.nome,
+                email: idoso.email,
+                codigoUsuario: idoso.codigoUsuario,
+                role: idoso.role
+            ]
         ]
     }
 
-    void confirmLink(Long userId, Long targetUserId, String code) {
-        ConfirmationCode confirmCode = confirmationCodeRepository.findByCodeAndUserIdAndUsedFalse(code, userId)
-            .orElseThrow { new RuntimeException("Código inválido ou expirado") }
-        
-        if (confirmCode.targetUserId != targetUserId) {
-            throw new IllegalArgumentException("Código não corresponde ao usuário alvo")
+    private String gerarCodigoUsuarioUnico() {
+        for (int tentativa = 0; tentativa < 1000; tentativa++) {
+            String codigo = String.format('%04d', ThreadLocalRandom.current().nextInt(10000))
+            if (!userRepository.findByCodigoUsuario(codigo).present) {
+                return codigo
+            }
         }
-        
-        if (confirmCode.expiresAt.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Código expirou")
-        }
-        
-        // Marcar como usado
-        confirmCode.used = true
-        confirmationCodeRepository.save(confirmCode)
-        
-        // Vincular usuários
-        addResponsavel(targetUserId, userId)
+        throw new IllegalStateException('Não foi possível gerar um código de usuário único.')
     }
 }

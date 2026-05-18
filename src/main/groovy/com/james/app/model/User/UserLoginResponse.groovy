@@ -7,6 +7,8 @@ class UserLoginResponse {
     Long id
     String nome
     String email
+    String usuario
+    String codigoUsuario
     UserRole role
     List<UserSimple> responsaveis = []
 }
@@ -16,5 +18,7 @@ class UserSimple {
     Long id
     String nome
     String email
+    String usuario
+    String codigoUsuario
     UserRole role
 }

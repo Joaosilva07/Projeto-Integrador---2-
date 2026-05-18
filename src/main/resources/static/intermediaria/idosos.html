@@ -120,7 +120,7 @@
         <p class="sub">Voce pode trocar de idoso depois no painel. Esse passo ajuda a entrar direto no contexto certo.</p>
       </header>
 
-      <section id="state" class="state">Carregando idosos vinculados...</section>
+      <section id="state" class="state">Buscando idosos vinculados...</section>
       <section id="grid" class="grid" style="display:none"></section>
     </main>
 
@@ -195,7 +195,7 @@
           const idosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
           renderCards(idosos);
         } catch (e) {
-          state.textContent = 'Erro ao carregar idosos vinculados.';
+          state.textContent = 'Não conseguimos carregar os idosos vinculados agora.';
         }
       }
 

@@ -233,13 +233,14 @@ function saveEvent() {
   const data = document.getElementById("event-date").value;
   const hora = document.getElementById("event-time").value;
   const tipo = document.getElementById("event-type").value;
+  const observacao = document.getElementById("event-observacao")?.value || '';
 
   if (!titulo || !data || !hora) {
     alert("Preencha todos os campos!");
     return;
   }
 
-  eventos.push({ titulo, data, hora, tipo });
+  eventos.push({ titulo, data, hora, tipo, observacao });
   localStorage.setItem("eventos", JSON.stringify(eventos));
 
   closeEventModal();
@@ -250,6 +251,8 @@ function saveEvent() {
   document.getElementById("event-date").value = "";
   document.getElementById("event-time").value = "";
   document.getElementById("event-type").value = "medication";
+  const obsEl = document.getElementById("event-observacao");
+  if (obsEl) obsEl.value = "";
 }
 
 // Inicializar calendário quando a view agenda for carregada
@@ -399,6 +402,7 @@ async function carregarConfiguracoesUsuario() {
   const nomeEl = document.getElementById("cfg-nome");
   const emailEl = document.getElementById("cfg-email");
   const roleEl = document.getElementById("cfg-role");
+  const codigoEl = document.getElementById("cfg-codigo");
   const senhaEl = document.getElementById("cfg-senha");
   const erroEl = document.getElementById("cfg-erro");
   const okEl = document.getElementById("cfg-ok");
@@ -406,6 +410,7 @@ async function carregarConfiguracoesUsuario() {
   if (nomeEl) nomeEl.value = usuarioLogado.nome || "";
   if (emailEl) emailEl.value = usuarioLogado.email || "";
   if (roleEl) roleEl.value = usuarioLogado.role || "";
+  if (codigoEl) codigoEl.value = usuarioLogado.codigoUsuario || "";
   if (senhaEl) senhaEl.value = "";
   if (erroEl) erroEl.style.display = "none";
   if (okEl) okEl.style.display = "none";
@@ -464,6 +469,8 @@ async function salvarConfiguracoesUsuario() {
     document.querySelectorAll(".user-role").forEach((el) => {
       el.textContent = updated.role || "";
     });
+    const codigoEl = document.getElementById("cfg-codigo");
+    if (codigoEl) codigoEl.value = updated.codigoUsuario || "";
     const avatarUrl = await carregarAvatarDoBackend();
     aplicarFotoPerfilUI(avatarUrl || "");
     if (okEl) {
@@ -681,7 +688,7 @@ window.onload = async () => {
   const tlMock = document.getElementById("timeline-cuidados");
   if (tlMock)
     tlMock.innerHTML =
-      '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Carregando...</div>';
+      '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Buscando atividades recentes...</div>';
   const agendaGrid = document.querySelector("#view-agenda .agenda-grid");
   if (agendaGrid) agendaGrid.innerHTML = "";
   const historicoTbody = document.getElementById("tbody-historico");
@@ -709,6 +716,10 @@ async function carregarUsuarios() {
     preencherSelectPacientesEvento();
   } catch (e) {
     console.error("Erro ao carregar usuários", e);
+    const tbody = document.getElementById('tbody-usuarios') || document.querySelector('#view-usuarios table tbody');
+    if (tbody && !tbody.children.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Não conseguimos carregar os usuários agora.</td></tr>';
+    }
   }
 }
 
@@ -887,11 +898,18 @@ async function carregarMedicamentos() {
     if (dashMeds) dashMeds.textContent = meds.length;
     const baixoCount = meds.filter((m) => (m.Unidades || 0) <= 5).length;
     if (dashMedsSub)
-      dashMedsSub.textContent =
-        baixoCount > 0 ? `${baixoCount} com estoque baixo` : "";
+      dashMedsSub.textContent = baixoCount > 0 ? `${baixoCount} com estoque baixo` : "";
     verificarAlertas();
   } catch (e) {
     console.error("Erro ao carregar medicamentos", e);
+    const grid = document.querySelector('#view-medicamentos .cards-grid');
+    if (grid) {
+      grid.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:24px">Não foi possível carregar os medicamentos agora.</div>';
+    }
+    const dashMeds = document.getElementById('dash-meds');
+    const dashMedsSub = document.getElementById('dash-meds-sub');
+    if (dashMeds) dashMeds.textContent = '-';
+    if (dashMedsSub) dashMedsSub.textContent = 'Sem atualização no momento';
   }
 }
 
@@ -944,6 +962,7 @@ async function salvarMedicamento() {
   const nome = document.getElementById("m-nome").value.trim();
   const horario = document.getElementById("m-horario").value.trim();
   const unidades = parseInt(document.getElementById("m-unidades").value) || 0;
+  const observacao = document.getElementById("m-observacao")?.value?.trim() || '';
   const pacienteId = document.getElementById("m-paciente").value;
   const erroEl = document.getElementById("m-erro");
   erroEl.style.display = "none";
@@ -961,6 +980,7 @@ async function salvarMedicamento() {
     Nome: nome,
     Horario: horario,
     Unidades: unidades,
+    observacao,
     Paciente: { id: parseInt(pacienteId) },
   };
   try {
@@ -979,6 +999,8 @@ async function salvarMedicamento() {
     document.getElementById("m-horario").value = "";
     document.getElementById("m-unidades").value = "";
     document.getElementById("m-paciente").value = "";
+    const obsEl = document.getElementById("m-observacao");
+    if (obsEl) obsEl.value = "";
     await carregarMedicamentos();
     await carregarEventos();
   } catch (e) {
@@ -1010,6 +1032,14 @@ async function carregarEventos() {
     renderWeeklyCalendar();
   } catch (e) {
     console.error("Erro ao carregar eventos", e);
+    const agendaGrid = document.querySelector('#view-agenda .agenda-grid');
+    if (agendaGrid) {
+      agendaGrid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Não foi possível carregar as atividades agora.</div>';
+    }
+    const dashPend = document.getElementById('dash-pendencias');
+    const dashTar = document.getElementById('dash-tarefas');
+    if (dashPend) dashPend.textContent = '-';
+    if (dashTar) dashTar.textContent = '-';
   }
 }
 

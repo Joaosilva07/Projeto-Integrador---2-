@@ -58,37 +58,10 @@
       <div class="form-title">Bem-vindo de volta</div>
       <div class="form-subtitle">Entre com sua conta para continuar</div>
 
-      <div class="social-row">
-        <button class="social-btn">
-          <!-- Google icon -->
-          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-          </svg>
-          Entrar com Google
-        </button>
-        <button class="social-btn">
-          <!-- Facebook icon -->
-          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="18" height="18" rx="4" fill="#1877F2"/>
-            <path d="M12.5 9H10.5V15H8V9H6.5V7H8V5.5C8 4.12 8.88 3 10.5 3H12V5H11C10.72 5 10.5 5.22 10.5 5.5V7H12.5L12.5 9Z" fill="white"/>
-          </svg>
-          Entrar com Facebook
-        </button>
-      </div>
-
-      <div class="divider">
-        <div class="divider-line"></div>
-        <div class="divider-text">ou entre com e-mail</div>
-        <div class="divider-line"></div>
-      </div>
-
       <form onsubmit="login(event)">
         <div class="field">
-          <label>E-mail</label>
-          <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+          <label>Usuário ou e-mail</label>
+          <input type="text" id="loginIdentificador" placeholder="seu usuario ou seu@email.com" required>
         </div>
 
         <div class="field">
@@ -111,31 +84,6 @@
       <div class="form-title">Criar conta</div>
       <div class="form-subtitle">Preencha seus dados para começar</div>
 
-      <div class="social-row">
-        <button class="social-btn">
-          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-          </svg>
-          Registrar com Google
-        </button>
-        <button class="social-btn">
-          <svg class="social-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="18" height="18" rx="4" fill="#1877F2"/>
-            <path d="M12.5 9H10.5V15H8V9H6.5V7H8V5.5C8 4.12 8.88 3 10.5 3H12V5H11C10.72 5 10.5 5.22 10.5 5.5V7H12.5L12.5 9Z" fill="white"/>
-          </svg>
-          Registrar com Facebook
-        </button>
-      </div>
-
-      <div class="divider">
-        <div class="divider-line"></div>
-        <div class="divider-text">ou crie com e-mail</div>
-        <div class="divider-line"></div>
-      </div>
-
       <div class="field field-row">
         <div>
           <label>Nome</label>
@@ -150,6 +98,11 @@
       <div class="field">
         <label>E-mail</label>
         <input type="email" id="criarEmail" placeholder="seu@email.com">
+      </div>
+
+      <div class="field">
+        <label>Usuário</label>
+        <input type="text" id="criarUsuario" placeholder="nome de usuário">
       </div>
 
       <div class="field">
@@ -244,12 +197,12 @@
       <div class="vstep-content" id="vstep-content-2">
         <div class="alert-info">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Informe o e-mail da pessoa com quem deseja se vincular.
+          Informe o código de 4 dígitos da pessoa com quem deseja se vincular.
         </div>
 
         <div class="field">
-          <label>E-mail do idoso / cuidador</label>
-          <input type="email" id="vincular-step2-email" placeholder="email@exemplo.com">
+          <label>Código do usuário</label>
+          <input type="text" id="vincular-step2-codigo" maxlength="4" inputmode="numeric" placeholder="0000">
         </div>
 
         <div id="vincular-step2-erro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
@@ -266,15 +219,11 @@
           <div style="width:56px; height:56px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">✉️</div>
           <div style="font-family:'Lora',serif; font-size:18px; font-weight:500; color:var(--text-primary); margin-bottom:8px;">Confirmar vínculo</div>
           <div style="font-size:13px; color:var(--text-muted); line-height:1.6; max-width:300px; margin:0 auto;">
-            Confirme o código de 4 dígitos enviado para <strong id="vincular-step3-email">seu@email.com</strong>
+            Confirme o vínculo com <strong id="vincular-step3-nome">o usuário selecionado</strong>.
           </div>
-        </div>
-
-        <div class="code-inputs">
-          <input type="text" maxlength="1" oninput="moveCode(this, null, document.querySelectorAll('.code-inputs input')[1])">
-          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[0], document.querySelectorAll('.code-inputs input')[2])">
-          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[1], document.querySelectorAll('.code-inputs input')[3])">
-          <input type="text" maxlength="1" oninput="moveCode(this, document.querySelectorAll('.code-inputs input')[2], null)">
+          <div style="font-size:13px; color:var(--text-secondary); margin-top:10px;">
+            Código: <strong id="vincular-step3-codigo">0000</strong>
+          </div>
         </div>
 
         <button class="btn-submit terra" onclick="vincularConfirm()">Confirmar vínculo</button>
@@ -343,8 +292,9 @@
         const user = await res.json();
       vincularState.userEmail = email;
       vincularState.userId = user.id;
+        vincularState.userRole = user.role;
       vincularNext(2);
-      document.getElementById('vincular-step2-email').focus();
+        document.getElementById('vincular-step2-codigo').focus();
     } catch (err) {
       erroEl.textContent = err.message;
       erroEl.style.display = 'block';
@@ -352,15 +302,15 @@
   }
 
   async function vincularStep2() {
-    const email = document.getElementById('vincular-step2-email').value;
+    const codigo = document.getElementById('vincular-step2-codigo').value.trim();
     const erroEl = document.getElementById('vincular-step2-erro');
     const btnEl = document.getElementById('vincular-step2-btn');
     erroEl.style.display = 'none';
 
     if (vincularStep2Loading) return;
 
-    if (!email) {
-      erroEl.textContent = 'Informe o e-mail da pessoa.';
+    if (!codigo || !/^\d{4}$/.test(codigo)) {
+      erroEl.textContent = 'Informe um código válido de 4 dígitos.';
       erroEl.style.display = 'block';
       return;
     }
@@ -374,44 +324,22 @@
     }
 
     try {
-      const res = await fetch('/api/user', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-        if (!res.ok) {
-          let errorMsg = 'Erro ao buscar usuários.';
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {}
-          throw new Error(errorMsg);
-        }
-      const users = await res.json();
-      const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!found) throw new Error('Usuário não encontrado.');
-      vincularState.targetEmail = email;
+      const res = await fetch(`/api/user/codigo/${codigo}`);
+      if (!res.ok) {
+        let errorMsg = 'Usuário não encontrado.';
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.message || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+      const found = await res.json();
+      vincularState.targetCodigo = codigo;
       vincularState.targetId = found.id;
       vincularState.targetNome = found.nome;
       vincularState.targetRole = found.role;
-
-      // Solicitar confirmação por email
-      const response = await fetch(`/api/user/${vincularState.userId}/request-link/${found.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-        if (!response.ok) {
-          let errorMsg = 'Erro ao enviar código.';
-          try {
-            const errorData = await response.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {}
-          throw new Error(errorMsg);
-        }
-      const linkData = await response.json();
-
-      // Atualizar Step 3 com email do alvo
-      document.getElementById('vincular-step3-email').textContent = linkData.targetEmail;
-
+      document.getElementById('vincular-step3-nome').textContent = found.nome;
+      document.getElementById('vincular-step3-codigo').textContent = codigo;
       vincularNext(3);
     } catch (err) {
       erroEl.textContent = err.message;
@@ -427,36 +355,23 @@
     }
   }
 
-  function generateCode() {
-    return Math.random().toString().substr(2, 4);
-  }
-
   async function vincularConfirm() {
-    const code = Array.from(document.querySelectorAll('.code-inputs input'))
-      .map(i => (i.value || '').trim())
-      .join('');
     const erroEl = document.getElementById('vincular-step3-erro');
-    
-    if (code.length !== 4 || !/^\d{4}$/.test(code)) {
-      if (!erroEl) {
-        const newErr = document.createElement('div');
-        newErr.id = 'vincular-step3-erro';
-        newErr.style.cssText = 'color:#c0392b; font-size:13px; margin-top:8px; text-align:center;';
-        document.querySelector('.code-inputs').after(newErr);
+    if (!vincularState.targetCodigo) {
+      if (erroEl) {
+        erroEl.textContent = 'Nenhum código selecionado.';
+        erroEl.style.display = 'block';
       }
-      document.getElementById('vincular-step3-erro').textContent = 'Digite um código válido de 4 dígitos.';
-      document.getElementById('vincular-step3-erro').style.display = 'block';
       return;
     }
 
     try {
-      const res = await fetch(`/api/user/${vincularState.userId}/confirm-link/${vincularState.targetId}`, {
+      const res = await fetch(`/api/user/${vincularState.userId}/link-by-code/${encodeURIComponent(vincularState.targetCodigo)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
+        headers: { 'Content-Type': 'application/json' }
       });
       if (!res.ok) {
-          let errorMsg = 'Erro ao confirmar.';
+          let errorMsg = 'Erro ao vincular.';
           try {
             const errorData = await res.json();
             errorMsg = errorData.message || errorMsg;
@@ -467,14 +382,10 @@
       }
       vincularDone();
     } catch (err) {
-      if (!erroEl) {
-        const newErr = document.createElement('div');
-        newErr.id = 'vincular-step3-erro';
-        newErr.style.cssText = 'color:#c0392b; font-size:13px; margin-top:8px; text-align:center;';
-        document.querySelector('.btn-submit.terra').before(newErr);
+      if (erroEl) {
+        erroEl.textContent = err.message;
+        erroEl.style.display = 'block';
       }
-      document.getElementById('vincular-step3-erro').textContent = err.message;
-      document.getElementById('vincular-step3-erro').style.display = 'block';
     }
   }
 
@@ -492,11 +403,6 @@
     document.querySelectorAll('.vstep').forEach(s => { s.className = 'vstep done'; });
   }
 
-  function moveCode(el, prev, next) {
-    if (el.value && next) next.focus();
-    if (!el.value && prev) prev.focus();
-  }
-
   // ═══════════════════════════════════════
   // INTEGRAÇÃO COM A API
   // ═══════════════════════════════════════
@@ -504,10 +410,11 @@
   let vincularState = {
     userEmail: null,
     userId: null,
-    targetEmail: null,
     targetId: null,
     targetNome: null,
-    targetRole: null
+    targetRole: null,
+    targetCodigo: null,
+    userRole: null
   };
   let vincularStep2Loading = false;
 
@@ -541,7 +448,7 @@
 
   async function login(e) {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
+    const identificador = document.getElementById('loginIdentificador').value;
     const senha = document.getElementById('loginSenha').value;
     const erroEl = document.getElementById('loginErro');
     erroEl.style.display = 'none';
@@ -549,7 +456,7 @@
       const res = await fetch('/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha })
+        body: JSON.stringify({ identificador, senha })
       });
         if (!res.ok) {
           let errorMsg = 'E-mail ou senha incorretos.';
@@ -572,18 +479,19 @@
     e.preventDefault();
     const nome = (document.getElementById('criarNome').value + ' ' + document.getElementById('criarSobrenome').value).trim();
     const email = document.getElementById('criarEmail').value;
+    const usuario = document.getElementById('criarUsuario').value.trim();
     const senha = document.getElementById('criarSenha').value;
     const senhaConf = document.getElementById('criarSenhaConf').value;
     const erroEl = document.getElementById('criarErro');
     erroEl.style.display = 'none';
-    if (!nome || !email || !senha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display = 'block'; return; }
+    if (!nome || !email || !usuario || !senha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display = 'block'; return; }
     if (senha !== senhaConf) { erroEl.textContent = 'As senhas não conferem.'; erroEl.style.display = 'block'; return; }
     if (!document.getElementById('terms').checked) { erroEl.textContent = 'Aceite os Termos de Uso.'; erroEl.style.display = 'block'; return; }
     try {
       const res = await fetch('/api/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, senha, role: selectedRole })
+        body: JSON.stringify({ nome, email, usuario, senha, role: selectedRole })
       });
       if (!res.ok) {
           let errorMsg = 'Erro ao criar conta.';
