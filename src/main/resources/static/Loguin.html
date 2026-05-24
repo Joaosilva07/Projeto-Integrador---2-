@@ -1,397 +1,621 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JAMES — Entrar</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="Loguin_.css" />
-</head>
-<body>
-
-<!-- LEFT PANEL -->
-<aside class="left-panel">
-  <div class="left-brand">
-    <div class="brand-name">JAMES
-    </div>
-    <div class="brand-tagline">Gestão de Cuidados</div>
-  </div>
-
-  <div class="left-middle">
-    <h1 class="left-headline">Cuide com <em>atenção,</em><br>gerencie com clareza.</h1>
-    <div class="left-features">
-      <div class="feature-item">
-        <div class="feature-dot"></div>
-        <div class="feature-text">Acompanhe medicamentos, horários e estoque de cada paciente</div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-dot"></div>
-        <div class="feature-text">Registre cada cuidado realizado e mantenha o histórico sempre atualizado</div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-dot"></div>
-        <div class="feature-text">Vincule cuidadores e parentes ao idoso com controle de acesso</div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-dot"></div>
-        <div class="feature-text">Agenda de tarefas diárias — banho, fisioterapia, caminhadas e mais</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="left-footer">© 2026 JAMES · Todos os direitos reservados</div>
-</aside>
-
-<!-- RIGHT PANEL -->
-<div class="right-panel">
-  <div class="auth-box">
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab active" onclick="showTab('entrar', this)">Entrar</button>
-      <button class="tab" onclick="showTab('criar', this)">Criar conta</button>
-      <button class="tab" onclick="showTab('vincular', this)">Vincular conta</button>
-    </div>
-
-    <!-- ════════ ENTRAR ════════ -->
-    <div class="form-view active" id="tab-entrar">
-      <div class="form-title">Bem-vindo de volta</div>
-      <div class="form-subtitle">Entre com sua conta para continuar</div>
-
-      <form onsubmit="login(event)">
-        <div class="field">
-          <label>Usuário ou e-mail</label>
-          <input type="text" id="loginIdentificador" placeholder="seu usuario ou seu@email.com" required>
-        </div>
-
-        <div class="field">
-          <label>Senha</label>
-          <input type="password" id="loginSenha" placeholder="••••••••" required>
-        </div>
-
-        <div id="loginErro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
-
-        <div class="forgot"><a>Esqueci minha senha</a></div>
-
-        <button type="submit" class="btn-submit">Entrar na conta</button>
-      </form>
-
-      <span class="form-link">Não tem conta? <a onclick="switchTab('criar')">Criar gratuitamente</a></span>
-    </div>
-
-    <!-- ════════ CRIAR CONTA ════════ -->
-    <div class="form-view" id="tab-criar">
-      <div class="form-title">Criar conta</div>
-      <div class="form-subtitle">Preencha seus dados para começar</div>
-
-      <div class="field field-row">
-        <div>
-          <label>Nome</label>
-          <input type="text" id="criarNome" placeholder="Seu nome">
-        </div>
-        <div>
-          <label>Sobrenome</label>
-          <input type="text" id="criarSobrenome" placeholder="Sobrenome">
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JAMES — Entrar</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="Loguin_.css" />
+  </head>
+  <body>
+    <!-- LEFT PANEL -->
+    <aside class="left-panel">
+      <div class="left-brand">
+        <div class="brand-name">JAMES</div>
+        <div class="brand-tagline">Gestão de Cuidados</div>
       </div>
 
-      <div class="field">
-        <label>E-mail</label>
-        <input type="email" id="criarEmail" placeholder="seu@email.com">
-      </div>
-
-      <div class="field">
-        <label>Usuário</label>
-        <input type="text" id="criarUsuario" placeholder="nome de usuário">
-      </div>
-
-      <div class="field">
-        <label>Telefone</label>
-        <input type="tel" placeholder="(11) 99999-9999">
-      </div>
-
-      <div class="field">
-        <label>Perfil de acesso</label>
-        <div class="type-selector">
-          <div class="type-option selected" onclick="selectType(this)">
-            <span class="type-emoji">🧓</span>
-            <span class="type-label">Idoso</span>
+      <div class="left-middle">
+        <h1 class="left-headline">
+          Cuide com <em>atenção,</em><br />gerencie com clareza.
+        </h1>
+        <div class="left-features">
+          <div class="feature-item">
+            <div class="feature-dot"></div>
+            <div class="feature-text">
+              Acompanhe medicamentos, horários e estoque de cada paciente
+            </div>
           </div>
-          <div class="type-option" onclick="selectType(this)">
-            <span class="type-emoji">🩺</span>
-            <span class="type-label">Cuidador</span>
+          <div class="feature-item">
+            <div class="feature-dot"></div>
+            <div class="feature-text">
+              Registre cada cuidado realizado e mantenha o histórico sempre
+              atualizado
+            </div>
           </div>
-          <div class="type-option" onclick="selectType(this)">
-            <span class="type-emoji">👨‍👩‍👧</span>
-            <span class="type-label">Parente</span>
+          <div class="feature-item">
+            <div class="feature-dot"></div>
+            <div class="feature-text">
+              Vincule cuidadores e parentes ao idoso com controle de acesso
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-dot"></div>
+            <div class="feature-text">
+              Agenda de tarefas diárias — banho, fisioterapia, caminhadas e mais
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="field">
-        <label>Senha</label>
-        <input type="password" id="criarSenha" placeholder="Mínimo 8 caracteres">
+      <div class="left-footer">© 2026 JAMES · Todos os direitos reservados</div>
+    </aside>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <div class="auth-box">
+        <!-- TABS -->
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('entrar', this)">
+            Entrar
+          </button>
+          <button class="tab" onclick="showTab('criar', this)">
+            Criar conta
+          </button>
+          <button class="tab" onclick="showTab('vincular', this)">
+            Vincular conta
+          </button>
+        </div>
+
+        <!-- ════════ ENTRAR ════════ -->
+        <div class="form-view active" id="tab-entrar">
+          <div class="form-title">Bem-vindo de volta</div>
+          <div class="form-subtitle">Entre com sua conta para continuar</div>
+
+          <form onsubmit="login(event)">
+            <div class="field">
+              <label>Usuário ou e-mail</label>
+              <input
+                type="text"
+                id="loginIdentificador"
+                placeholder="seu usuario ou seu@email.com"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label>Senha</label>
+              <input
+                type="password"
+                id="loginSenha"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div
+              id="loginErro"
+              style="
+                color: #c0392b;
+                font-size: 13px;
+                margin-top: -6px;
+                display: none;
+              "
+            ></div>
+
+            <div class="forgot"><a>Esqueci minha senha</a></div>
+
+            <button type="submit" class="btn-submit">Entrar na conta</button>
+          </form>
+
+          <span class="form-link"
+            >Não tem conta?
+            <a onclick="switchTab('criar')">Criar gratuitamente</a></span
+          >
+        </div>
+
+        <!-- ════════ CRIAR CONTA ════════ -->
+        <div class="form-view" id="tab-criar">
+          <div class="form-title">Criar conta</div>
+          <div class="form-subtitle">Preencha seus dados para começar</div>
+
+          <div class="field field-row">
+            <div>
+              <label>Nome</label>
+              <input type="text" id="criarNome" placeholder="Seu nome" />
+            </div>
+            <div>
+              <label>Sobrenome</label>
+              <input type="text" id="criarSobrenome" placeholder="Sobrenome" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>E-mail</label>
+            <input type="email" id="criarEmail" placeholder="seu@email.com" />
+          </div>
+
+          <div class="field">
+            <label>Usuário</label>
+            <input
+              type="text"
+              id="criarUsuario"
+              placeholder="nome de usuário"
+            />
+          </div>
+
+          <div class="field">
+            <label>Telefone</label>
+            <input type="tel" placeholder="(11) 99999-9999" />
+          </div>
+
+          <div class="field">
+            <label>Perfil de acesso</label>
+            <div class="type-selector">
+              <div class="type-option selected" onclick="selectType(this)">
+                <span class="type-emoji">🧓</span>
+                <span class="type-label">Idoso</span>
+              </div>
+              <div class="type-option" onclick="selectType(this)">
+                <span class="type-emoji">🩺</span>
+                <span class="type-label">Cuidador</span>
+              </div>
+              <div class="type-option" onclick="selectType(this)">
+                <span class="type-emoji">👨‍👩‍👧</span>
+                <span class="type-label">Parente</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Senha</label>
+            <input
+              type="password"
+              id="criarSenha"
+              placeholder="Mínimo 8 caracteres"
+            />
+          </div>
+
+          <div class="field">
+            <label>Confirmar senha</label>
+            <input
+              type="password"
+              id="criarSenhaConf"
+              placeholder="Repita a senha"
+            />
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="terms" />
+            <label for="terms">
+              Concordo com os
+              <a href="#" onclick="abrirModal('termos')">Termos de Uso</a>
+              e a
+              <a href="#" onclick="abrirModal('privacidade')"
+                >Política de Privacidade</a
+              >
+              do James
+            </label>
+          </div>
+
+          <div
+            id="criarErro"
+            style="
+              color: #c0392b;
+              font-size: 13px;
+              margin-bottom: 8px;
+              display: none;
+            "
+          ></div>
+
+          <button class="btn-submit" onclick="registrar(event)">
+            Criar minha conta
+          </button>
+
+          <span class="form-link"
+            >Já tem conta?
+            <a onclick="switchTab('entrar')">Entrar agora</a></span
+          >
+        </div>
+
+        <!-- ════════ VINCULAR CONTA ════════ -->
+        <div class="form-view" id="tab-vincular">
+          <div class="form-title">Vincular conta</div>
+          <div class="form-subtitle">
+            Conecte-se a um idoso ou cuidador já cadastrado
+          </div>
+
+          <!-- Progress steps -->
+          <div class="vincular-steps">
+            <div class="vstep active" id="vs1">
+              <div class="vstep-num">1</div>
+              <div class="vstep-label">Sua conta</div>
+            </div>
+            <div class="vstep idle" id="vs2">
+              <div class="vstep-num">2</div>
+              <div class="vstep-label">Encontrar</div>
+            </div>
+            <div class="vstep idle" id="vs3">
+              <div class="vstep-num">3</div>
+              <div class="vstep-label">Confirmar</div>
+            </div>
+          </div>
+
+          <!-- Step 1: login -->
+          <div class="vstep-content active" id="vstep-content-1">
+            <div class="alert-info">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style="flex-shrink: 0; margin-top: 1px"
+              >
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="#4A6FA5"
+                  stroke-width="1.2"
+                />
+                <path
+                  d="M8 7v4M8 5.5v.5"
+                  stroke="#4A6FA5"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Para vincular, primeiro confirme sua identidade entrando com sua
+              conta.
+            </div>
+
+            <div class="field">
+              <label>Seu e-mail</label>
+              <input
+                type="email"
+                id="vincular-step1-email"
+                placeholder="seu@email.com"
+              />
+            </div>
+            <div class="field">
+              <label>Sua senha</label>
+              <input
+                type="password"
+                id="vincular-step1-senha"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div
+              id="vincular-step1-erro"
+              style="
+                color: #c0392b;
+                font-size: 13px;
+                margin-top: -6px;
+                display: none;
+              "
+            ></div>
+
+            <button class="btn-submit" onclick="vincularStep1()">
+              Continuar →
+            </button>
+          </div>
+
+          <!-- Step 2: find person -->
+          <div class="vstep-content" id="vstep-content-2">
+            <div class="alert-info">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style="flex-shrink: 0; margin-top: 1px"
+              >
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="7"
+                  stroke="#4A6FA5"
+                  stroke-width="1.2"
+                />
+                <path
+                  d="M8 7v4M8 5.5v.5"
+                  stroke="#4A6FA5"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Informe o código de 4 dígitos da pessoa com quem deseja se
+              vincular.
+            </div>
+
+            <div class="field">
+              <label>Código do usuário</label>
+              <input
+                type="text"
+                id="vincular-step2-codigo"
+                maxlength="4"
+                inputmode="numeric"
+                placeholder="0000"
+              />
+            </div>
+
+            <div
+              id="vincular-step2-erro"
+              style="
+                color: #c0392b;
+                font-size: 13px;
+                margin-top: -6px;
+                display: none;
+              "
+            ></div>
+
+            <div style="display: flex; gap: 10px">
+              <button
+                class="btn-submit btn-ghost-green"
+                style="
+                  background: var(--sand-100);
+                  color: var(--text-secondary);
+                  border: 1px solid var(--border);
+                  flex: 1;
+                "
+                onclick="vincularNext(1)"
+              >
+                ← Voltar
+              </button>
+              <button
+                id="vincular-step2-btn"
+                class="btn-submit"
+                style="flex: 2"
+                onclick="vincularStep2()"
+              >
+                Encontrar →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: confirm -->
+          <div class="vstep-content" id="vstep-content-3">
+            <div style="text-align: center; padding: 8px 0 20px">
+              <div
+                style="
+                  width: 56px;
+                  height: 56px;
+                  background: #eef5f1;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 auto 14px;
+                  font-size: 24px;
+                "
+              >
+                ✉️
+              </div>
+              <div
+                style="
+                  font-family: &quot;Lora&quot;, serif;
+                  font-size: 18px;
+                  font-weight: 500;
+                  color: var(--text-primary);
+                  margin-bottom: 8px;
+                "
+              >
+                Confirmar vínculo
+              </div>
+              <div
+                style="
+                  font-size: 13px;
+                  color: var(--text-muted);
+                  line-height: 1.6;
+                  max-width: 300px;
+                  margin: 0 auto;
+                "
+              >
+                Confirme o vínculo com
+                <strong id="vincular-step3-nome">o usuário selecionado</strong>.
+              </div>
+              <div
+                style="
+                  font-size: 13px;
+                  color: var(--text-secondary);
+                  margin-top: 10px;
+                "
+              >
+                Código: <strong id="vincular-step3-codigo">0000</strong>
+              </div>
+            </div>
+
+            <button class="btn-submit terra" onclick="vincularConfirm()">
+              Confirmar vínculo
+            </button>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px">
+              <button
+                class="btn-submit"
+                style="
+                  background: var(--sand-100);
+                  color: var(--text-secondary);
+                  border: 1px solid var(--border);
+                  font-size: 12.5px;
+                "
+                onclick="vincularNext(2)"
+              >
+                ← Voltar
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- / vincular -->
       </div>
-
-      <div class="field">
-        <label>Confirmar senha</label>
-        <input type="password" id="criarSenhaConf" placeholder="Repita a senha">
-      </div>
-
-      <div class="check-row">
-        <input type="checkbox" id="terms">
-        <label for="terms">Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do James
-</label>
-      </div>
-
-      <div id="criarErro" style="color:#c0392b; font-size:13px; margin-bottom:8px; display:none;"></div>
-
-      <button class="btn-submit" onclick="registrar(event)">Criar minha conta</button>
-
-      <span class="form-link">Já tem conta? <a onclick="switchTab('entrar')">Entrar agora</a></span>
     </div>
 
-    <!-- ════════ VINCULAR CONTA ════════ -->
-    <div class="form-view" id="tab-vincular">
-      <div class="form-title">Vincular conta</div>
-      <div class="form-subtitle">Conecte-se a um idoso ou cuidador já cadastrado</div>
+    <script>
+      function showTab(name, el) {
+        document
+          .querySelectorAll(".form-view")
+          .forEach((f) => f.classList.remove("active"));
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById("tab-" + name).classList.add("active");
+        if (el) el.classList.add("active");
+      }
 
-      <!-- Progress steps -->
-      <div class="vincular-steps">
-        <div class="vstep active" id="vs1">
-          <div class="vstep-num">1</div>
-          <div class="vstep-label">Sua conta</div>
-        </div>
-        <div class="vstep idle" id="vs2">
-          <div class="vstep-num">2</div>
-          <div class="vstep-label">Encontrar</div>
-        </div>
-        <div class="vstep idle" id="vs3">
-          <div class="vstep-num">3</div>
-          <div class="vstep-label">Confirmar</div>
-        </div>
-      </div>
+      function switchTab(name) {
+        const tabs = document.querySelectorAll(".tab");
+        const map = { entrar: 0, criar: 1, vincular: 2 };
+        showTab(name, tabs[map[name]]);
+      }
 
-      <!-- Step 1: login -->
-      <div class="vstep-content active" id="vstep-content-1">
-        <div class="alert-info">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Para vincular, primeiro confirme sua identidade entrando com sua conta.
-        </div>
+      function vincularNext(step) {
+        [1, 2, 3].forEach((i) => {
+          const s = document.getElementById("vs" + i);
+          const c = document.getElementById("vstep-content-" + i);
+          s.className =
+            "vstep " + (i < step ? "done" : i === step ? "active" : "idle");
+          c.classList.toggle("active", i === step);
+        });
+      }
 
-        <div class="field">
-          <label>Seu e-mail</label>
-          <input type="email" id="vincular-step1-email" placeholder="seu@email.com">
-        </div>
-        <div class="field">
-          <label>Sua senha</label>
-          <input type="password" id="vincular-step1-senha" placeholder="••••••••">
-        </div>
+      async function vincularStep1() {
+        const email = document.getElementById("vincular-step1-email").value;
+        const senha = document.getElementById("vincular-step1-senha").value;
+        const erroEl = document.getElementById("vincular-step1-erro");
+        erroEl.style.display = "none";
 
-        <div id="vincular-step1-erro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
-
-        <button class="btn-submit" onclick="vincularStep1()">Continuar →</button>
-      </div>
-
-      <!-- Step 2: find person -->
-      <div class="vstep-content" id="vstep-content-2">
-        <div class="alert-info">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><circle cx="8" cy="8" r="7" stroke="#4A6FA5" stroke-width="1.2"/><path d="M8 7v4M8 5.5v.5" stroke="#4A6FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Informe o código de 4 dígitos da pessoa com quem deseja se vincular.
-        </div>
-
-        <div class="field">
-          <label>Código do usuário</label>
-          <input type="text" id="vincular-step2-codigo" maxlength="4" inputmode="numeric" placeholder="0000">
-        </div>
-
-        <div id="vincular-step2-erro" style="color:#c0392b; font-size:13px; margin-top:-6px; display:none;"></div>
-
-        <div style="display:flex; gap:10px;">
-          <button class="btn-submit btn-ghost-green" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); flex:1;" onclick="vincularNext(1)">← Voltar</button>
-          <button id="vincular-step2-btn" class="btn-submit" style="flex:2;" onclick="vincularStep2()">Encontrar →</button>
-        </div>
-      </div>
-
-      <!-- Step 3: confirm -->
-      <div class="vstep-content" id="vstep-content-3">
-        <div style="text-align:center; padding: 8px 0 20px;">
-          <div style="width:56px; height:56px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:24px;">✉️</div>
-          <div style="font-family:'Lora',serif; font-size:18px; font-weight:500; color:var(--text-primary); margin-bottom:8px;">Confirmar vínculo</div>
-          <div style="font-size:13px; color:var(--text-muted); line-height:1.6; max-width:300px; margin:0 auto;">
-            Confirme o vínculo com <strong id="vincular-step3-nome">o usuário selecionado</strong>.
-          </div>
-          <div style="font-size:13px; color:var(--text-secondary); margin-top:10px;">
-            Código: <strong id="vincular-step3-codigo">0000</strong>
-          </div>
-        </div>
-
-        <button class="btn-submit terra" onclick="vincularConfirm()">Confirmar vínculo</button>
-
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <button class="btn-submit" style="background:var(--sand-100); color:var(--text-secondary); border:1px solid var(--border); font-size:12.5px;" onclick="vincularNext(2)">← Voltar</button>
-        </div>
-      </div>
-
-    </div>
-    <!-- / vincular -->
-
-  </div>
-
-</div>
-
-<script>
-  function showTab(name, el) {
-    document.querySelectorAll('.form-view').forEach(f => f.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    if (el) el.classList.add('active');
-  }
-
-  function switchTab(name) {
-    const tabs = document.querySelectorAll('.tab');
-    const map = { entrar: 0, criar: 1, vincular: 2 };
-    showTab(name, tabs[map[name]]);
-  }
-
-  function vincularNext(step) {
-    [1,2,3].forEach(i => {
-      const s = document.getElementById('vs' + i);
-      const c = document.getElementById('vstep-content-' + i);
-      s.className = 'vstep ' + (i < step ? 'done' : i === step ? 'active' : 'idle');
-      c.classList.toggle('active', i === step);
-    });
-  }
-
-  async function vincularStep1() {
-    const email = document.getElementById('vincular-step1-email').value;
-    const senha = document.getElementById('vincular-step1-senha').value;
-    const erroEl = document.getElementById('vincular-step1-erro');
-    erroEl.style.display = 'none';
-
-    if (!email || !senha) {
-      erroEl.textContent = 'Preencha e-mail e senha.';
-      erroEl.style.display = 'block';
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/user/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha })
-      });
-        if (!res.ok) {
-          let errorMsg = 'E-mail ou senha incorretos.';
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {}
-          throw new Error(errorMsg);
+        if (!email || !senha) {
+          erroEl.textContent = "Preencha e-mail e senha.";
+          erroEl.style.display = "block";
+          return;
         }
-        const user = await res.json();
-      vincularState.userEmail = email;
-      vincularState.userId = user.id;
-        vincularState.userRole = user.role;
-      vincularNext(2);
-        document.getElementById('vincular-step2-codigo').focus();
-    } catch (err) {
-      erroEl.textContent = err.message;
-      erroEl.style.display = 'block';
-    }
-  }
 
-  async function vincularStep2() {
-    const codigo = document.getElementById('vincular-step2-codigo').value.trim();
-    const erroEl = document.getElementById('vincular-step2-erro');
-    const btnEl = document.getElementById('vincular-step2-btn');
-    erroEl.style.display = 'none';
-
-    if (vincularStep2Loading) return;
-
-    if (!codigo || !/^\d{4}$/.test(codigo)) {
-      erroEl.textContent = 'Informe um código válido de 4 dígitos.';
-      erroEl.style.display = 'block';
-      return;
-    }
-
-    vincularStep2Loading = true;
-    if (btnEl) {
-      btnEl.disabled = true;
-      btnEl.textContent = 'Enviando...';
-      btnEl.style.opacity = '0.75';
-      btnEl.style.cursor = 'not-allowed';
-    }
-
-    try {
-      const res = await fetch(`/api/user/codigo/${codigo}`);
-      if (!res.ok) {
-        let errorMsg = 'Usuário não encontrado.';
         try {
-          const errorData = await res.json();
-          errorMsg = errorData.message || errorMsg;
-        } catch {}
-        throw new Error(errorMsg);
-      }
-      const found = await res.json();
-      vincularState.targetCodigo = codigo;
-      vincularState.targetId = found.id;
-      vincularState.targetNome = found.nome;
-      vincularState.targetRole = found.role;
-      document.getElementById('vincular-step3-nome').textContent = found.nome;
-      document.getElementById('vincular-step3-codigo').textContent = codigo;
-      vincularNext(3);
-    } catch (err) {
-      erroEl.textContent = err.message;
-      erroEl.style.display = 'block';
-    } finally {
-      vincularStep2Loading = false;
-      if (btnEl) {
-        btnEl.disabled = false;
-        btnEl.textContent = 'Encontrar →';
-        btnEl.style.opacity = '';
-        btnEl.style.cursor = '';
-      }
-    }
-  }
-
-  async function vincularConfirm() {
-    const erroEl = document.getElementById('vincular-step3-erro');
-    if (!vincularState.targetCodigo) {
-      if (erroEl) {
-        erroEl.textContent = 'Nenhum código selecionado.';
-        erroEl.style.display = 'block';
-      }
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/user/${vincularState.userId}/link-by-code/${encodeURIComponent(vincularState.targetCodigo)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!res.ok) {
-          let errorMsg = 'Erro ao vincular.';
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {
-            errorMsg = await res.text() || errorMsg;
+          const res = await fetch("/api/user/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha }),
+          });
+          if (!res.ok) {
+            let errorMsg = "E-mail ou senha incorretos.";
+            try {
+              const errorData = await res.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch {}
+            throw new Error(errorMsg);
           }
-          throw new Error(errorMsg);
+          const user = await res.json();
+          vincularState.userEmail = email;
+          vincularState.userId = user.id;
+          vincularState.userRole = user.role;
+          vincularNext(2);
+          document.getElementById("vincular-step2-codigo").focus();
+        } catch (err) {
+          erroEl.textContent = err.message;
+          erroEl.style.display = "block";
+        }
       }
-      vincularDone();
-    } catch (err) {
-      if (erroEl) {
-        erroEl.textContent = err.message;
-        erroEl.style.display = 'block';
-      }
-    }
-  }
 
-  function vincularDone() {
-    const content = document.getElementById('vstep-content-3');
-    content.innerHTML = `
+      async function vincularStep2() {
+        const codigo = document
+          .getElementById("vincular-step2-codigo")
+          .value.trim();
+        const erroEl = document.getElementById("vincular-step2-erro");
+        const btnEl = document.getElementById("vincular-step2-btn");
+        erroEl.style.display = "none";
+
+        if (vincularStep2Loading) return;
+
+        if (!codigo || !/^\d{4}$/.test(codigo)) {
+          erroEl.textContent = "Informe um código válido de 4 dígitos.";
+          erroEl.style.display = "block";
+          return;
+        }
+
+        vincularStep2Loading = true;
+        if (btnEl) {
+          btnEl.disabled = true;
+          btnEl.textContent = "Enviando...";
+          btnEl.style.opacity = "0.75";
+          btnEl.style.cursor = "not-allowed";
+        }
+
+        try {
+          const res = await fetch(`/api/user/codigo/${codigo}`);
+          if (!res.ok) {
+            let errorMsg = "Usuário não encontrado.";
+            try {
+              const errorData = await res.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch {}
+            throw new Error(errorMsg);
+          }
+          const found = await res.json();
+          vincularState.targetCodigo = codigo;
+          vincularState.targetId = found.id;
+          vincularState.targetNome = found.nome;
+          vincularState.targetRole = found.role;
+          document.getElementById("vincular-step3-nome").textContent =
+            found.nome;
+          document.getElementById("vincular-step3-codigo").textContent = codigo;
+          vincularNext(3);
+        } catch (err) {
+          erroEl.textContent = err.message;
+          erroEl.style.display = "block";
+        } finally {
+          vincularStep2Loading = false;
+          if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.textContent = "Encontrar →";
+            btnEl.style.opacity = "";
+            btnEl.style.cursor = "";
+          }
+        }
+      }
+
+      async function vincularConfirm() {
+        const erroEl = document.getElementById("vincular-step3-erro");
+        if (!vincularState.targetCodigo) {
+          if (erroEl) {
+            erroEl.textContent = "Nenhum código selecionado.";
+            erroEl.style.display = "block";
+          }
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            `/api/user/${vincularState.userId}/link-by-code/${encodeURIComponent(vincularState.targetCodigo)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+          if (!res.ok) {
+            let errorMsg = "Erro ao vincular.";
+            try {
+              const errorData = await res.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch {
+              errorMsg = (await res.text()) || errorMsg;
+            }
+            throw new Error(errorMsg);
+          }
+          vincularDone();
+        } catch (err) {
+          if (erroEl) {
+            erroEl.textContent = err.message;
+            erroEl.style.display = "block";
+          }
+        }
+      }
+
+      function vincularDone() {
+        const content = document.getElementById("vstep-content-3");
+        content.innerHTML = `
       <div style="text-align:center; padding: 20px 0 10px;">
         <div style="width:64px; height:64px; background:#EEF5F1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:28px;">✅</div>
         <div style="font-family:'Lora',serif; font-size:20px; font-weight:500; color:var(--text-primary); margin-bottom:10px;">Vínculo confirmado!</div>
@@ -400,118 +624,253 @@
         </div>
         <button class="btn-submit" style="max-width:240px; margin:0 auto;" onclick="switchTab('entrar')">Ir para o login →</button>
       </div>`;
-    document.querySelectorAll('.vstep').forEach(s => { s.className = 'vstep done'; });
-  }
-
-  // ═══════════════════════════════════════
-  // INTEGRAÇÃO COM A API
-  // ═══════════════════════════════════════
-  let selectedRole = 'IDOSO';
-  let vincularState = {
-    userEmail: null,
-    userId: null,
-    targetId: null,
-    targetNome: null,
-    targetRole: null,
-    targetCodigo: null,
-    userRole: null
-  };
-  let vincularStep2Loading = false;
-
-  function redirectAfterAuth(user) {
-    if (!user || !user.role) {
-      window.location.href = '/Index.html';
-      return;
-    }
-    if (user.role === 'CUIDADOR') {
-      window.location.href = '/intermediaria/idosos.html';
-      return;
-    }
-    if (user.role === 'IDOSO') {
-      window.location.href = '/idoso.html';
-      return;
-    }
-    if (user.role === 'PARENTE') {
-      window.location.href = '/parente.html';
-      return;
-    }
-    window.location.href = '/Index.html';
-  }
-
-  function selectType(el) {
-    el.closest('.type-selector').querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-    const label = el.querySelector('.type-label').textContent.trim().toUpperCase();
-    const map = { 'IDOSO': 'IDOSO', 'CUIDADOR': 'CUIDADOR', 'PARENTE': 'PARENTE', 'ADMIN': 'ADMIN' };
-    selectedRole = map[label] || 'IDOSO';
-  }
-
-  async function login(e) {
-    e.preventDefault();
-    const identificador = document.getElementById('loginIdentificador').value;
-    const senha = document.getElementById('loginSenha').value;
-    const erroEl = document.getElementById('loginErro');
-    erroEl.style.display = 'none';
-    try {
-      const res = await fetch('/api/user/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identificador, senha })
-      });
-        if (!res.ok) {
-          let errorMsg = 'E-mail ou senha incorretos.';
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {}
-          throw new Error(errorMsg);
-        }
-      const user = await res.json();
-      sessionStorage.setItem('jamesUser', JSON.stringify(user));
-      redirectAfterAuth(user);
-    } catch (err) {
-      erroEl.textContent = err.message;
-      erroEl.style.display = 'block';
-    }
-  }
-
-  async function registrar(e) {
-    e.preventDefault();
-    const nome = (document.getElementById('criarNome').value + ' ' + document.getElementById('criarSobrenome').value).trim();
-    const email = document.getElementById('criarEmail').value;
-    const usuario = document.getElementById('criarUsuario').value.trim();
-    const senha = document.getElementById('criarSenha').value;
-    const senhaConf = document.getElementById('criarSenhaConf').value;
-    const erroEl = document.getElementById('criarErro');
-    erroEl.style.display = 'none';
-    if (!nome || !email || !usuario || !senha) { erroEl.textContent = 'Preencha todos os campos.'; erroEl.style.display = 'block'; return; }
-    if (senha !== senhaConf) { erroEl.textContent = 'As senhas não conferem.'; erroEl.style.display = 'block'; return; }
-    if (!document.getElementById('terms').checked) { erroEl.textContent = 'Aceite os Termos de Uso.'; erroEl.style.display = 'block'; return; }
-    try {
-      const res = await fetch('/api/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, usuario, senha, role: selectedRole })
-      });
-      if (!res.ok) {
-          let errorMsg = 'Erro ao criar conta.';
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch {
-            errorMsg = await res.text() || errorMsg;
-          }
-          throw new Error(errorMsg);
+        document.querySelectorAll(".vstep").forEach((s) => {
+          s.className = "vstep done";
+        });
       }
-      const user = await res.json();
-      sessionStorage.setItem('jamesUser', JSON.stringify(user));
-      redirectAfterAuth(user);
-    } catch (err) {
-      erroEl.textContent = err.message;
-      erroEl.style.display = 'block';
-    }
-  }
-</script>
 
-</body>
+      // ═══════════════════════════════════════
+      // INTEGRAÇÃO COM A API
+      // ═══════════════════════════════════════
+      let selectedRole = "IDOSO";
+      let vincularState = {
+        userEmail: null,
+        userId: null,
+        targetId: null,
+        targetNome: null,
+        targetRole: null,
+        targetCodigo: null,
+        userRole: null,
+      };
+      let vincularStep2Loading = false;
+
+      function redirectAfterAuth(user) {
+        if (!user || !user.role) {
+          window.location.href = "/Index.html";
+          return;
+        }
+        if (user.role === "CUIDADOR") {
+          window.location.href = "/intermediaria/idosos.html";
+          return;
+        }
+        if (user.role === "IDOSO") {
+          window.location.href = "/idoso.html";
+          return;
+        }
+        if (user.role === "PARENTE") {
+          window.location.href = "/parente.html";
+          return;
+        }
+        window.location.href = "/Index.html";
+      }
+
+      function selectType(el) {
+        el.closest(".type-selector")
+          .querySelectorAll(".type-option")
+          .forEach((o) => o.classList.remove("selected"));
+        el.classList.add("selected");
+        const label = el
+          .querySelector(".type-label")
+          .textContent.trim()
+          .toUpperCase();
+        const map = {
+          IDOSO: "IDOSO",
+          CUIDADOR: "CUIDADOR",
+          PARENTE: "PARENTE",
+          ADMIN: "ADMIN",
+        };
+        selectedRole = map[label] || "IDOSO";
+      }
+
+      async function login(e) {
+        e.preventDefault();
+        const identificador =
+          document.getElementById("loginIdentificador").value;
+        const senha = document.getElementById("loginSenha").value;
+        const erroEl = document.getElementById("loginErro");
+        erroEl.style.display = "none";
+        try {
+          const res = await fetch("/api/user/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identificador, senha }),
+          });
+          if (!res.ok) {
+            let errorMsg = "E-mail ou senha incorretos.";
+            try {
+              const errorData = await res.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch {}
+            throw new Error(errorMsg);
+          }
+          const user = await res.json();
+          sessionStorage.setItem("jamesUser", JSON.stringify(user));
+          redirectAfterAuth(user);
+        } catch (err) {
+          erroEl.textContent = err.message;
+          erroEl.style.display = "block";
+        }
+      }
+
+      async function registrar(e) {
+        e.preventDefault();
+        const nome = (
+          document.getElementById("criarNome").value +
+          " " +
+          document.getElementById("criarSobrenome").value
+        ).trim();
+        const email = document.getElementById("criarEmail").value;
+        const usuario = document.getElementById("criarUsuario").value.trim();
+        const senha = document.getElementById("criarSenha").value;
+        const senhaConf = document.getElementById("criarSenhaConf").value;
+        const erroEl = document.getElementById("criarErro");
+        erroEl.style.display = "none";
+        if (!nome || !email || !usuario || !senha) {
+          erroEl.textContent = "Preencha todos os campos.";
+          erroEl.style.display = "block";
+          return;
+        }
+        if (senha !== senhaConf) {
+          erroEl.textContent = "As senhas não conferem.";
+          erroEl.style.display = "block";
+          return;
+        }
+        if (!document.getElementById("terms").checked) {
+          erroEl.textContent = "Aceite os Termos de Uso.";
+          erroEl.style.display = "block";
+          return;
+        }
+        try {
+          const res = await fetch("/api/user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nome,
+              email,
+              usuario,
+              senha,
+              role: selectedRole,
+            }),
+          });
+          if (!res.ok) {
+            let errorMsg = "Erro ao criar conta.";
+            try {
+              const errorData = await res.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch {
+              errorMsg = (await res.text()) || errorMsg;
+            }
+            throw new Error(errorMsg);
+          }
+          const user = await res.json();
+          sessionStorage.setItem("jamesUser", JSON.stringify(user));
+          redirectAfterAuth(user);
+        } catch (err) {
+          erroEl.textContent = err.message;
+          erroEl.style.display = "block";
+        }
+      }
+      function abrirModal(tipo) {
+        const overlay = document.getElementById("modalOverlay");
+        const titulo = document.getElementById("modalTitulo");
+        const conteudo = document.getElementById("modalConteudo");
+
+        overlay.classList.add("active");
+
+        if (tipo === "termos") {
+          titulo.innerText = "Termos de Uso";
+
+          conteudo.innerHTML = `
+      <h3>1. Objetivo da Plataforma</h3>
+      <p>
+        O James é uma plataforma destinada ao gerenciamento de cuidados
+        de idosos, permitindo o acompanhamento de medicamentos,
+        cuidadores, parentes e tarefas diárias.
+      </p>
+
+      <h3>2. Responsabilidade do Usuário</h3>
+      <p>
+        O usuário é responsável pelas informações cadastradas no sistema,
+        garantindo que sejam verdadeiras e atualizadas.
+      </p>
+
+      <h3>3. Segurança</h3>
+      <p>
+        O usuário deve manter sua senha em sigilo e não compartilhar
+        seu acesso com terceiros.
+      </p>
+
+      <h3>4. Uso Indevido</h3>
+      <p>
+        É proibido utilizar a plataforma para atividades ilegais,
+        fraudulentas ou que prejudiquem outros usuários.
+      </p>
+
+      <h3>5. Alterações</h3>
+      <p>
+        O James poderá atualizar estes termos a qualquer momento para
+        melhorar a experiência e segurança da plataforma.
+      </p>
+    `;
+        } else {
+          titulo.innerText = "Política de Privacidade";
+
+          conteudo.innerHTML = `
+      <h3>1. Coleta de Dados</h3>
+      <p>
+        Coletamos informações fornecidas no cadastro, como nome,
+        e-mail e perfil de acesso.
+      </p>
+
+      <h3>2. Uso das Informações</h3>
+      <p>
+        Os dados são utilizados apenas para funcionamento da plataforma
+        e melhoria da experiência do usuário.
+      </p>
+
+      <h3>3. Compartilhamento</h3>
+      <p>
+        O James não vende informações pessoais para terceiros.
+      </p>
+
+      <h3>4. Segurança dos Dados</h3>
+      <p>
+        Utilizamos medidas de segurança para proteger os dados dos usuários.
+      </p>
+
+      <h3>5. Direitos do Usuário</h3>
+      <p>
+        O usuário pode solicitar atualização ou remoção de seus dados
+        conforme a legislação aplicável.
+      </p>
+    `;
+        }
+      }
+
+      function fecharModal() {
+        document.getElementById("modalOverlay").classList.remove("active");
+      }
+
+      /* fechar clicando fora */
+      document
+        .getElementById("modalOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            fecharModal();
+          }
+        });
+    </script>
+    <!-- MODAL TERMOS -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 id="modalTitulo">Termos de Uso</h2>
+
+          <button class="close-btn" onclick="fecharModal()">✕</button>
+        </div>
+
+        <div class="modal-content" id="modalConteudo"></div>
+      </div>
+    </div>
+  </body>
 </html>
