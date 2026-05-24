@@ -308,8 +308,21 @@
                 </button>
               </div>
               <div class="table-wrap">
-                <div class="timeline" id="timeline-cuidados" style="padding: 4px 20px">
-                  <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Buscando agenda...</div>
+                <div
+                  class="timeline"
+                  id="timeline-cuidados"
+                  style="padding: 4px 20px"
+                >
+                  <div
+                    style="
+                      padding: 20px;
+                      text-align: center;
+                      color: var(--text-muted);
+                      font-size: 13px;
+                    "
+                  >
+                    Buscando agenda...
+                  </div>
                 </div>
               </div>
             </div>
@@ -386,7 +399,16 @@
           </div>
 
           <div class="cards-grid" id="medicamentos-grid">
-            <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Buscando informações...</div>
+            <div
+              style="
+                padding: 20px;
+                text-align: center;
+                color: var(--text-muted);
+                font-size: 13px;
+              "
+            >
+              Buscando informações...
+            </div>
           </div>
         </div>
 
@@ -582,11 +604,11 @@
                   <label>Perfil</label>
                   <input id="cfg-role" type="text" disabled />
                 </div>
-                <div class="modal-field" style="margin:0;">
+                <div class="modal-field" style="margin: 0">
                   <label>Meu código</label>
                   <input id="cfg-codigo" type="text" disabled />
                 </div>
-                <div class="modal-field" style="margin:0;">
+                <div class="modal-field" style="margin: 0">
                   <label>Nova senha (opcional)</label>
                   <input
                     id="cfg-senha"
@@ -801,8 +823,7 @@
           />
         </div>
         <div class="modal-field">
-          <label>Horário</label
-          ><input type="text" id="m-horario" placeholder="Ex: 08:00 e 20:00" />
+          <label>Horário</label><input type="time" id="m-horario" />
         </div>
         <div class="modal-field">
           <label>Unidades em estoque</label
@@ -810,13 +831,12 @@
         </div>
         <div class="modal-field">
           <label>Observação</label>
-          <textarea id="m-observacao" placeholder="Ex: Tomar após o café" rows="3" style="resize:vertical;"></textarea>
-        </div>
-        <div class="modal-field">
-          <label>Paciente (Idoso)</label>
-          <select id="m-paciente">
-            <option value="">Nenhum</option>
-          </select>
+          <textarea
+            id="m-observacao"
+            placeholder="Ex: Tomar após o café"
+            rows="3"
+            style="resize: vertical"
+          ></textarea>
         </div>
         <div
           id="m-erro"
@@ -857,12 +877,6 @@
           <input type="time" id="event-time" />
         </div>
         <div class="modal-field">
-          <label>Idoso</label>
-          <select id="event-paciente">
-            <option value="">Selecione o idoso</option>
-          </select>
-        </div>
-        <div class="modal-field">
           <label>Tipo de Evento</label>
           <select id="event-type">
             <option value="medication">Medicamento</option>
@@ -875,7 +889,12 @@
         </div>
         <div class="modal-field">
           <label>Observação</label>
-          <textarea id="event-observacao" placeholder="Ex: Levar exames e carteirinha" rows="3" style="resize:vertical;"></textarea>
+          <textarea
+            id="event-observacao"
+            placeholder="Ex: Levar exames e carteirinha"
+            rows="3"
+            style="resize: vertical"
+          ></textarea>
         </div>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="closeEventModal()">
