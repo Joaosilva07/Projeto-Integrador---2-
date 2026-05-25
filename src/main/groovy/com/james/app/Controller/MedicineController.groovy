@@ -35,17 +35,17 @@ class MedicineController {
     }
 
     @GetMapping("/{id}")
-    Medicine getById(@PathVariable Long id) {
+    Medicine getById(@PathVariable("id") Long id) {
         return service.getById(id)
     }
 
     @PutMapping("/{id}")
-    Medicine update(@PathVariable Long id, @RequestBody Medicine medicine) {
+    Medicine update(@PathVariable("id") Long id, @RequestBody Medicine medicine) {
         return service.update(id, medicine)
     }
 
     @DeleteMapping("/{id}")
-    void delete(@PathVariable Long id) {
+    void delete(@PathVariable("id") Long id) {
         service.deleteMedicine(id)
     }
 }

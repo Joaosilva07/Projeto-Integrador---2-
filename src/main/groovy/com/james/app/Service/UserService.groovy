@@ -139,6 +139,10 @@ class UserService {
         User responsavel = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
         User idoso = findByCodigoUsuario(codigoUsuario)
 
+        if (idoso.role != UserRole.IDOSO) {
+            throw new IllegalArgumentException("O código informado não pertence a um idoso.")
+        }
+
         addResponsavel(idoso.id, responsavel.id)
 
         return [

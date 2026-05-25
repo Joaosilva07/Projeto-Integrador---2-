@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../CSS/Index_.css" />
+    <script src="/js/loading.js"></script>
   </head>
   <style>
     :root {
@@ -659,6 +660,21 @@
           </svg>
           Histórico Completo
         </button>
+
+        <div class="nav-section-label">Conta</div>
+        <button class="nav-item" onclick="showView('config', this)">
+          <svg
+            class="nav-icon"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M10 3.5l1.2 1.9 2.2.4-.8 2.1 1.5 1.6-1.5 1.6.8 2.1-2.2.4L10 16.5l-1.2-1.9-2.2-.4.8-2.1-1.5-1.6 1.5-1.6-.8-2.1 2.2-.4L10 3.5Z" />
+            <circle cx="10" cy="10" r="2.4" />
+          </svg>
+          Configurações
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -914,24 +930,110 @@
             </p>
           </div>
         </div>
-      </div>
-      <!-- BOTÃO EXCLUIR CONTA -->
-      <div style="margin-top: 30px">
-        <button
-          onclick="abrirModalExcluirConta()"
-          style="
-            background: #c0392b;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 500;
-          "
-        >
-          Excluir minha conta
-        </button>
+
+        <div class="view" id="view-config">
+          <div class="section-header">
+            <span class="section-title">Configurações da Conta</span>
+          </div>
+
+          <div class="two-col" style="align-items: start">
+            <div class="card" style="padding: 18px">
+              <div
+                style="
+                  font-size: 16px;
+                  font-weight: 600;
+                  margin-bottom: 14px;
+                  color: var(--text-primary);
+                "
+              >
+                Informações pessoais
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 16px;
+                  align-items: center;
+                  margin-bottom: 14px;
+                "
+              >
+                <div
+                  id="cfg-avatar-preview"
+                  style="
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    border: 1px solid var(--border);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: var(--text-muted);
+                    font-weight: 600;
+                    background: var(--sand-50);
+                    font-size: 18px;
+                  "
+                >
+                  U
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <small style="color: var(--text-muted); font-size: 12px"
+                    >Atualize seus dados de acesso por aqui.</small
+                  >
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr; gap: 10px">
+                <div style="display: grid; gap: 6px">
+                  <label style="font-size: 12px; color: var(--text-secondary)">Nome</label>
+                  <input id="cfg-nome" type="text" placeholder="Seu nome" style="border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit;" />
+                </div>
+                <div style="display: grid; gap: 6px">
+                  <label style="font-size: 12px; color: var(--text-secondary)">E-mail</label>
+                  <input id="cfg-email" type="email" placeholder="seu@email.com" style="border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit;" />
+                </div>
+                <div style="display: grid; gap: 6px">
+                  <label style="font-size: 12px; color: var(--text-secondary)">Perfil</label>
+                  <input id="cfg-role" type="text" disabled style="border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit; background: var(--sand-50);" />
+                </div>
+                <div style="display: grid; gap: 6px">
+                  <label style="font-size: 12px; color: var(--text-secondary)">Meu código</label>
+                  <input id="cfg-codigo" type="text" disabled style="border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit; background: var(--sand-50);" />
+                </div>
+                <div style="display: grid; gap: 6px">
+                  <label style="font-size: 12px; color: var(--text-secondary)">Nova senha (opcional)</label>
+                  <input id="cfg-senha" type="password" placeholder="Deixe vazio para manter a atual" style="border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit;" />
+                </div>
+              </div>
+
+              <div id="cfg-erro" style="color: #c0392b; font-size: 13px; display: none; margin-top: 10px"></div>
+              <div id="cfg-ok" style="color: #1f7a46; font-size: 13px; display: none; margin-top: 10px"></div>
+
+              <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end">
+                <button onclick="carregarConfiguracoesUsuario()" style="background: transparent; border: 1px solid var(--border); color: var(--text-primary); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600;">Recarregar</button>
+                <button onclick="salvarConfiguracoesUsuario()" style="background: var(--sage-500); border: 0; color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600;">Salvar alterações</button>
+              </div>
+            </div>
+
+            <div class="card" style="padding: 18px">
+              <div
+                style="
+                  font-size: 16px;
+                  font-weight: 600;
+                  margin-bottom: 14px;
+                  color: var(--text-primary);
+                "
+              >
+                Segurança da conta
+              </div>
+              <div style="color: var(--text-muted); font-size: 13px; line-height: 1.55; margin-bottom: 16px;">
+                Use esta área para revisar seus dados e, se necessário, encerrar sua conta com confirmação.
+              </div>
+              <button onclick="abrirModalExcluirConta()" style="background: #c0392b; color: white; border: none; padding: 12px 18px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 500; width: 100%;">
+                Excluir minha conta
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- MODAL EXCLUIR CONTA -->
@@ -1039,8 +1141,11 @@
           .toUpperCase();
         document.getElementById("sidebar-avatar-initials").textContent =
           iniciais;
+        const cfgAvatar = document.getElementById("cfg-avatar-preview");
+        if (cfgAvatar) cfgAvatar.textContent = iniciais;
 
         await carregarIdoso();
+        await carregarConfiguracoesUsuario();
         if (idosoData) {
           await Promise.all([
             carregarMedicamentos(),
@@ -1194,6 +1299,11 @@
         }
       }
 
+      function getObservacaoEvento(evento) {
+        const observacao = evento?.observacao ?? evento?.Observacao ?? "";
+        return String(observacao).trim();
+      }
+
       function renderTimeline(eventos) {
         const container = document.getElementById("timeline-hoje");
         if (!eventos || eventos.length === 0) {
@@ -1206,8 +1316,9 @@
           eventos
             .map((e, i) => {
               const isLast = i === eventos.length - 1;
-              const obs = e.observacao
-                ? `<div class="tl-obs">"${e.observacao}"</div>`
+              const observacao = getObservacaoEvento(e);
+              const obs = observacao
+                ? `<div class="tl-obs">"${observacao}"</div>`
                 : "";
               const tipo = (e.tipo || "").toLowerCase();
               const dotColor =
@@ -1252,6 +1363,7 @@
         }
         tbody.innerHTML = eventos
           .map((e) => {
+            const observacao = getObservacaoEvento(e);
             const tipo = e.tipo || "Programado";
             const badgeClass =
               tipo.toLowerCase() === "realizado" ||
@@ -1267,7 +1379,7 @@
           <td><div style="font-weight:500;">${e.data || "--"} ${e.hora || ""}</div></td>
           <td>${e.titulo || "--"}</td>
           <td><span class="badge ${badgeClass}" style="${badgeStyle}">${tipo}</span></td>
-          <td style="font-size:12px; color:var(--text-muted);">${e.observacao || "—"}</td>
+          <td style="font-size:12px; color:var(--text-muted);">${observacao}</td>
         </tr>`;
           })
           .join("");
@@ -1349,10 +1461,83 @@
           dashboard: "Visão Geral do Dia",
           medicamentos: "Medicamentos & Estoque",
           historico: "Histórico de Eventos",
+          config: "Configurações da Conta",
         };
         document.getElementById("topbar-title").textContent =
           titles[name] || "";
       }
+
+      async function carregarConfiguracoesUsuario() {
+        if (!currentUser?.id) return;
+        const erroEl = document.getElementById("cfg-erro");
+        const okEl = document.getElementById("cfg-ok");
+        if (erroEl) erroEl.style.display = "none";
+        if (okEl) okEl.style.display = "none";
+        try {
+          const resp = await fetch(`/api/user/${currentUser.id}`);
+          if (!resp.ok) throw new Error("Não foi possível carregar suas configurações.");
+          const user = await resp.json();
+          currentUser = user;
+          sessionStorage.setItem("jamesUser", JSON.stringify(user));
+          document.getElementById("cfg-nome").value = user.nome || "";
+          document.getElementById("cfg-email").value = user.email || "";
+          document.getElementById("cfg-role").value = user.role || "";
+          document.getElementById("cfg-codigo").value = user.codigoUsuario || "";
+          document.getElementById("cfg-senha").value = "";
+          const iniciais = (user.nome || "U")
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+          const cfgAvatar = document.getElementById("cfg-avatar-preview");
+          if (cfgAvatar) cfgAvatar.textContent = iniciais;
+          const sideName = document.getElementById("sidebar-nome");
+          if (sideName) sideName.textContent = user.nome || "Parente";
+          const sideAvatar = document.getElementById("sidebar-avatar-initials");
+          if (sideAvatar) sideAvatar.textContent = iniciais;
+        } catch (e) {
+          if (erroEl) {
+            erroEl.textContent = e.message || "Erro ao carregar configurações.";
+            erroEl.style.display = "block";
+          }
+        }
+      }
+
+      async function salvarConfiguracoesUsuario() {
+        if (!currentUser?.id) return;
+        const erroEl = document.getElementById("cfg-erro");
+        const okEl = document.getElementById("cfg-ok");
+        if (erroEl) erroEl.style.display = "none";
+        if (okEl) okEl.style.display = "none";
+        try {
+          const payload = {
+            nome: document.getElementById("cfg-nome").value.trim(),
+            email: document.getElementById("cfg-email").value.trim(),
+            role: currentUser.role,
+          };
+          const senha = document.getElementById("cfg-senha").value.trim();
+          if (senha) payload.senha = senha;
+
+          const resp = await fetch(`/api/user/${currentUser.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!resp.ok) throw new Error("Não foi possível salvar suas configurações.");
+          await carregarConfiguracoesUsuario();
+          if (okEl) {
+            okEl.textContent = "Configurações salvas com sucesso.";
+            okEl.style.display = "block";
+          }
+        } catch (e) {
+          if (erroEl) {
+            erroEl.textContent = e.message || "Erro ao salvar configurações.";
+            erroEl.style.display = "block";
+          }
+        }
+      }
+
       function abrirModalExcluirConta() {
         document.getElementById("modal-excluir-conta").style.display = "flex";
       }

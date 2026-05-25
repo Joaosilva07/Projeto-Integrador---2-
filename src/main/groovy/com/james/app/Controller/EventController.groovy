@@ -38,17 +38,17 @@ class EventController {
     }
 
     @GetMapping("/{id}")
-    Event Evento(@PathVariable Long id) {
+    Event Evento(@PathVariable("id") Long id) {
         return eventService.findById(id)
     }
 
     @PutMapping("/{id}")
-    Event updateEvent(@PathVariable Long id, @RequestBody Event event) {
+    Event updateEvent(@PathVariable("id") Long id, @RequestBody Event event) {
         return eventService.updateEvent(id, event)
     }
 
     @DeleteMapping("/{id}")
-    void deleteEvent(@PathVariable Long id) {
+    void deleteEvent(@PathVariable("id") Long id) {
         eventService.deleteEvent(id)
     }
 }

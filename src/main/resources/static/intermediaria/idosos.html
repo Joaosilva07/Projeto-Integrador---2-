@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Selecionar Idoso</title>
+    <script src="/js/loading.js"></script>
     <style>
       :root {
         --bg: #f7f5f1;
@@ -13,6 +14,8 @@
         --text: #2d2d2d;
         --muted: #7f7f7f;
         --border: #e6dfd6;
+        --accent: #c06b4a;
+        --success: #5c8268;
       }
 
       * {
@@ -22,45 +25,105 @@
       body {
         margin: 0;
         font-family: "DM Sans", system-ui, sans-serif;
-        background: radial-gradient(circle at top left, #fcfaf7 0%, var(--bg) 50%, #f2ede6 100%);
+        background:
+          radial-gradient(circle at top left, rgba(63, 111, 82, 0.08), transparent 30%),
+          radial-gradient(circle at top right, rgba(192, 107, 74, 0.09), transparent 26%),
+          linear-gradient(180deg, #fcfaf7 0%, var(--bg) 48%, #f2ede6 100%);
         color: var(--text);
         min-height: 100vh;
-        display: grid;
-        place-items: center;
         padding: 24px;
       }
 
       .wrap {
-        width: min(900px, 100%);
+        width: min(1120px, 100%);
+        margin: 0 auto;
       }
 
       .header {
-        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 22px;
+      }
+
+      .hero {
+        max-width: 620px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 12px;
       }
 
       .title {
         margin: 0;
-        font-size: 28px;
+        font-size: 34px;
         font-weight: 600;
+        line-height: 1.1;
       }
 
       .sub {
-        margin: 8px 0 0;
+        margin: 10px 0 0;
         color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+        max-width: 60ch;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .btn-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 18px;
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      }
+
+      .panel h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .panel-sub {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
       }
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         gap: 14px;
-      }
-
-      .card {
-        border: 1px solid var(--border);
-        background: var(--card);
-        border-radius: 14px;
-        padding: 14px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
       }
 
       .name {
@@ -79,6 +142,7 @@
         margin-top: 12px;
         display: flex;
         gap: 8px;
+        flex-wrap: wrap;
       }
 
       .btn {
@@ -104,6 +168,44 @@
         color: var(--text);
       }
 
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+      }
+
+      .btn-outline:hover {
+        background: rgba(63, 111, 82, 0.08);
+      }
+
+      .input-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .code-input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font: inherit;
+        background: #fff;
+      }
+
+      .code-input:focus {
+        outline: 2px solid rgba(63, 111, 82, 0.16);
+        border-color: var(--primary);
+      }
+
+      .helper-box {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px dashed var(--border);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
       .state {
         border: 1px dashed var(--border);
         padding: 24px;
@@ -111,20 +213,91 @@
         background: #fff;
         color: var(--muted);
       }
+
+      .code-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(63, 111, 82, 0.08);
+        color: var(--primary-dark);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .empty-note {
+        text-align: center;
+        padding: 26px 16px;
+        color: var(--muted);
+      }
+
+      .stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      @media (max-width: 900px) {
+        .header,
+        .shell {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .top-actions {
+          justify-content: flex-start;
+        }
+
+        .input-row {
+          flex-direction: column;
+        }
+      }
     </style>
   </head>
   <body>
     <main class="wrap">
       <header class="header">
-        <h1 class="title">Escolha o idoso para gerenciar</h1>
-        <p class="sub">Voce pode trocar de idoso depois no painel. Esse passo ajuda a entrar direto no contexto certo.</p>
+        <div class="hero">
+          <div class="eyebrow">Acesso do cuidador</div>
+          <h1 class="title">Escolha um idoso ou vincule pelo código</h1>
+          <p class="sub">Essa tela serve para entrar direto no contexto do idoso. Se ele ainda não estiver vinculado, informe o código e confirme o vínculo aqui mesmo.</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn btn-ghost btn-link" href="/Loguin.html">Voltar ao início</a>
+          <button class="btn btn-outline" onclick="reloadList()">Atualizar lista</button>
+        </div>
       </header>
 
-      <section id="state" class="state">Buscando idosos vinculados...</section>
-      <section id="grid" class="grid" style="display:none"></section>
+      <section class="shell">
+        <div class="panel">
+          <section id="state" class="state">Buscando idosos vinculados...</section>
+          <section id="grid" class="grid" style="display:none"></section>
+        </div>
+
+        <div class="stack">
+          <section class="panel">
+            <h2>Vincular por código</h2>
+            <p class="panel-sub">Peça o código do idoso e use essa caixa para criar o vínculo sem depender de outra tela.</p>
+            <div class="input-row">
+              <input id="codigo-idoso" class="code-input" type="text" inputmode="numeric" maxlength="4" placeholder="Ex: 1234" />
+              <button class="btn btn-primary" onclick="vincularPorCodigo()">Vincular</button>
+            </div>
+            <div id="link-status" class="helper-box">Digite o código para vincular um novo idoso.</div>
+          </section>
+
+          <section class="panel">
+            <h2>Como funciona</h2>
+            <p class="panel-sub">Cada idoso possui um código único. Depois de vincular, ele aparece nesta lista e no painel principal.</p>
+            <div class="code-badge">Fluxo direto sem selecionar duas vezes</div>
+          </section>
+        </div>
+      </section>
     </main>
 
     <script>
+      let currentUser = null;
+
       function redirectByRole(user) {
         if (!user || !user.role) {
           window.location.href = '/Loguin.html';
@@ -144,13 +317,47 @@
         window.location.href = '/Index.html';
       }
 
-      function logout() {
-        sessionStorage.removeItem('jamesUser');
-        window.location.href = '/Loguin.html';
+      function reloadList() {
+        if (currentUser) {
+          loadIdosos(currentUser);
+        }
       }
 
       function openDashboard(idosoId) {
         window.location.href = `/Index.html?idosoId=${encodeURIComponent(idosoId)}`;
+      }
+
+      function setStatus(message, isError = false) {
+        const status = document.getElementById('link-status');
+        if (!status) return;
+        status.textContent = message;
+        status.style.color = isError ? '#c0392b' : 'var(--muted)';
+      }
+
+      async function vincularPorCodigo() {
+        if (!currentUser?.id) return;
+        const input = document.getElementById('codigo-idoso');
+        const codigo = (input?.value || '').trim();
+        if (!codigo) {
+          setStatus('Informe o código do idoso.', true);
+          return;
+        }
+
+        try {
+          setStatus('Vinculando idoso...');
+          const res = await fetch(`/api/user/${encodeURIComponent(currentUser.id)}/link-by-code/${encodeURIComponent(codigo)}`, {
+            method: 'POST',
+          });
+          const data = await res.json().catch(() => null);
+          if (!res.ok) {
+            throw new Error(data?.erro || data?.message || 'Não foi possível vincular pelo código.');
+          }
+          input.value = '';
+          setStatus(data?.message || 'Vínculo realizado com sucesso.');
+          await loadIdosos(currentUser);
+        } catch (e) {
+          setStatus(e.message || 'Não foi possível vincular pelo código.', true);
+        }
       }
 
       function renderCards(idosos) {
@@ -169,6 +376,7 @@
           <article class="card">
             <div class="name">${i.nome || 'Sem nome'}</div>
             <div class="meta">${i.email || ''}</div>
+            <div class="code-badge">Código ${i.codigoUsuario || '---'}</div>
             <div class="actions">
               <button class="btn btn-primary" onclick="openDashboard(${i.id})">Entrar no painel</button>
             </div>
@@ -176,9 +384,26 @@
         `).join('');
       }
 
+      async function loadIdosos(me) {
+        const state = document.getElementById('state');
+        const grid = document.getElementById('grid');
+        try {
+          state.style.display = 'block';
+          state.textContent = 'Buscando idosos vinculados...';
+          grid.style.display = 'none';
+          const res = await fetch('/api/user');
+          const users = await res.json();
+          const idosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
+          renderCards(idosos);
+        } catch (e) {
+          state.style.display = 'block';
+          state.textContent = 'Não conseguimos carregar os idosos vinculados agora.';
+          grid.style.display = 'none';
+        }
+      }
+
       async function init() {
         const userRaw = sessionStorage.getItem('jamesUser');
-        const state = document.getElementById('state');
 
         if (!userRaw) {
           window.location.href = '/Loguin.html';
@@ -186,17 +411,11 @@
         }
 
         const me = JSON.parse(userRaw);
+        currentUser = me;
         redirectByRole(me);
         if (me.role !== 'CUIDADOR') return;
 
-        try {
-          const res = await fetch('/api/user');
-          const users = await res.json();
-          const idosos = users.filter(u => u.role === 'IDOSO' && Array.isArray(u.responsaveis) && u.responsaveis.some(r => String(r.id) === String(me.id)));
-          renderCards(idosos);
-        } catch (e) {
-          state.textContent = 'Não conseguimos carregar os idosos vinculados agora.';
-        }
+        await loadIdosos(me);
       }
 
       init();

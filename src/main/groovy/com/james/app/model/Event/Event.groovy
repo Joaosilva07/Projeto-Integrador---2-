@@ -2,6 +2,7 @@ package com.james.app.model.Event
 
 import com.james.app.model.User.User;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tabela_evento")
@@ -26,6 +27,11 @@ class Event {
     @ManyToOne
     @JoinColumn(name = "paciente_id")
     User paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "responsavel_id")
+    @JsonIgnoreProperties(["responsaveis"])
+    User responsavel;
 
     @Column(length = 1000)
     String observacao;

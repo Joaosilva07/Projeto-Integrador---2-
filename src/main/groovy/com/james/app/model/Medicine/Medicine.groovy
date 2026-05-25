@@ -1,6 +1,7 @@
 package com.james.app.model.Medicine
 
 import com.james.app.model.User.User
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -27,6 +28,11 @@ class Medicine {
     @ManyToOne
     @JoinColumn(name = "paciente_id")
     User Paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "responsavel_id")
+    @JsonIgnoreProperties(["responsaveis"])
+    User Responsavel;
 
     @Column
     Integer Unidades;

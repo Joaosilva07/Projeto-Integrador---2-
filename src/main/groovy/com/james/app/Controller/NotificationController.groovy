@@ -58,7 +58,7 @@ class NotificationController {
 
   // Marcar uma notificação como lida
   @PutMapping("/{id}/ler")
-  ResponseEntity<?> marcarComoLida(@PathVariable Long id, @RequestParam(value = "userId", required = true) Long userId) {
+  ResponseEntity<?> marcarComoLida(@PathVariable("id") Long id, @RequestParam(value = "userId", required = true) Long userId) {
     def user = userService.userRepository.findById(userId).orElse(null)
     if (!user) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body([erro: 'Usuário não encontrado'])

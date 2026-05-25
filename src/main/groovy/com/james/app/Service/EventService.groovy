@@ -21,6 +21,7 @@ class EventService {
 
     Event creatEvent(Event event) {
         event.setPaciente(resolvePaciente(event.getPaciente()))
+        event.setResponsavel(resolveResponsavel(event.getResponsavel()))
         def saved = eventRepository.save(event)
         
         // Notificar paciente e responsáveis sobre novo evento
@@ -39,6 +40,7 @@ class EventService {
         event.setHora(newEvent.getHora())
         event.setTipo(newEvent.getTipo())
         event.setPaciente(resolvePaciente(newEvent.getPaciente()))
+        event.setResponsavel(resolveResponsavel(newEvent.getResponsavel()))
 
         return eventRepository.save(event)
     }
@@ -89,6 +91,15 @@ class EventService {
         }
 
         return paciente
+    }
+
+    private User resolveResponsavel(User responsavelRef) {
+        if (responsavelRef?.id == null) {
+            return null
+        }
+
+        return userRepository.findById(responsavelRef.id)
+                .orElseThrow(() -> new RuntimeException("Responsável não encontrado"))
     }
     
     private void notificarNovoEvento(Event event) {

@@ -21,6 +21,7 @@ class MedicineService {
 
     Medicine saveMedicine(Medicine medicine) {
         medicine.Paciente = resolvePaciente(medicine.Paciente)
+        medicine.Responsavel = resolveResponsavel(medicine.Responsavel)
         def saved = medicineRepository.save(medicine)
         
         // Verificar estoque baixo e notificar responsáveis
@@ -39,6 +40,7 @@ class MedicineService {
         medicine.Horario = newMedicine.Horario
         medicine.Unidades = newMedicine.Unidades
         medicine.Paciente = resolvePaciente(newMedicine.Paciente)
+        medicine.Responsavel = resolveResponsavel(newMedicine.Responsavel)
 
         def updated = medicineRepository.save(medicine)
         
@@ -95,6 +97,15 @@ class MedicineService {
         }
 
         return paciente
+    }
+
+    private User resolveResponsavel(User responsavelRef) {
+        if (responsavelRef?.id == null) {
+            return null
+        }
+
+        return userRepository.findById(responsavelRef.id)
+                .orElseThrow(() -> new RuntimeException("Responsável não encontrado"))
     }
     
     private void notificarEstoqueBaixo(Medicine medicine) {

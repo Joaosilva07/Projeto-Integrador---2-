@@ -61,8 +61,41 @@ function filtrarEventosPorPaciente(evs, pacienteId) {
 }
 
 function getAgendaPacienteSelecionado() {
+  if (selectedIdosoFromUrl) return selectedIdosoFromUrl;
   const sel = document.getElementById("agenda-filtro-idoso");
   return sel ? sel.value : "";
+}
+
+function getHistoricoPacienteSelecionado() {
+  if (selectedIdosoFromUrl) return selectedIdosoFromUrl;
+  return "";
+}
+
+function getPacienteContexto() {
+  return selectedIdosoFromUrl || "";
+}
+
+function configurarCampoPacienteModal(selectId, fieldId, permitido) {
+  const sel = document.getElementById(selectId);
+  const field = document.getElementById(fieldId);
+  if (!sel) return;
+
+  const idosos = getIdososPermitidos(usuariosGlobal || []);
+  const contexto = getPacienteContexto();
+  const lista = permitido ? idosos : idosos;
+
+  sel.innerHTML = '<option value="">Selecione o idoso</option>';
+  lista.forEach((i) => {
+    sel.innerHTML += `<option value="${i.id}">${i.nome}</option>`;
+  });
+
+  if (contexto && lista.some((i) => String(i.id) === String(contexto))) {
+    sel.value = String(contexto);
+    if (field) field.style.display = "none";
+    return;
+  }
+
+  if (field) field.style.display = "";
 }
 
 function buildScopeQuery() {
@@ -725,24 +758,7 @@ async function carregarUsuarios() {
 
 function preencherFiltrosPacientes(users) {
   const idosos = getIdososPermitidos(users);
-  const historicoSel = document.getElementById("historico-filtro-paciente");
   const agendaSel = document.getElementById("agenda-filtro-idoso");
-
-  if (historicoSel) {
-    const atual = historicoSel.value;
-    historicoSel.innerHTML = '<option value="">Todos os pacientes</option>';
-    idosos.forEach((i) => {
-      historicoSel.innerHTML += `<option value="${i.id}">${i.nome}</option>`;
-    });
-    const preferidoHistorico = idosos.some(
-      (i) => String(i.id) === String(selectedIdosoFromUrl),
-    )
-      ? String(selectedIdosoFromUrl)
-      : idosos.some((i) => String(i.id) === String(atual))
-        ? atual
-        : "";
-    historicoSel.value = preferidoHistorico;
-  }
 
   if (agendaSel) {
     const atual = agendaSel.value;
@@ -952,6 +968,7 @@ async function excluirMedicamento(id) {
 }
 
 function abrirModalMedicamento() {
+  preencherSelectPacientes();
   document.getElementById("modal-med").classList.add("active");
 }
 function fecharModalMedicamento() {
@@ -982,6 +999,7 @@ async function salvarMedicamento() {
     Unidades: unidades,
     observacao,
     Paciente: { id: parseInt(pacienteId) },
+    Responsavel: usuarioLogado?.id ? { id: parseInt(usuarioLogado.id) } : null,
   };
   try {
     const res = await fetch("/Medicines/create_medicine", {
@@ -1132,20 +1150,19 @@ function renderProximasTarefas(evs) {
 function renderHistorico(evs) {
   const tbody = document.getElementById("tbody-historico");
   if (!tbody) return;
-  const pacienteId =
-    document.getElementById("historico-filtro-paciente")?.value || "";
+  const pacienteId = getHistoricoPacienteSelecionado();
   const filtrados = filtrarEventosPorPaciente(evs, pacienteId);
   atualizarBadgeHistorico(filtrados.length);
   if (filtrados.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum evento registrado.</td></tr>';
+      '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum evento registrado.</td></tr>';
     return;
   }
   tbody.innerHTML = [...filtrados]
     .reverse()
     .map(
       (e) => `<tr>
-          <td>${e.paciente ? e.paciente.nome : "—"}</td><td>—</td>
+          <td>${e.paciente ? e.paciente.nome : "—"}</td>
           <td><div class="name" style="font-size:13px">${e.data || "—"}</div><div class="sub">${e.hora || ""}</div></td>
           <td>${e.titulo || "—"}</td>
           <td><span class="badge badge-realizado">Registrado</span></td>
@@ -1204,7 +1221,11 @@ saveEvent = async function () {
   const data = document.getElementById("event-date").value;
   const hora = document.getElementById("event-time").value;
   const tipo = document.getElementById("event-type").value;
-  const pacienteId = document.getElementById("event-paciente").value;
+  const observacao = document.getElementById("event-observacao")?.value?.trim() || "";
+  const pacienteId =
+    document.getElementById("event-paciente")?.value ||
+    getAgendaPacienteSelecionado() ||
+    getPacienteContexto();
   if (!titulo || !data || !hora) {
     alert("Preencha todos os campos!");
     return;
@@ -1214,8 +1235,9 @@ saveEvent = async function () {
     return;
   }
   try {
-    const body = { titulo, data, hora, tipo };
+    const body = { titulo, data, hora, tipo, observacao };
     if (pacienteId) body.paciente = { id: parseInt(pacienteId) };
+    if (usuarioLogado?.id) body.responsavel = { id: parseInt(usuarioLogado.id) };
     const res = await fetch("/Eventos/criarEvent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1230,6 +1252,8 @@ saveEvent = async function () {
     document.getElementById("event-time").value = "";
     document.getElementById("event-type").value = "medication";
     document.getElementById("event-paciente").value = "";
+    const obsEl = document.getElementById("event-observacao");
+    if (obsEl) obsEl.value = "";
     await carregarEventos();
   } catch (e) {
     alert(e.message || "Erro ao salvar evento.");
@@ -1238,26 +1262,11 @@ saveEvent = async function () {
 
 // Carregar lista de pacientes no select do modal de medicamentos
 function preencherSelectPacientes() {
-  const sel = document.getElementById("m-paciente");
-  if (!sel) return;
-  sel.innerHTML = '<option value="">Selecione o idoso</option>';
-  getIdososPermitidos(usuariosGlobal).forEach((u) => {
-    sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
-  });
+  configurarCampoPacienteModal("m-paciente", "m-paciente-field");
 }
 
 function preencherSelectPacientesEvento() {
-  const sel = document.getElementById("event-paciente");
-  if (!sel) return;
-  const atual = sel.value;
-  const idososPermitidos = getIdososPermitidos(usuariosGlobal);
-  sel.innerHTML = '<option value="">Selecione o idoso</option>';
-  idososPermitidos.forEach((u) => {
-    sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
-  });
-  sel.value = idososPermitidos.some((u) => String(u.id) === String(atual))
-    ? atual
-    : "";
+  configurarCampoPacienteModal("event-paciente", "event-paciente-field");
 }
 
 // Sobrescrever abrirModalMedicamento para preencher select
@@ -1285,10 +1294,6 @@ document.querySelectorAll("#view-agenda .btn-primary").forEach((btn) => {
 document.querySelectorAll("#view-historico .btn-primary").forEach((btn) => {
   btn.onclick = openEventModal;
 });
-
-const historicoFiltro = document.getElementById("historico-filtro-paciente");
-if (historicoFiltro)
-  historicoFiltro.addEventListener("change", () => renderHistorico(eventos));
 
 const agendaFiltro = document.getElementById("agenda-filtro-idoso");
 if (agendaFiltro)
