@@ -27,7 +27,7 @@ class EventService {
         event.setPaciente(resolvePaciente(event.getPaciente()))
         event.setResponsavel(resolveResponsavel(event.getResponsavel()))
         def saved = eventRepository.save(event)
-        registrarHistorico(saved, "CRIACAO")
+        registrarHistorico(saved, "CRIACAO", montarResumoEvento(saved))
         
         // Notificar paciente e responsáveis sobre novo evento
         notificarNovoEvento(saved)
@@ -40,16 +40,25 @@ class EventService {
                 () -> new RuntimeException("Evento não encontrado")
         )
 
+        User novoPaciente = resolvePaciente(newEvent.getPaciente())
+        User novoResponsavel = resolveResponsavel(newEvent.getResponsavel())
+        String detalhesAlteracao = montarDetalhesAlteracao(
+                event,
+                newEvent,
+                novoPaciente,
+                novoResponsavel
+        )
+
         event.setTitulo(newEvent.getTitulo())
         event.setData(newEvent.getData())
         event.setHora(newEvent.getHora())
         event.setTipo(newEvent.getTipo())
-        event.setPaciente(resolvePaciente(newEvent.getPaciente()))
-        event.setResponsavel(resolveResponsavel(newEvent.getResponsavel()))
+        event.setPaciente(novoPaciente)
+        event.setResponsavel(novoResponsavel)
         event.setObservacao(newEvent.getObservacao())
 
         def updated = eventRepository.save(event)
-        registrarHistorico(updated, "ALTERACAO")
+        registrarHistorico(updated, "ALTERACAO", detalhesAlteracao)
         return updated
     }
 
@@ -57,7 +66,7 @@ class EventService {
         Event event = eventRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Evento não encontrado")
         )
-        registrarHistorico(event, "EXCLUSAO")
+        registrarHistorico(event, "EXCLUSAO", montarResumoEvento(event))
         eventRepository.delete(event)
     }
 
@@ -131,7 +140,7 @@ class EventService {
                 .orElseThrow(() -> new RuntimeException("Responsável não encontrado"))
     }
 
-    private void registrarHistorico(Event event, String acao) {
+    private void registrarHistorico(Event event, String acao, String detalhes) {
         if (event == null || event.id == null) {
             return
         }
@@ -143,13 +152,77 @@ class EventService {
                 data: event.data,
                 hora: event.hora,
                 tipo: event.tipo,
-                observacao: event.observacao,
+                observacao: detalhes,
                 pacienteId: event.paciente?.id,
                 pacienteNome: event.paciente?.nome,
                 responsavelId: event.responsavel?.id,
                 responsavelNome: event.responsavel?.nome
         )
         eventHistoryRepository.save(history)
+    }
+
+    private String montarResumoEvento(Event event) {
+        if (event == null) {
+            return ""
+        }
+
+        List<String> detalhes = []
+        detalhes << "Titulo: ${valorOuTraco(event.titulo)}"
+        detalhes << "Data: ${valorOuTraco(event.data)}"
+        detalhes << "Hora: ${valorOuTraco(event.hora)}"
+        detalhes << "Tipo: ${tipoEventoLabel(event.tipo)}"
+        detalhes << "Paciente: ${valorOuTraco(event.paciente?.nome)}"
+        if (event.responsavel?.nome) {
+            detalhes << "Responsavel: ${event.responsavel.nome}"
+        }
+        if (event.observacao) {
+            detalhes << "Observacao: ${event.observacao.trim()}"
+        }
+        return detalhes.join(" • ")
+    }
+
+    private String montarDetalhesAlteracao(Event atual, Event novo, User novoPaciente, User novoResponsavel) {
+        List<String> mudancas = []
+        adicionarMudanca(mudancas, "Titulo", atual?.titulo, novo?.titulo)
+        adicionarMudanca(mudancas, "Data", atual?.data, novo?.data)
+        adicionarMudanca(mudancas, "Hora", atual?.hora, novo?.hora)
+        adicionarMudanca(mudancas, "Tipo", tipoEventoLabel(atual?.tipo), tipoEventoLabel(novo?.tipo))
+        adicionarMudanca(mudancas, "Paciente", atual?.paciente?.nome, novoPaciente?.nome)
+        adicionarMudanca(mudancas, "Responsavel", atual?.responsavel?.nome, novoResponsavel?.nome)
+        adicionarMudanca(mudancas, "Observacao", atual?.observacao, novo?.observacao)
+        return mudancas ? mudancas.join(" • ") : "Nenhum campo alterado."
+    }
+
+    private void adicionarMudanca(List<String> mudancas, String campo, Object anterior, Object novo) {
+        String valorAnterior = valorOuTraco(anterior)
+        String valorNovo = valorOuTraco(novo)
+        if (valorAnterior != valorNovo) {
+            mudancas << "${campo}: ${valorAnterior} -> ${valorNovo}"
+        }
+    }
+
+    private String valorOuTraco(Object valor) {
+        String texto = valor == null ? "" : String.valueOf(valor).trim()
+        return texto ? texto : "—"
+    }
+
+    private String tipoEventoLabel(String tipo) {
+        switch ((tipo ?: "").toLowerCase()) {
+            case "medication":
+                return "Medicamento"
+            case "health":
+                return "Saude"
+            case "activity":
+                return "Atividade Fisica"
+            case "meal":
+                return "Alimentacao"
+            case "hygiene":
+                return "Higiene"
+            case "other":
+                return "Outro"
+            default:
+                return valorOuTraco(tipo)
+        }
     }
     
     private void notificarNovoEvento(Event event) {

@@ -87,15 +87,10 @@ function toggleWeeklyView(view) {
 }
 
 function openEventModal() {
-  const selModalPaciente = document.getElementById("event-paciente");
   const agendaPaciente = getAgendaPacienteSelecionado();
-  if (selModalPaciente) {
-    preencherSelectPacientesEvento();
-    if (agendaPaciente) selModalPaciente.value = agendaPaciente;
-  }
 
-  if (usuarioLogado && usuarioLogado.role === "CUIDADOR" && !(selModalPaciente && selModalPaciente.value)) {
-    alert("Selecione o idoso na agenda antes de criar um evento.");
+  if (usuarioLogado && usuarioLogado.role === "CUIDADOR" && !agendaPaciente) {
+    alert("Nenhum idoso esta definido no contexto atual.");
     return;
   }
 

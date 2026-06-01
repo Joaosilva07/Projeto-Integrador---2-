@@ -25,6 +25,8 @@ let historicoEventos = [];
 let medicamentosGlobal = [];
 let usuariosGlobal = [];
 let usuarioLogado = null;
+let medicamentoEmEdicaoId = null;
+let eventoEmEdicaoId = null;
 const selectedIdosoFromUrl = new URLSearchParams(window.location.search).get(
   "idosoId",
 );
@@ -74,6 +76,52 @@ function getHistoricoPacienteSelecionado() {
 
 function getPacienteContexto() {
   return selectedIdosoFromUrl || getAgendaPacienteSelecionado() || "";
+}
+
+function limparModalMedicamento() {
+  document.getElementById("m-nome").value = "";
+  document.getElementById("m-horario").value = "";
+  document.getElementById("m-unidades").value = "";
+  const obsEl = document.getElementById("m-observacao");
+  if (obsEl) obsEl.value = "";
+  const erroEl = document.getElementById("m-erro");
+  if (erroEl) {
+    erroEl.textContent = "";
+    erroEl.style.display = "none";
+  }
+}
+
+function atualizarModalMedicamento() {
+  const title = document.getElementById("modal-med-title");
+  const submit = document.getElementById("modal-med-submit");
+  if (title) {
+    title.textContent = medicamentoEmEdicaoId
+      ? "Editar Medicamento"
+      : "Novo Medicamento";
+  }
+  if (submit) {
+    submit.textContent = medicamentoEmEdicaoId ? "Salvar alteracoes" : "Salvar";
+  }
+}
+
+function limparModalEvento() {
+  document.getElementById("event-title").value = "";
+  document.getElementById("event-date").value = "";
+  document.getElementById("event-time").value = "";
+  document.getElementById("event-type").value = "medication";
+  const obsEl = document.getElementById("event-observacao");
+  if (obsEl) obsEl.value = "";
+}
+
+function atualizarModalEvento() {
+  const title = document.getElementById("event-modal-title");
+  const submit = document.getElementById("event-modal-submit");
+  if (title) {
+    title.textContent = eventoEmEdicaoId ? "Editar Evento" : "Criar Evento";
+  }
+  if (submit) {
+    submit.textContent = eventoEmEdicaoId ? "Salvar alteracoes" : "Salvar";
+  }
 }
 
 function configurarCampoPacienteModal(
@@ -246,18 +294,8 @@ function toggleWeeklyView(view) {
 }
 
 function openEventModal() {
-  const selModalPaciente = document.getElementById("event-paciente");
-  const agendaPaciente = getAgendaPacienteSelecionado();
-  if (selModalPaciente) {
-    preencherSelectPacientesEvento();
-    if (agendaPaciente) selModalPaciente.value = agendaPaciente;
-  }
-  if (
-    usuarioLogado &&
-    usuarioLogado.role === "CUIDADOR" &&
-    !selModalPaciente?.value
-  ) {
-    alert("Selecione o idoso na agenda antes de criar um evento.");
+  if (usuarioLogado && usuarioLogado.role === "CUIDADOR" && !getPacienteContexto()) {
+    alert("Nenhum idoso esta definido no contexto atual.");
     return;
   }
   const modal = document.getElementById("event-modal");
@@ -653,6 +691,20 @@ function getBadgeHistorico(item) {
 function getTipoEventoLabel(tipo) {
   if (!tipo) return "";
   return eventTypes[tipo]?.label || tipo;
+}
+
+function getHistoricoOrigemLabel(item) {
+  if (item?.data) return "Evento";
+  if (String(item?.tipo || "").toLowerCase() === "medication") {
+    return "Medicamento";
+  }
+  return "Registro";
+}
+
+function getHistoricoAtividadeLabel(item) {
+  const origem = getHistoricoOrigemLabel(item);
+  const titulo = item?.titulo || "Sem titulo";
+  return `${origem}: ${titulo}`;
 }
 
 function montarDetalhesHistorico(item) {
@@ -1073,7 +1125,10 @@ function renderCardsMedicamentos(meds) {
             <div class="card-row"><span class="card-row-label">Horário</span><span class="card-row-value">${m.Horario || "—"}</span></div>
             <div class="card-row"><span class="card-row-label">Paciente</span><span class="card-row-value">${m.Paciente ? m.Paciente.nome : "—"}</span></div>
             <div class="card-row"><span class="card-row-label">Estoque</span><span class="card-row-value" style="color:${baixo ? "var(--terracotta)" : "var(--sage-600)"}">${m.Unidades ?? "?"} unid.</span></div>
-            <button class="btn btn-ghost" style="margin-top:8px;width:100%;font-size:12px;color:var(--terracotta)" onclick="excluirMedicamento(${m.id})">Excluir</button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+              <button class="btn btn-ghost" style="width:100%;font-size:12px;" onclick="editarMedicamento(${m.id})">Editar</button>
+              <button class="btn btn-ghost" style="width:100%;font-size:12px;color:var(--terracotta)" onclick="excluirMedicamento(${m.id})">Excluir</button>
+            </div>
           </div>`;
   });
   if (addCard) {
@@ -1089,14 +1144,43 @@ async function excluirMedicamento(id) {
   if (!confirm("Excluir este medicamento?")) return;
   await fetch("/Medicines/" + id, { method: "DELETE" });
   carregarMedicamentos();
+  carregarHistorico();
 }
 
 function abrirModalMedicamento() {
-  preencherSelectPacientes();
+  medicamentoEmEdicaoId = null;
+  limparModalMedicamento();
+  atualizarModalMedicamento();
   document.getElementById("modal-med").classList.add("active");
 }
 function fecharModalMedicamento() {
+  medicamentoEmEdicaoId = null;
+  limparModalMedicamento();
+  atualizarModalMedicamento();
   document.getElementById("modal-med").classList.remove("active");
+}
+
+function editarMedicamento(id) {
+  const medicamento = (medicamentosGlobal || []).find(
+    (item) => String(item.id) === String(id),
+  );
+  if (!medicamento) {
+    alert("Medicamento não encontrado.");
+    return;
+  }
+  medicamentoEmEdicaoId = id;
+  document.getElementById("m-nome").value = medicamento.Nome || "";
+  document.getElementById("m-horario").value = medicamento.Horario || "";
+  document.getElementById("m-unidades").value = medicamento.Unidades ?? "";
+  const obsEl = document.getElementById("m-observacao");
+  if (obsEl) obsEl.value = medicamento.observacao || "";
+  const erroEl = document.getElementById("m-erro");
+  if (erroEl) {
+    erroEl.textContent = "";
+    erroEl.style.display = "none";
+  }
+  atualizarModalMedicamento();
+  document.getElementById("modal-med").classList.add("active");
 }
 
 async function salvarMedicamento() {
@@ -1104,7 +1188,12 @@ async function salvarMedicamento() {
   const horario = document.getElementById("m-horario").value.trim();
   const unidades = parseInt(document.getElementById("m-unidades").value) || 0;
   const observacao = document.getElementById("m-observacao")?.value?.trim() || '';
-  const pacienteId = document.getElementById("m-paciente").value;
+  const medicamentoAtual = medicamentoEmEdicaoId
+    ? (medicamentosGlobal || []).find(
+        (item) => String(item.id) === String(medicamentoEmEdicaoId),
+      )
+    : null;
+  const pacienteId = getPacienteContexto() || medicamentoAtual?.Paciente?.id || "";
   const erroEl = document.getElementById("m-erro");
   erroEl.style.display = "none";
   if (!nome) {
@@ -1113,7 +1202,7 @@ async function salvarMedicamento() {
     return;
   }
   if (!pacienteId) {
-    erroEl.textContent = "Selecione o idoso para este medicamento.";
+    erroEl.textContent = "Nenhum idoso esta definido no contexto atual.";
     erroEl.style.display = "block";
     return;
   }
@@ -1126,25 +1215,25 @@ async function salvarMedicamento() {
     Responsavel: usuarioLogado?.id ? { id: parseInt(usuarioLogado.id) } : null,
   };
   try {
-    const res = await fetch("/Medicines/create_medicine", {
-      method: "POST",
+    const res = await fetch(
+      medicamentoEmEdicaoId
+        ? `/Medicines/${encodeURIComponent(medicamentoEmEdicaoId)}`
+        : "/Medicines/create_medicine",
+      {
+        method: medicamentoEmEdicaoId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    });
+      },
+    );
     if (!res.ok) {
       throw new Error(
         await extrairMensagemErro(res, "Erro ao salvar medicamento."),
       );
     }
     fecharModalMedicamento();
-    document.getElementById("m-nome").value = "";
-    document.getElementById("m-horario").value = "";
-    document.getElementById("m-unidades").value = "";
-    document.getElementById("m-paciente").value = "";
-    const obsEl = document.getElementById("m-observacao");
-    if (obsEl) obsEl.value = "";
     await carregarMedicamentos();
     await carregarEventos();
+    await carregarHistorico();
   } catch (e) {
     erroEl.textContent = e.message;
     erroEl.style.display = "block";
@@ -1309,10 +1398,11 @@ function renderHistorico(evs) {
   tbody.innerHTML = filtrados
     .map((e) => {
       const badge = getBadgeHistorico(e);
+      const origem = getHistoricoOrigemLabel(e);
       return `<tr>
           <td>${e.pacienteNome || e.paciente?.nome || "—"}</td>
-          <td><div class="name" style="font-size:13px">${formatarDataHoraHistorico(e)}</div><div class="sub">Evento #${e.eventId || e.id || "—"}</div></td>
-          <td>${e.titulo || "—"}</td>
+          <td><div class="name" style="font-size:13px">${formatarDataHoraHistorico(e)}</div><div class="sub">${origem} #${e.eventId || e.id || "—"}</div></td>
+          <td>${getHistoricoAtividadeLabel(e)}</td>
           <td><span class="badge ${badge.className}">${badge.label}</span></td>
           <td style="font-size:12.5px;color:var(--text-muted)">${montarDetalhesHistorico(e)}</td>
         </tr>`;
@@ -1347,7 +1437,8 @@ function renderAgendaLista(evs) {
                 <div class="agenda-patient-age">${e.hora} · ${e.tipo || ""} · ${e.paciente ? e.paciente.nome : ""}</div>
               </div>
             </div>
-            <div style="padding:8px 0">
+            <div style="padding:8px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <button class="btn btn-ghost" style="font-size:12px;" onclick="editarEvento(${e.id})">Editar evento</button>
               <button class="btn btn-ghost" style="font-size:12px;color:var(--terracotta)" onclick="excluirEvento(${e.id})">Excluir evento</button>
             </div>
           </div>`;
@@ -1371,24 +1462,24 @@ saveEvent = async function () {
   const hora = document.getElementById("event-time").value;
   const tipo = document.getElementById("event-type").value;
   const observacao = document.getElementById("event-observacao")?.value?.trim() || "";
-  const pacienteId =
-    document.getElementById("event-paciente")?.value ||
-    getAgendaPacienteSelecionado() ||
-    getPacienteContexto();
+  const eventoAtual = eventoEmEdicaoId
+    ? (eventos || []).find((item) => String(item.id) === String(eventoEmEdicaoId))
+    : null;
+  const pacienteId = getPacienteContexto() || eventoAtual?.paciente?.id || "";
   if (!titulo || !data || !hora) {
     alert("Preencha todos os campos!");
     return;
   }
   if (!pacienteId) {
-    alert("Selecione o idoso para criar o evento.");
+    alert("Nenhum idoso esta definido no contexto atual.");
     return;
   }
   try {
     const body = { titulo, data, hora, tipo, observacao };
     if (pacienteId) body.paciente = { id: parseInt(pacienteId) };
     if (usuarioLogado?.id) body.responsavel = { id: parseInt(usuarioLogado.id) };
-    const res = await fetch("/Eventos/criarEvent", {
-      method: "POST",
+    const res = await fetch(eventoEmEdicaoId ? `/Eventos/${encodeURIComponent(eventoEmEdicaoId)}` : "/Eventos/criarEvent", {
+      method: eventoEmEdicaoId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
@@ -1396,13 +1487,6 @@ saveEvent = async function () {
       throw new Error(await extrairMensagemErro(res, "Erro ao salvar evento."));
     }
     closeEventModal();
-    document.getElementById("event-title").value = "";
-    document.getElementById("event-date").value = "";
-    document.getElementById("event-time").value = "";
-    document.getElementById("event-type").value = "medication";
-    document.getElementById("event-paciente").value = "";
-    const obsEl = document.getElementById("event-observacao");
-    if (obsEl) obsEl.value = "";
     await carregarEventos();
     await carregarHistorico();
   } catch (e) {
@@ -1410,30 +1494,55 @@ saveEvent = async function () {
   }
 };
 
+function editarEvento(id) {
+  const evento = (eventos || []).find((item) => String(item.id) === String(id));
+  if (!evento) {
+    alert("Evento não encontrado.");
+    return;
+  }
+  eventoEmEdicaoId = id;
+  document.getElementById("event-title").value = evento.titulo || "";
+  document.getElementById("event-date").value = evento.data || "";
+  document.getElementById("event-time").value = evento.hora || "";
+  document.getElementById("event-type").value = evento.tipo || "medication";
+  const obsEl = document.getElementById("event-observacao");
+  if (obsEl) obsEl.value = evento.observacao || "";
+  atualizarModalEvento();
+  document.getElementById("event-modal").classList.add("active");
+}
+
 // Carregar lista de pacientes no select do modal de medicamentos
 function preencherSelectPacientes() {
-  configurarCampoPacienteModal(
-    "m-paciente",
-    "m-paciente-field",
-    undefined,
-    "Escolha para quem e o medicamento",
-  );
+  return getPacienteContexto();
 }
 
 function preencherSelectPacientesEvento() {
-  configurarCampoPacienteModal(
-    "event-paciente",
-    "event-paciente-field",
-    undefined,
-    "Escolha para quem e o evento",
-  );
+  return getPacienteContexto();
 }
 
 // Sobrescrever abrirModalMedicamento para preencher select
 const _abrirModalMed = abrirModalMedicamento;
 abrirModalMedicamento = function () {
-  preencherSelectPacientes();
+  medicamentoEmEdicaoId = null;
+  limparModalMedicamento();
+  atualizarModalMedicamento();
   document.getElementById("modal-med").classList.add("active");
+};
+
+const _openEventModalOriginal = openEventModal;
+openEventModal = function () {
+  eventoEmEdicaoId = null;
+  limparModalEvento();
+  atualizarModalEvento();
+  return _openEventModalOriginal();
+};
+
+const _closeEventModalOriginal = closeEventModal;
+closeEventModal = function () {
+  eventoEmEdicaoId = null;
+  limparModalEvento();
+  atualizarModalEvento();
+  return _closeEventModalOriginal();
 };
 
 // Botão "topbar-btn" removido - agora usando avatar/perfil no topo

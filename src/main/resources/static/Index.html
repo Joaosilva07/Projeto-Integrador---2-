@@ -859,7 +859,7 @@
     <div class="modal-overlay" id="modal-med">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="modal-title">Novo Medicamento</span
+          <span class="modal-title" id="modal-med-title">Novo Medicamento</span
           ><button class="modal-close" onclick="fecharModalMedicamento()">
             ×
           </button>
@@ -888,12 +888,6 @@
             style="resize: vertical"
           ></textarea>
         </div>
-        <div class="modal-field" id="m-paciente-field">
-          <label>Idoso</label>
-          <select id="m-paciente">
-            <option value="">Escolha para quem e o medicamento</option>
-          </select>
-        </div>
         <div
           id="m-erro"
           style="
@@ -906,7 +900,7 @@
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fecharModalMedicamento()">
             Cancelar</button
-          ><button class="btn-save" onclick="salvarMedicamento()">
+          ><button class="btn-save" id="modal-med-submit" onclick="salvarMedicamento()">
             Salvar
           </button>
         </div>
@@ -917,7 +911,7 @@
     <div class="modal-overlay" id="event-modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="modal-title">Criar Evento</span>
+          <span class="modal-title" id="event-modal-title">Criar Evento</span>
           <button class="modal-close" onclick="closeEventModal()">×</button>
         </div>
         <div class="modal-field">
@@ -943,12 +937,6 @@
             <option value="other">Outro</option>
           </select>
         </div>
-        <div class="modal-field" id="event-paciente-field">
-          <label>Idoso</label>
-          <select id="event-paciente">
-            <option value="">Escolha para quem e o evento</option>
-          </select>
-        </div>
         <div class="modal-field">
           <label>Observação</label>
           <textarea
@@ -962,7 +950,7 @@
           <button class="btn-cancel" onclick="closeEventModal()">
             Cancelar
           </button>
-          <button class="btn-save" onclick="saveEvent()">Salvar</button>
+          <button class="btn-save" id="event-modal-submit" onclick="saveEvent()">Salvar</button>
         </div>
       </div>
     </div>

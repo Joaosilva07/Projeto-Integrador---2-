@@ -1592,6 +1592,20 @@
         return labels[tipo] || tipo || "";
       }
 
+      function getHistoricoOrigemLabel(item) {
+        if (item?.data) return "Evento";
+        if (String(item?.tipo || "").toLowerCase() === "medication") {
+          return "Medicamento";
+        }
+        return "Registro";
+      }
+
+      function getHistoricoAtividadeLabel(item) {
+        const origem = getHistoricoOrigemLabel(item);
+        const titulo = item?.titulo || "Sem título";
+        return `${origem}: ${titulo}`;
+      }
+
       function renderTimeline(eventos) {
         const container = document.getElementById("timeline-hoje");
         if (!eventos || eventos.length === 0) {
@@ -1660,9 +1674,10 @@
             const momento = e.registradoEm
               ? new Date(e.registradoEm).toLocaleString("pt-BR")
               : `${e.data || "--"} ${e.hora || ""}`.trim();
+            const origem = getHistoricoOrigemLabel(e);
             return `<tr>
-          <td><div style="font-weight:500;">${momento}</div></td>
-          <td>${e.titulo || "--"}</td>
+          <td><div style="font-weight:500;">${momento}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${origem} #${e.eventId || e.id || "--"}</div></td>
+          <td>${getHistoricoAtividadeLabel(e)}</td>
           <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
           <td style="font-size:12px; color:var(--text-muted);">${observacao}</td>
         </tr>`;
