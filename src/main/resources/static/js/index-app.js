@@ -73,10 +73,15 @@ function getHistoricoPacienteSelecionado() {
 }
 
 function getPacienteContexto() {
-  return selectedIdosoFromUrl || "";
+  return selectedIdosoFromUrl || getAgendaPacienteSelecionado() || "";
 }
 
-function configurarCampoPacienteModal(selectId, fieldId, permitido) {
+function configurarCampoPacienteModal(
+  selectId,
+  fieldId,
+  permitido,
+  placeholder = "Selecione o idoso",
+) {
   const sel = document.getElementById(selectId);
   const field = document.getElementById(fieldId);
   if (!sel) return;
@@ -85,13 +90,19 @@ function configurarCampoPacienteModal(selectId, fieldId, permitido) {
   const contexto = getPacienteContexto();
   const lista = permitido ? idosos : idosos;
 
-  sel.innerHTML = '<option value="">Selecione o idoso</option>';
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
   lista.forEach((i) => {
     sel.innerHTML += `<option value="${i.id}">${i.nome}</option>`;
   });
 
   if (contexto && lista.some((i) => String(i.id) === String(contexto))) {
     sel.value = String(contexto);
+    if (field) field.style.display = "none";
+    return;
+  }
+
+  if (lista.length === 1) {
+    sel.value = String(lista[0].id);
     if (field) field.style.display = "none";
     return;
   }
@@ -1401,11 +1412,21 @@ saveEvent = async function () {
 
 // Carregar lista de pacientes no select do modal de medicamentos
 function preencherSelectPacientes() {
-  configurarCampoPacienteModal("m-paciente", "m-paciente-field");
+  configurarCampoPacienteModal(
+    "m-paciente",
+    "m-paciente-field",
+    undefined,
+    "Escolha para quem e o medicamento",
+  );
 }
 
 function preencherSelectPacientesEvento() {
-  configurarCampoPacienteModal("event-paciente", "event-paciente-field");
+  configurarCampoPacienteModal(
+    "event-paciente",
+    "event-paciente-field",
+    undefined,
+    "Escolha para quem e o evento",
+  );
 }
 
 // Sobrescrever abrirModalMedicamento para preencher select
