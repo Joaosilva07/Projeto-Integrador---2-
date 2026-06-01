@@ -417,7 +417,9 @@
         <div class="view" id="view-historico">
           <div class="section-header">
             <span class="section-title">Histórico de Cuidados</span>
-            <button class="btn btn-primary">+ Novo Registro</button>
+            <div style="font-size: 12px; color: var(--text-muted)">
+              Logs permanentes de criação, alteração e exclusão para consulta
+            </div>
           </div>
 
           <div class="table-wrap">
@@ -425,10 +427,10 @@
               <thead>
                 <tr>
                   <th>Paciente</th>
-                  <th>Data / Hora</th>
+                  <th>Registrado em</th>
                   <th>Atividade</th>
-                  <th>Status</th>
-                  <th>Observação</th>
+                  <th>Ação</th>
+                  <th>Detalhes</th>
                 </tr>
               </thead>
               <tbody id="tbody-historico"></tbody>
@@ -649,7 +651,7 @@
                   margin-bottom: 16px;
                 "
               >
-                Revise seus dados, atualize a senha quando precisar e use a ação abaixo apenas em caso de encerramento definitivo da conta.
+                Revise seus dados, atualize a senha quando precisar e deixe a exclusão apenas como último recurso.
               </div>
               <button
                 onclick="abrirModalExcluirConta()"
@@ -665,8 +667,54 @@
                   width: 100%;
                 "
               >
-                Excluir minha conta
+                Encerrar minha conta
               </button>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 18px; margin-top: 18px">
+            <div
+              style="
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 14px;
+                color: var(--text-primary);
+              "
+            >
+              Vincular novo idoso
+            </div>
+            <div
+              style="
+                color: var(--text-muted);
+                font-size: 13px;
+                line-height: 1.55;
+                margin-bottom: 14px;
+              "
+            >
+              Informe o código da conta para criar um vínculo sem sair do painel.
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
+              <input
+                id="cfg-link-code"
+                type="text"
+                maxlength="4"
+                inputmode="numeric"
+                placeholder="Código do idoso"
+                style="flex: 1; min-width: 180px; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit;"
+              />
+              <button class="btn btn-primary" onclick="vincularContaPorCodigo()">
+                Vincular conta
+              </button>
+            </div>
+            <div
+              id="cfg-link-status"
+              style="
+                margin-top: 10px;
+                color: var(--text-muted);
+                font-size: 12px;
+              "
+            >
+              Use o código do idoso para adicionar um novo vínculo.
             </div>
           </div>
 
@@ -714,7 +762,7 @@
             <div class="modal-content" style="max-width: 400px">
               <div class="modal-header">
                 <span class="modal-title" style="color: #c0392b">
-                  Excluir Conta
+                  Confirmar exclusão da conta
                 </span>
 
                 <button class="modal-close" onclick="fecharModalExcluirConta()">
@@ -730,16 +778,15 @@
                   line-height: 1.5;
                 "
               >
-                Tem certeza que deseja excluir sua conta?
-                <br /><br />
-                <span style="color: #c0392b; font-size: 13px">
-                  Essa ação não poderá ser desfeita.
-                </span>
+                Você está prestes a remover este perfil de forma definitiva.
+                <div style="margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff5f4; border: 1px solid #f0d3cf; color: #7c4a44; font-size: 13px; line-height: 1.55;">
+                  Se continuar, os vínculos deste perfil serão encerrados, a sessão atual será finalizada e você voltará para o login. Essa ação não poderá ser desfeita.
+                </div>
               </div>
 
               <div class="modal-actions">
                 <button class="btn-cancel" onclick="fecharModalExcluirConta()">
-                  Cancelar
+                  Manter minha conta
                 </button>
 
                 <button
@@ -747,7 +794,7 @@
                   style="background: #c0392b"
                   onclick="excluirConta()"
                 >
-                  Sim, excluir
+                  Excluir conta agora
                 </button>
               </div>
             </div>

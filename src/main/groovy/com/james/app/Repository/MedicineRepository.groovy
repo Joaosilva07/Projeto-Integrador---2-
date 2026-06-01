@@ -13,4 +13,9 @@ interface MedicineRepository extends JpaRepository<Medicine,Long> {
 
     @Query("select m from Medicine m where m.Paciente.id in :pacienteIds")
     List<Medicine> findByPacienteIds(@Param("pacienteIds") List<Long> pacienteIds)
+
+    @Query("select m from Medicine m where m.Responsavel.id = :responsavelId")
+    List<Medicine> findByResponsavelId(@Param("responsavelId") Long responsavelId)
+
+    void deleteByPacienteId(Long pacienteId)
 }

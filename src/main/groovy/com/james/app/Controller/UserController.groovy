@@ -66,6 +66,12 @@ class UserController {
         userService.addResponsavel(idosoId, responsavelId)
     }
 
+    @DeleteMapping("/{idosoId}/link/{responsavelId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void unlink(@PathVariable("idosoId") Long idosoId, @PathVariable("responsavelId") Long responsavelId) {
+        userService.removeResponsavel(idosoId, responsavelId)
+    }
+
     @GetMapping("/codigo/{codigo}")
     User getByCodigo(@PathVariable("codigo") String codigo) {
         userService.findByCodigoUsuario(codigo)
@@ -82,6 +88,7 @@ class UserController {
                 id: idoso.id,
                 nome: idoso.nome,
                 email: idoso.email,
+                codigoUsuario: idoso.codigoUsuario,
                 role: idoso.role,
                 cuidadores: cuidadores.collect { c -> [id: c.id, nome: c.nome, email: c.email] }
             ]

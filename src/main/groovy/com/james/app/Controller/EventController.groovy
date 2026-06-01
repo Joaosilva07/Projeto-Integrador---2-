@@ -2,6 +2,7 @@ package com.james.app.Controller
 
 import com.james.app.Service.EventService
 import com.james.app.model.Event.Event
+import com.james.app.model.Event.EventHistory
 import jakarta.transaction.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -40,6 +41,14 @@ class EventController {
     @GetMapping("/{id}")
     Event Evento(@PathVariable("id") Long id) {
         return eventService.findById(id)
+    }
+
+    @GetMapping("/historico")
+    List<EventHistory> getHistorico(
+            @RequestParam(value = "pacienteId", required = false) Long pacienteId,
+            @RequestParam(value = "responsavelId", required = false) Long responsavelId
+    ) {
+        return eventService.getHistorico(pacienteId, responsavelId)
     }
 
     @PutMapping("/{id}")

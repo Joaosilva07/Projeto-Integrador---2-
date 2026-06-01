@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface EventRepository extends JpaRepository<Event, Long>{
     List<Event> findByPaciente_Id(Long pacienteId)
     List<Event> findByPaciente_IdIn(List<Long> pacienteIds)
+    List<Event> findByResponsavel_Id(Long responsavelId)
+    void deleteByPaciente_Id(Long pacienteId)
 }

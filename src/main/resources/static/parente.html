@@ -253,6 +253,56 @@
       margin-bottom: 8px;
     }
 
+    .empty-link-state {
+      display: none;
+      margin-bottom: 24px;
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      background: linear-gradient(180deg, #fffdf9 0%, #faf5ee 100%);
+    }
+
+    .empty-link-state.active {
+      display: block;
+    }
+
+    .empty-link-title {
+      font-family: "Lora", serif;
+      font-size: 22px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-link-copy {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 58ch;
+      margin-bottom: 16px;
+    }
+
+    .primary-action-btn {
+      background: var(--sage-500);
+      color: white;
+      border: none;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary-action-btn:hover {
+      background: var(--sage-600);
+    }
+
+    .link-modal-status {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 18px;
+      margin-top: 10px;
+    }
+
     /* VIEWS E ANIMAÇÕES */
     .view {
       display: none;
@@ -684,7 +734,7 @@
             style="background: var(--amber)"
             id="sidebar-avatar-initials"
           >
-            --
+            ...
           </div>
           <div>
             <div class="user-name" id="sidebar-nome">
@@ -725,7 +775,7 @@
               style="width: 56px; height: 56px; font-size: 20px"
               id="patient-avatar"
             >
-              -
+              ...
             </div>
             <div>
               <h2
@@ -757,48 +807,43 @@
               "
               id="patient-progress"
             ></div>
-            <button
-              onclick="logout()"
-              style="
-                margin-top: 8px;
-                background: none;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                padding: 6px 14px;
-                font-size: 12px;
-                color: var(--text-muted);
-                cursor: pointer;
-              "
-            >
-              Sair
-            </button>
           </div>
+        </div>
+
+        <div class="empty-link-state" id="empty-link-state">
+          <div class="empty-link-title">Nenhum idoso vinculado ainda</div>
+          <div class="empty-link-copy">
+            Para começar a acompanhar, informe o código do idoso e crie o vínculo por aqui.
+          </div>
+          <button class="primary-action-btn" onclick="abrirModalVincularIdoso()">
+            Vincular idoso
+          </button>
         </div>
 
         <div class="view active" id="view-dashboard">
           <div class="stats-grid" id="stats-grid">
             <div class="stat-card blue">
               <div class="stat-label">Medicamentos</div>
-              <div class="stat-value" id="stat-meds">-</div>
+              <div class="stat-value" id="stat-meds">...</div>
               <div class="stat-sub" id="stat-meds-sub">
                 Buscando medicamentos...
               </div>
             </div>
             <div class="stat-card green">
               <div class="stat-label">Eventos Hoje</div>
-              <div class="stat-value" id="stat-eventos">-</div>
+              <div class="stat-value" id="stat-eventos">...</div>
               <div class="stat-sub" id="stat-eventos-sub">
                 Buscando atividades...
               </div>
             </div>
             <div class="stat-card terra">
               <div class="stat-label">Estoque Baixo</div>
-              <div class="stat-value" id="stat-estoque">-</div>
+              <div class="stat-value" id="stat-estoque">...</div>
               <div class="stat-sub">Remédios com menos de 5 unidades</div>
             </div>
             <div class="stat-card amber">
               <div class="stat-label">Notificações</div>
-              <div class="stat-value" id="stat-notifs">-</div>
+              <div class="stat-value" id="stat-notifs">...</div>
               <div class="stat-sub" id="stat-notifs-sub">Não lidas</div>
             </div>
           </div>
@@ -897,14 +942,18 @@
             </div>
           </div>
 
+          <div style="margin-bottom: 12px; color: var(--text-muted); font-size: 12px; line-height: 1.5;">
+            Este histórico mostra os logs permanentes do que foi criado, alterado ou excluído no cuidado do idoso.
+          </div>
+
           <div class="table-wrap" id="container-tabela-historico">
             <table>
               <thead>
                 <tr>
-                  <th>Data / Hora</th>
+                  <th>Registrado em</th>
                   <th>Evento</th>
-                  <th>Tipo</th>
-                  <th>Observação</th>
+                  <th>Ação</th>
+                  <th>Detalhes</th>
                 </tr>
               </thead>
               <tbody id="corpo-historico">
@@ -1026,10 +1075,10 @@
                 Segurança da conta
               </div>
               <div style="color: var(--text-muted); font-size: 13px; line-height: 1.55; margin-bottom: 16px;">
-                Use esta área para revisar seus dados e, se necessário, encerrar sua conta com confirmação.
+                Use esta área para revisar seus dados e deixe a exclusão apenas para quando quiser encerrar este acesso em definitivo.
               </div>
               <button onclick="abrirModalExcluirConta()" style="background: #c0392b; color: white; border: none; padding: 12px 18px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 500; width: 100%;">
-                Excluir minha conta
+                Encerrar minha conta
               </button>
             </div>
           </div>
@@ -1067,7 +1116,7 @@
               margin-bottom: 12px;
             "
           >
-            Excluir conta
+            Confirmar exclusão da conta
           </div>
 
           <div
@@ -1078,9 +1127,10 @@
               margin-bottom: 22px;
             "
           >
-            Tem certeza que deseja excluir sua conta?
-            <br /><br />
-            Essa ação não poderá ser desfeita.
+            Você está prestes a remover este perfil de forma definitiva.
+            <div style="margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff5f4; border: 1px solid #f0d3cf; color: #7c4a44; font-size: 13px; line-height: 1.55;">
+              Se continuar, sua sessão será encerrada agora e você voltará para o login. Essa ação não poderá ser desfeita.
+            </div>
           </div>
 
           <div style="display: flex; justify-content: flex-end; gap: 10px">
@@ -1094,7 +1144,7 @@
                 cursor: pointer;
               "
             >
-              Cancelar
+              Manter minha conta
             </button>
 
             <button
@@ -1108,7 +1158,96 @@
                 cursor: pointer;
               "
             >
-              Sim, excluir
+              Excluir conta agora
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="modal-vincular-idoso"
+        style="
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.45);
+          z-index: 999;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid var(--border);
+          "
+        >
+          <div
+            style="
+              font-size: 20px;
+              font-weight: 600;
+              color: var(--text-primary);
+              margin-bottom: 10px;
+            "
+          >
+            Vincular idoso
+          </div>
+
+          <div
+            style="
+              font-size: 14px;
+              color: var(--text-secondary);
+              line-height: 1.6;
+              margin-bottom: 14px;
+            "
+          >
+            Digite o código do idoso para criar o vínculo desta conta com ele.
+          </div>
+
+          <input
+            id="vincular-idoso-codigo"
+            type="text"
+            inputmode="numeric"
+            maxlength="4"
+            placeholder="Ex: 1234"
+            style="width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: inherit;"
+          />
+
+          <div id="vincular-idoso-status" class="link-modal-status">
+            Use o código que aparece no perfil do idoso.
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+            <button
+              onclick="fecharModalVincularIdoso()"
+              style="
+                background: transparent;
+                border: 1px solid var(--border);
+                padding: 10px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              Cancelar
+            </button>
+
+            <button
+              id="btn-vincular-idoso"
+              onclick="vincularIdosoPorCodigo()"
+              style="
+                background: var(--sage-500);
+                color: white;
+                border: none;
+                padding: 10px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              Vincular agora
             </button>
           </div>
         </div>
@@ -1120,6 +1259,7 @@
       let currentUser = null;
       let idosoData = null;
       let todosEventos = [];
+      let historicoEventos = [];
       let todosMedicamentos = [];
 
       // ─── Init ─────────────────────────────────────────────────
@@ -1150,6 +1290,7 @@
           await Promise.all([
             carregarMedicamentos(),
             carregarEventos(),
+            carregarHistorico(),
             carregarNotificacoes(),
           ]);
         }
@@ -1160,18 +1301,135 @@
         window.location.href = "/Loguin.html";
       }
 
+      function setEmptyLinkState(active) {
+        const emptyState = document.getElementById("empty-link-state");
+        const statsGrid = document.getElementById("stats-grid");
+        if (emptyState) emptyState.classList.toggle("active", !!active);
+        if (statsGrid) statsGrid.style.opacity = active ? "0.55" : "1";
+      }
+
+      function resetPainelSemIdoso() {
+        document.getElementById("stat-meds").textContent = "0";
+        document.getElementById("stat-meds-sub").textContent =
+          "Vincule um idoso para acompanhar";
+        document.getElementById("stat-eventos").textContent = "0";
+        document.getElementById("stat-eventos-sub").textContent =
+          "Sem vínculo ativo";
+        document.getElementById("stat-estoque").textContent = "0";
+        document.getElementById("stat-notifs").textContent = "0";
+        document.getElementById("stat-notifs-sub").textContent =
+          "Sem vínculo ativo";
+        document.getElementById("timeline-hoje").innerHTML =
+          '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Vincule um idoso para visualizar a agenda.</div>';
+        document.getElementById("alertas-container").innerHTML =
+          '<div class="agenda-item"><div class="agenda-desc" style="color:var(--text-muted); font-size:12px;">Vincule um idoso para receber avisos.</div></div>';
+        document.getElementById("cuidadores-container").innerHTML =
+          '<div style="font-size:13px; color:var(--text-muted); padding:8px 0;">Sem vínculo ativo no momento.</div>';
+        const medsGrid = document.getElementById("meds-grid");
+        if (medsGrid) {
+          medsGrid.innerHTML =
+            '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:13px;">Vincule um idoso para acompanhar os medicamentos.</div>';
+        }
+        const historico = document.getElementById("corpo-historico");
+        if (historico) {
+          historico.innerHTML =
+            '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Vincule um idoso para visualizar o histórico.</td></tr>';
+        }
+      }
+
+      function abrirModalVincularIdoso() {
+        const modal = document.getElementById("modal-vincular-idoso");
+        const status = document.getElementById("vincular-idoso-status");
+        const input = document.getElementById("vincular-idoso-codigo");
+        const button = document.getElementById("btn-vincular-idoso");
+        if (status) {
+          status.textContent = "Use o código que aparece no perfil do idoso.";
+          status.style.color = "var(--text-muted)";
+        }
+        if (input) input.value = "";
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Vincular agora";
+        }
+        if (modal) modal.style.display = "flex";
+      }
+
+      function fecharModalVincularIdoso() {
+        const modal = document.getElementById("modal-vincular-idoso");
+        if (modal) modal.style.display = "none";
+      }
+
+      async function vincularIdosoPorCodigo() {
+        if (!currentUser?.id) return;
+        const input = document.getElementById("vincular-idoso-codigo");
+        const status = document.getElementById("vincular-idoso-status");
+        const button = document.getElementById("btn-vincular-idoso");
+        const codigo = (input?.value || "").trim();
+        if (!codigo) {
+          if (status) {
+            status.textContent = "Informe o código do idoso.";
+            status.style.color = "#c0392b";
+          }
+          return;
+        }
+
+        try {
+          if (status) {
+            status.textContent = "Criando vínculo...";
+            status.style.color = "var(--text-muted)";
+          }
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Vinculando...";
+          }
+          const res = await fetch(
+            `/api/user/${encodeURIComponent(currentUser.id)}/link-by-code/${encodeURIComponent(codigo)}`,
+            { method: "POST" },
+          );
+          const data = await res.json().catch(() => null);
+          if (!res.ok) {
+            throw new Error(data?.erro || data?.message || "Não foi possível vincular este idoso.");
+          }
+
+          fecharModalVincularIdoso();
+          await carregarIdoso();
+          if (idosoData) {
+            await Promise.all([
+              carregarMedicamentos(),
+              carregarEventos(),
+              carregarHistorico(),
+              carregarNotificacoes(),
+            ]);
+          }
+        } catch (e) {
+          if (status) {
+            status.textContent = e.message || "Não foi possível vincular este idoso.";
+            status.style.color = "#c0392b";
+          }
+          if (button) {
+            button.disabled = false;
+            button.textContent = "Vincular agora";
+          }
+        }
+      }
+
       // ─── Carregar idoso vinculado ──────────────────────────────
       async function carregarIdoso() {
         try {
           const resp = await fetch(`/api/user/${currentUser.id}/idosos`);
           const lista = await resp.json();
           if (!lista || lista.length === 0) {
+            idosoData = null;
+            setEmptyLinkState(true);
             document.getElementById("patient-name").textContent =
               "Nenhum idoso vinculado";
             document.getElementById("patient-caregiver").textContent =
-              "Nenhum idoso vinculado no momento.";
+              "Vincule um idoso por código para começar a acompanhar.";
+            document.getElementById("patient-avatar").textContent = "+";
+            resetPainelSemIdoso();
             return;
           }
+          setEmptyLinkState(false);
           idosoData = lista[0];
           const iniciais = idosoData.nome
             .split(" ")
@@ -1212,8 +1470,12 @@
               .join("");
           }
         } catch (e) {
+          setEmptyLinkState(true);
           document.getElementById("patient-name").textContent =
             "Erro ao carregar";
+          document.getElementById("patient-caregiver").textContent =
+            "Tente atualizar novamente em instantes.";
+          resetPainelSemIdoso();
         }
       }
 
@@ -1292,16 +1554,42 @@
             eventosHoje.length === 0 ? "Nenhum hoje" : "Programados hoje";
 
           renderTimeline(eventosHoje);
-          renderHistorico(todosEventos);
         } catch (e) {
           document.getElementById("timeline-hoje").innerHTML =
             '<div style="padding:20px; text-align:center; color:var(--text-muted);">Erro ao carregar eventos.</div>';
         }
       }
 
+      async function carregarHistorico() {
+        try {
+          const resp = await fetch(
+            `/Eventos/historico?pacienteId=${idosoData.id}`,
+          );
+          historicoEventos = await resp.json();
+          renderHistorico(historicoEventos);
+        } catch (e) {
+          const tbody = document.getElementById("corpo-historico");
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Erro ao carregar histórico.</td></tr>';
+          }
+        }
+      }
+
       function getObservacaoEvento(evento) {
         const observacao = evento?.observacao ?? evento?.Observacao ?? "";
         return String(observacao).trim();
+      }
+
+      function getTipoEventoLabel(tipo) {
+        const labels = {
+          medication: "Medicamento",
+          health: "Saúde",
+          activity: "Atividade Física",
+          meal: "Alimentação",
+          hygiene: "Higiene",
+          other: "Outro",
+        };
+        return labels[tipo] || tipo || "";
       }
 
       function renderTimeline(eventos) {
@@ -1358,27 +1646,24 @@
         const tbody = document.getElementById("corpo-historico");
         if (!eventos || eventos.length === 0) {
           tbody.innerHTML =
-            '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sem eventos registrados.</td></tr>';
+            '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Sem logs registrados.</td></tr>';
           return;
         }
         tbody.innerHTML = eventos
           .map((e) => {
-            const observacao = getObservacaoEvento(e);
-            const tipo = e.tipo || "Programado";
-            const badgeClass =
-              tipo.toLowerCase() === "realizado" ||
-              tipo.toLowerCase() === "concluido"
-                ? "badge-realizado"
-                : tipo.toLowerCase() === "pendente"
-                  ? "badge-pendente"
-                  : "";
-            const badgeStyle = badgeClass
-              ? ""
-              : "background:var(--sand-100); color:var(--text-secondary);";
+            const observacao = [e.tipo ? `Tipo: ${getTipoEventoLabel(e.tipo)}` : "", e.responsavelNome ? `Por: ${e.responsavelNome}` : "", e.observacao || ""]
+              .filter(Boolean)
+              .join(" • ");
+            const acao = e.acao || "CRIACAO";
+            const badgeClass = acao === "EXCLUSAO" ? "badge-pendente" : "badge-realizado";
+            const badgeLabel = acao === "ALTERACAO" ? "Alterado" : acao === "EXCLUSAO" ? "Excluído" : "Criado";
+            const momento = e.registradoEm
+              ? new Date(e.registradoEm).toLocaleString("pt-BR")
+              : `${e.data || "--"} ${e.hora || ""}`.trim();
             return `<tr>
-          <td><div style="font-weight:500;">${e.data || "--"} ${e.hora || ""}</div></td>
+          <td><div style="font-weight:500;">${momento}</div></td>
           <td>${e.titulo || "--"}</td>
-          <td><span class="badge ${badgeClass}" style="${badgeStyle}">${tipo}</span></td>
+          <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
           <td style="font-size:12px; color:var(--text-muted);">${observacao}</td>
         </tr>`;
           })
@@ -1388,11 +1673,19 @@
       function filtrarHistorico() {
         const data = document.getElementById("filtro-data").value;
         if (!data) {
-          renderHistorico(todosEventos);
+          renderHistorico(historicoEventos);
           return;
         }
-        const filtrados = todosEventos.filter(
-          (e) => (e.data || "").substring(0, 10) === data,
+        const filtrados = historicoEventos.filter(
+          (e) => {
+            if (e.registradoEm) {
+              const dt = new Date(e.registradoEm);
+              if (!Number.isNaN(dt.getTime())) {
+                return dt.toISOString().substring(0, 10) === data;
+              }
+            }
+            return String(e.data || "").substring(0, 10) === data;
+          },
         );
         renderHistorico(filtrados);
       }
@@ -1548,15 +1841,19 @@
 
       async function excluirConta() {
         try {
-          await fetch(`/api/user/${currentUser.id}`, {
+          const res = await fetch(`/api/user/${currentUser.id}`, {
             method: "DELETE",
           });
+
+          if (!res.ok) {
+            throw new Error("Erro ao excluir conta.");
+          }
 
           sessionStorage.clear();
 
           alert("Conta excluída com sucesso.");
 
-          window.location.href = "/Loguin.html";
+          window.location.replace("/Loguin.html");
         } catch (e) {
           alert("Erro ao excluir conta.");
         }

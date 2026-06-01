@@ -113,6 +113,12 @@
         font-weight: 700;
       }
 
+      .btn-subtle {
+        border-color: #d9d1c5;
+        color: #6a5d4a;
+        background: #f7f1e8;
+      }
+
       .btn-link {
         text-decoration: none;
         display: inline-flex;
@@ -131,6 +137,64 @@
         border: 2px solid var(--border);
         border-radius: var(--radius);
         padding: 16px;
+      }
+
+      .account-panel {
+        display: none;
+        background: #faf6f0;
+        border: 2px dashed #d7c8b4;
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+
+      .account-panel.active {
+        display: block;
+      }
+
+      .account-panel-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .account-panel-copy {
+        color: #5d5141;
+        font-size: 18px;
+      }
+
+      .danger-note {
+        border: 2px solid #e9d4cf;
+        background: #fff8f7;
+        border-radius: 14px;
+        padding: 14px;
+        color: #6f433f;
+        font-size: 17px;
+        margin-top: 12px;
+      }
+
+      .danger-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .modal-warning {
+        margin: 18px 0;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #fff6f5;
+        border: 2px solid #f1d4d0;
+        color: #72433e;
+        font-size: 17px;
+        line-height: 1.5;
+      }
+
+      .modal-status {
+        min-height: 26px;
+        margin-bottom: 12px;
+        color: var(--red);
+        font-size: 17px;
+        font-weight: 700;
       }
 
       .summary-title {
@@ -295,6 +359,10 @@
           flex-direction: column;
           align-items: flex-start;
         }
+
+        .top-actions {
+          flex-wrap: wrap;
+        }
       }
     </style>
   </head>
@@ -332,11 +400,13 @@
           </button>
 
           <button
-            class="btn btn-danger"
-            onclick="abrirModalExcluirConta()"
-            aria-label="Excluir conta"
+            class="btn btn-subtle"
+            id="conta-opcoes-btn"
+            onclick="toggleContaPanel()"
+            aria-label="Abrir opções da conta"
+            aria-expanded="false"
           >
-            Excluir conta
+            Opções da conta
           </button>
         </div>
       </header>
@@ -358,6 +428,22 @@
           <div class="summary-title">Meu código</div>
           <div class="summary-value" id="resumo-meu-codigo">----</div>
         </article>
+      </section>
+
+      <section class="account-panel" id="painel-conta" aria-label="Opções da conta">
+        <div class="account-panel-title">Opções da conta</div>
+        <div class="account-panel-copy">
+          Esta área fica mais reservada para evitar toques acidentais.
+          Use apenas se realmente quiser encerrar seu acesso.
+        </div>
+        <div class="danger-note">
+          Excluir a conta encerra a sessão deste perfil e leva você de volta para a tela de login.
+        </div>
+        <div class="danger-actions">
+          <button class="btn btn-danger" onclick="abrirModalExcluirConta()" aria-label="Excluir minha conta">
+            Excluir minha conta
+          </button>
+        </div>
       </section>
 
       <section class="content-grid" aria-label="Informações principais">
@@ -415,6 +501,15 @@
             ? "Alto contraste ativado"
             : "Alto contraste desativado",
         );
+      }
+
+      function toggleContaPanel() {
+        const panel = document.getElementById("painel-conta");
+        const btn = document.getElementById("conta-opcoes-btn");
+        if (!panel || !btn) return;
+        const active = panel.classList.toggle("active");
+        btn.setAttribute("aria-expanded", active ? "true" : "false");
+        btn.textContent = active ? "Fechar opções" : "Opções da conta";
       }
 
       function formatHora(hora) {
@@ -626,6 +721,13 @@
         renderEventos(Array.isArray(evs) ? evs : []);
       }
       function abrirModalExcluirConta() {
+        const statusEl = document.getElementById("modal-excluir-status");
+        const btnEl = document.getElementById("confirmar-exclusao-conta");
+        if (statusEl) statusEl.textContent = "";
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.textContent = "Excluir conta agora";
+        }
         document.getElementById("modal-excluir-conta").style.display = "flex";
       }
 
@@ -634,12 +736,19 @@
       }
 
       async function excluirConta() {
+        const statusEl = document.getElementById("modal-excluir-status");
+        const btnEl = document.getElementById("confirmar-exclusao-conta");
         if (!usuarioAtual?.id) {
-          alert("Usuário não identificado.");
+          if (statusEl) statusEl.textContent = "Usuário não identificado.";
           return;
         }
 
         try {
+          if (statusEl) statusEl.textContent = "Excluindo conta...";
+          if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.textContent = "Excluindo...";
+          }
           const res = await fetch(
             `/api/user/${encodeURIComponent(usuarioAtual.id)}`,
             {
@@ -652,13 +761,17 @@
           }
 
           sessionStorage.clear();
-
-          alert("Conta excluída com sucesso.");
-
-          window.location.href = "/Loguin.html";
+          window.location.replace("/Loguin.html");
         } catch (e) {
           console.error(e);
-          alert("Erro ao excluir conta.");
+          if (statusEl) {
+            statusEl.textContent =
+              "Não foi possível excluir sua conta agora. Tente novamente.";
+          }
+          if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.textContent = "Excluir conta agora";
+          }
         }
       }
 
@@ -695,29 +808,38 @@
             margin-bottom: 12px;
           "
         >
-          Excluir conta
+          Confirmar exclusão da conta
         </div>
 
         <div
           style="
-            font-size: 20px;
+            font-size: 19px;
             color: var(--muted);
             line-height: 1.6;
-            margin-bottom: 22px;
+            margin-bottom: 12px;
           "
         >
-          Tem certeza que deseja excluir sua conta?
-          <br /><br />
-          Essa ação não poderá ser desfeita.
+          Você está prestes a apagar este perfil de forma definitiva.
         </div>
+
+        <div class="modal-warning">
+          Se continuar, sua sessão será encerrada agora e você voltará para a
+          tela de login. Essa ação não poderá ser desfeita.
+        </div>
+
+        <div id="modal-excluir-status" class="modal-status"></div>
 
         <div style="display: flex; justify-content: flex-end; gap: 10px">
           <button onclick="fecharModalExcluirConta()" class="btn">
-            Cancelar
+            Manter minha conta
           </button>
 
-          <button onclick="excluirConta()" class="btn btn-danger">
-            Sim, excluir
+          <button
+            id="confirmar-exclusao-conta"
+            onclick="excluirConta()"
+            class="btn btn-danger"
+          >
+            Excluir conta agora
           </button>
         </div>
       </div>

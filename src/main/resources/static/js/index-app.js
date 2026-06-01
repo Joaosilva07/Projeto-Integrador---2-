@@ -21,6 +21,7 @@ const btnLabels = {
 // ═══════════════════════════════════════════════════════
 
 let eventos = [];
+let historicoEventos = [];
 let medicamentosGlobal = [];
 let usuariosGlobal = [];
 let usuarioLogado = null;
@@ -296,6 +297,9 @@ showView = function (name, navEl) {
     renderWeeklyCalendar();
     carregarEventos();
   }
+  if (name === "historico") {
+    carregarHistorico();
+  }
   if (name === "config") {
     carregarConfiguracoesUsuario();
   }
@@ -315,7 +319,9 @@ function showView(name, navEl) {
   if (topBtn) {
     topBtn.textContent = btnLabels[name] || "";
     topBtn.style.display =
-      name === "agenda" || name === "config" ? "none" : "inline-flex";
+      name === "agenda" || name === "config" || name === "historico"
+        ? "none"
+        : "inline-flex";
   }
 }
 
@@ -422,12 +428,23 @@ function renderMeusIdososConfig() {
             <div>
               <div style="font-weight:600;color:var(--text-primary);font-size:13px;">${i.nome || "Sem nome"}</div>
               <div style="color:var(--text-muted);font-size:12px;">${i.email || "Sem e-mail"}</div>
+              <div style="color:var(--text-muted);font-size:11px;margin-top:4px;">Código ${i.codigoUsuario || "----"}</div>
             </div>
-            <span class="badge badge-idoso">IDOSO</span>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+              <span class="badge badge-idoso">IDOSO</span>
+              <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px;color:var(--terracotta)" onclick="desvincularIdoso(${i.id}, '${(i.nome || "Idoso").replace(/'/g, "\\'")}')">Desvincular</button>
+            </div>
           </div>
         `,
     )
     .join("");
+}
+
+function setStatusVinculoConta(message, isError = false) {
+  const statusEl = document.getElementById("cfg-link-status");
+  if (!statusEl) return;
+  statusEl.textContent = message;
+  statusEl.style.color = isError ? "#c0392b" : "var(--text-muted)";
 }
 
 async function carregarConfiguracoesUsuario() {
@@ -518,6 +535,66 @@ async function salvarConfiguracoesUsuario() {
   }
 }
 
+async function vincularContaPorCodigo() {
+  if (!usuarioLogado?.id) return;
+  const input = document.getElementById("cfg-link-code");
+  const codigo = input?.value?.trim();
+  if (!codigo) {
+    setStatusVinculoConta("Informe o código do idoso.", true);
+    return;
+  }
+
+  setStatusVinculoConta("Criando vínculo...");
+  try {
+    const res = await fetch(
+      `/api/user/${encodeURIComponent(usuarioLogado.id)}/link-by-code/${encodeURIComponent(codigo)}`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(
+        await extrairMensagemErro(res, "Não foi possível vincular a conta."),
+      );
+    }
+    input.value = "";
+    setStatusVinculoConta("Conta vinculada com sucesso.");
+    await carregarUsuarios();
+    await carregarEventos();
+    await carregarHistorico();
+    await carregarConfiguracoesUsuario();
+  } catch (e) {
+    setStatusVinculoConta(
+      e.message || "Não foi possível vincular a conta.",
+      true,
+    );
+  }
+}
+
+async function desvincularIdoso(idosoId, nomeIdoso) {
+  if (!usuarioLogado?.id) return;
+  if (!confirm(`Desvincular ${nomeIdoso || "este idoso"}?`)) return;
+
+  try {
+    const res = await fetch(
+      `/api/user/${encodeURIComponent(idosoId)}/link/${encodeURIComponent(usuarioLogado.id)}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(
+        await extrairMensagemErro(res, "Não foi possível remover o vínculo."),
+      );
+    }
+    await carregarUsuarios();
+    await carregarEventos();
+    await carregarHistorico();
+    await carregarConfiguracoesUsuario();
+    if (String(selectedIdosoFromUrl || "") === String(idosoId)) {
+      window.location.replace("/Index.html");
+    }
+  } catch (e) {
+    alert(e.message || "Não foi possível remover o vínculo.");
+  }
+}
+
 async function extrairMensagemErro(res, fallbackMsg) {
   try {
     const data = await res.json();
@@ -539,6 +616,41 @@ function atualizarBadgeHistorico(total) {
   const valor = Number.isFinite(total) ? total : 0;
   badge.textContent = String(valor);
   badge.style.display = valor > 0 ? "inline-flex" : "none";
+}
+
+function formatarDataHoraHistorico(item) {
+  if (item?.registradoEm) {
+    const dt = new Date(item.registradoEm);
+    if (!Number.isNaN(dt.getTime())) {
+      return dt.toLocaleString("pt-BR");
+    }
+  }
+  return `${item?.data || "—"} ${item?.hora || ""}`.trim();
+}
+
+function getBadgeHistorico(item) {
+  const acao = String(item?.acao || "").toUpperCase();
+  if (acao === "EXCLUSAO") {
+    return { label: "Exclusão", className: "badge-pendente" };
+  }
+  if (acao === "ALTERACAO") {
+    return { label: "Alteração", className: "badge-idoso" };
+  }
+  return { label: "Criação", className: "badge-realizado" };
+}
+
+function getTipoEventoLabel(tipo) {
+  if (!tipo) return "";
+  return eventTypes[tipo]?.label || tipo;
+}
+
+function montarDetalhesHistorico(item) {
+  const partes = [];
+  if (item?.observacao) partes.push(item.observacao);
+  if (item?.responsavelNome)
+    partes.push(`Registrado por ${item.responsavelNome}`);
+  if (item?.tipo) partes.push(`Tipo: ${getTipoEventoLabel(item.tipo)}`);
+  return partes.join(" • ") || "Sem observações.";
 }
 
 // ===============================
@@ -731,6 +843,7 @@ window.onload = async () => {
   carregarUsuarios();
   carregarMedicamentos();
   carregarEventos();
+  carregarHistorico();
   carregarConfiguracoesUsuario();
 };
 
@@ -1038,8 +1151,6 @@ async function carregarEventos() {
     renderAgendaLista(evs);
     renderCuidadosRecentes(evs);
     renderProximasTarefas(evs);
-    atualizarBadgeHistorico(evs.length);
-    renderHistorico(evs);
     const hoje = new Date().toISOString().split("T")[0];
     const hojeEvs = evs.filter((e) => e.data === hoje);
     const dashPend = document.getElementById("dash-pendencias");
@@ -1058,6 +1169,27 @@ async function carregarEventos() {
     const dashTar = document.getElementById('dash-tarefas');
     if (dashPend) dashPend.textContent = '-';
     if (dashTar) dashTar.textContent = '-';
+  }
+}
+
+async function carregarHistorico() {
+  try {
+    const res = await fetch("/Eventos/historico" + buildScopeQuery());
+    if (!res.ok) {
+      throw new Error("Não foi possível carregar o histórico.");
+    }
+    const logs = await res.json();
+    historicoEventos = Array.isArray(logs) ? logs : [];
+    atualizarBadgeHistorico(historicoEventos.length);
+    renderHistorico(historicoEventos);
+  } catch (e) {
+    console.error("Erro ao carregar histórico", e);
+    const tbody = document.getElementById("tbody-historico");
+    if (tbody) {
+      tbody.innerHTML =
+        '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Não foi possível carregar o histórico agora.</td></tr>';
+    }
+    atualizarBadgeHistorico(0);
   }
 }
 
@@ -1151,24 +1283,29 @@ function renderHistorico(evs) {
   const tbody = document.getElementById("tbody-historico");
   if (!tbody) return;
   const pacienteId = getHistoricoPacienteSelecionado();
-  const filtrados = filtrarEventosPorPaciente(evs, pacienteId);
+  const filtrados = pacienteId
+    ? (evs || []).filter(
+        (e) =>
+          String(e.pacienteId || e.paciente?.id || "") === String(pacienteId),
+      )
+    : evs || [];
   atualizarBadgeHistorico(filtrados.length);
   if (filtrados.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum evento registrado.</td></tr>';
+      '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Nenhum log registrado.</td></tr>';
     return;
   }
-  tbody.innerHTML = [...filtrados]
-    .reverse()
-    .map(
-      (e) => `<tr>
-          <td>${e.paciente ? e.paciente.nome : "—"}</td>
-          <td><div class="name" style="font-size:13px">${e.data || "—"}</div><div class="sub">${e.hora || ""}</div></td>
+  tbody.innerHTML = filtrados
+    .map((e) => {
+      const badge = getBadgeHistorico(e);
+      return `<tr>
+          <td>${e.pacienteNome || e.paciente?.nome || "—"}</td>
+          <td><div class="name" style="font-size:13px">${formatarDataHoraHistorico(e)}</div><div class="sub">Evento #${e.eventId || e.id || "—"}</div></td>
           <td>${e.titulo || "—"}</td>
-          <td><span class="badge badge-realizado">Registrado</span></td>
-          <td style="font-size:12.5px;font-style:italic;color:var(--text-muted)">${e.tipo || "—"}</td>
-        </tr>`,
-    )
+          <td><span class="badge ${badge.className}">${badge.label}</span></td>
+          <td style="font-size:12.5px;color:var(--text-muted)">${montarDetalhesHistorico(e)}</td>
+        </tr>`;
+    })
     .join("");
 }
 
@@ -1211,7 +1348,8 @@ function renderAgendaLista(evs) {
 async function excluirEvento(id) {
   if (!confirm("Excluir este evento?")) return;
   await fetch("/Eventos/" + id, { method: "DELETE" });
-  carregarEventos();
+  await carregarEventos();
+  await carregarHistorico();
 }
 
 // Override saveEvent para também chamar a API
@@ -1255,6 +1393,7 @@ saveEvent = async function () {
     const obsEl = document.getElementById("event-observacao");
     if (obsEl) obsEl.value = "";
     await carregarEventos();
+    await carregarHistorico();
   } catch (e) {
     alert(e.message || "Erro ao salvar evento.");
   }
@@ -1290,16 +1429,12 @@ document.querySelectorAll("#view-medicamentos .btn-primary").forEach((btn) => {
 document.querySelectorAll("#view-agenda .btn-primary").forEach((btn) => {
   btn.onclick = openEventModal;
 });
-// Botão "+ Novo Registro" no histórico
-document.querySelectorAll("#view-historico .btn-primary").forEach((btn) => {
-  btn.onclick = openEventModal;
-});
-
 const agendaFiltro = document.getElementById("agenda-filtro-idoso");
 if (agendaFiltro)
   agendaFiltro.addEventListener("change", () => {
     renderAgendaLista(eventos);
     renderWeeklyCalendar();
+    renderHistorico(historicoEventos);
   });
 
 // Logout
@@ -1332,11 +1467,21 @@ function fecharModalExcluirConta() {
   document.getElementById("modal-excluir-conta").style.display = "none";
 }
 
-function excluirConta() {
-  alert("Conta excluída com sucesso!");
-
-  // futuramente aqui você coloca a requisição pro backend
-  // fetch(...)
-
-  fecharModalExcluirConta();
+async function excluirConta() {
+  if (!usuarioLogado?.id) return;
+  try {
+    const res = await fetch(`/api/user/${encodeURIComponent(usuarioLogado.id)}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(
+        await extrairMensagemErro(res, "Não foi possível excluir a conta."),
+      );
+    }
+    sessionStorage.clear();
+    fecharModalExcluirConta();
+    window.location.replace("/Loguin.html");
+  } catch (e) {
+    alert(e.message || "Erro ao excluir conta.");
+  }
 }

@@ -1,5 +1,9 @@
 package com.james.app.Service
 
+import com.james.app.Repository.EventHistoryRepository
+import com.james.app.Repository.EventRepository
+import com.james.app.Repository.MedicineRepository
+import com.james.app.Repository.NotificationRepository
 import com.james.app.Repository.UserRepository
 import com.james.app.model.User.*
 import jakarta.annotation.PostConstruct
@@ -12,9 +16,17 @@ import java.util.concurrent.ThreadLocalRandom
 class UserService {
 
     private final UserRepository userRepository
+    private final EventRepository eventRepository
+    private final EventHistoryRepository eventHistoryRepository
+    private final MedicineRepository medicineRepository
+    private final NotificationRepository notificationRepository
     
-    UserService(UserRepository userRepository) {
+    UserService(UserRepository userRepository, EventRepository eventRepository, EventHistoryRepository eventHistoryRepository, MedicineRepository medicineRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository
+        this.eventRepository = eventRepository
+        this.eventHistoryRepository = eventHistoryRepository
+        this.medicineRepository = medicineRepository
+        this.notificationRepository = notificationRepository
     }
 
     @PostConstruct
@@ -82,6 +94,11 @@ class UserService {
 
     User update(Long id, User data) {
         User user = userRepository.findById(id).orElseThrow { new RuntimeException("Usuário não encontrado") }
+        userRepository.findByEmail(data.email).ifPresent { found ->
+            if (found.id != id) {
+                throw new IllegalArgumentException("E-mail já cadastrado!")
+            }
+        }
         user.nome = data.nome
         user.email = data.email
         user.role = data.role
@@ -98,6 +115,26 @@ class UserService {
                 userRepository.save(u)
             }
         }
+
+        user.responsaveis?.clear()
+        userRepository.save(user)
+
+        if (user.role == UserRole.IDOSO) {
+            eventRepository.deleteByPaciente_Id(user.id)
+            medicineRepository.deleteByPacienteId(user.id)
+            eventHistoryRepository.deleteByPacienteId(user.id)
+        } else {
+            eventRepository.findByResponsavel_Id(user.id).each { event ->
+                event.responsavel = null
+                eventRepository.save(event)
+            }
+            medicineRepository.findByResponsavelId(user.id).each { medicine ->
+                medicine.Responsavel = null
+                medicineRepository.save(medicine)
+            }
+        }
+
+        notificationRepository.deleteByUser(user)
         userRepository.delete(user)
     }
 
@@ -112,6 +149,15 @@ class UserService {
             idoso.responsaveis.add(resp)
             userRepository.save(idoso)
         }
+    }
+
+    void removeResponsavel(Long idosoId, Long responsavelId) {
+        User idoso = userRepository.findById(idosoId).orElseThrow { new RuntimeException("Idoso não encontrado") }
+        boolean removed = idoso.responsaveis.removeIf { it.id == responsavelId }
+        if (!removed) {
+            throw new RuntimeException("Vínculo não encontrado")
+        }
+        userRepository.save(idoso)
     }
 
     User findByCodigoUsuario(String codigoUsuario) {
@@ -136,11 +182,27 @@ class UserService {
     }
 
     Map<String, Object> linkByCodigoUsuario(Long userId, String codigoUsuario) {
-        User responsavel = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
-        User idoso = findByCodigoUsuario(codigoUsuario)
+        User currentUser = userRepository.findById(userId).orElseThrow { new RuntimeException("Usuário não encontrado") }
+        User targetUser = findByCodigoUsuario(codigoUsuario)
 
-        if (idoso.role != UserRole.IDOSO) {
-            throw new IllegalArgumentException("O código informado não pertence a um idoso.")
+        if (currentUser.id == targetUser.id) {
+            throw new IllegalArgumentException("Não é possível vincular a própria conta.")
+        }
+
+        User idoso
+        User responsavel
+        if (currentUser.role == UserRole.IDOSO) {
+            if (targetUser.role == UserRole.IDOSO) {
+                throw new IllegalArgumentException("O idoso deve informar o código de um cuidador, parente ou administrador.")
+            }
+            idoso = currentUser
+            responsavel = targetUser
+        } else {
+            if (targetUser.role != UserRole.IDOSO) {
+                throw new IllegalArgumentException("O código informado deve pertencer a um idoso.")
+            }
+            idoso = targetUser
+            responsavel = currentUser
         }
 
         addResponsavel(idoso.id, responsavel.id)

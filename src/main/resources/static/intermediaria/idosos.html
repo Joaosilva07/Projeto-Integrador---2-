@@ -233,6 +233,24 @@
         color: var(--muted);
       }
 
+      .account-form {
+        display: grid;
+        gap: 10px;
+      }
+
+      .account-form label {
+        display: grid;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .account-status {
+        font-size: 12px;
+        color: var(--muted);
+        min-height: 18px;
+      }
+
       .stack {
         display: grid;
         gap: 18px;
@@ -291,6 +309,35 @@
             <p class="panel-sub">Cada idoso possui um código único. Depois de vincular, ele aparece nesta lista e no painel principal.</p>
             <div class="code-badge">Fluxo direto sem selecionar duas vezes</div>
           </section>
+
+          <section class="panel">
+            <h2>Minha conta</h2>
+            <p class="panel-sub">Atualize seus dados, confira seu código e gerencie a conta sem sair desta tela inicial.</p>
+            <div class="account-form">
+              <label>
+                Nome
+                <input id="conta-nome" class="code-input" type="text" placeholder="Seu nome" />
+              </label>
+              <label>
+                E-mail
+                <input id="conta-email" class="code-input" type="email" placeholder="seu@email.com" />
+              </label>
+              <label>
+                Meu código
+                <input id="conta-codigo" class="code-input" type="text" disabled />
+              </label>
+              <label>
+                Nova senha
+                <input id="conta-senha" class="code-input" type="password" placeholder="Opcional" />
+              </label>
+            </div>
+            <div id="account-status" class="account-status"></div>
+            <div class="actions">
+              <button class="btn btn-primary" onclick="salvarConta()">Salvar conta</button>
+              <button class="btn btn-outline" onclick="window.location.href='/Index.html'">Abrir painel</button>
+              <button class="btn btn-ghost" style="color:#c0392b" onclick="excluirConta()">Excluir conta</button>
+            </div>
+          </section>
         </div>
       </section>
     </main>
@@ -334,6 +381,94 @@
         status.style.color = isError ? '#c0392b' : 'var(--muted)';
       }
 
+      function setAccountStatus(message, isError = false) {
+        const status = document.getElementById('account-status');
+        if (!status) return;
+        status.textContent = message;
+        status.style.color = isError ? '#c0392b' : 'var(--muted)';
+      }
+
+      function renderConta() {
+        if (!currentUser) return;
+        const nomeEl = document.getElementById('conta-nome');
+        const emailEl = document.getElementById('conta-email');
+        const codigoEl = document.getElementById('conta-codigo');
+        const senhaEl = document.getElementById('conta-senha');
+        if (nomeEl) nomeEl.value = currentUser.nome || '';
+        if (emailEl) emailEl.value = currentUser.email || '';
+        if (codigoEl) codigoEl.value = currentUser.codigoUsuario || '----';
+        if (senhaEl) senhaEl.value = '';
+      }
+
+      async function salvarConta() {
+        if (!currentUser?.id) return;
+        const nome = (document.getElementById('conta-nome')?.value || '').trim();
+        const email = (document.getElementById('conta-email')?.value || '').trim();
+        const senha = (document.getElementById('conta-senha')?.value || '').trim();
+
+        if (!nome || !email) {
+          setAccountStatus('Nome e e-mail são obrigatórios.', true);
+          return;
+        }
+
+        try {
+          setAccountStatus('Salvando conta...');
+          const payload = { nome, email, role: currentUser.role };
+          if (senha) payload.senha = senha;
+          const res = await fetch(`/api/user/${encodeURIComponent(currentUser.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json().catch(() => null);
+          if (!res.ok) {
+            throw new Error(data?.erro || data?.message || 'Não foi possível salvar a conta.');
+          }
+          currentUser = data;
+          sessionStorage.setItem('jamesUser', JSON.stringify(data));
+          renderConta();
+          setAccountStatus('Conta atualizada com sucesso.');
+        } catch (e) {
+          setAccountStatus(e.message || 'Não foi possível salvar a conta.', true);
+        }
+      }
+
+      async function excluirConta() {
+        if (!currentUser?.id) return;
+        if (!window.confirm('Excluir sua conta agora? Essa ação não poderá ser desfeita.')) return;
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(currentUser.id)}`, {
+            method: 'DELETE',
+          });
+          const data = await res.json().catch(() => null);
+          if (!res.ok) {
+            throw new Error(data?.erro || data?.message || 'Não foi possível excluir a conta.');
+          }
+          sessionStorage.clear();
+          window.location.replace('/Loguin.html');
+        } catch (e) {
+          setAccountStatus(e.message || 'Não foi possível excluir a conta.', true);
+        }
+      }
+
+      async function desvincularIdoso(idosoId, nome) {
+        if (!currentUser?.id) return;
+        if (!window.confirm(`Desvincular ${nome || 'este idoso'}?`)) return;
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(idosoId)}/link/${encodeURIComponent(currentUser.id)}`, {
+            method: 'DELETE',
+          });
+          const data = await res.json().catch(() => null);
+          if (!res.ok) {
+            throw new Error(data?.erro || data?.message || 'Não foi possível remover o vínculo.');
+          }
+          setStatus('Vínculo removido com sucesso.');
+          await loadIdosos(currentUser);
+        } catch (e) {
+          setStatus(e.message || 'Não foi possível remover o vínculo.', true);
+        }
+      }
+
       async function vincularPorCodigo() {
         if (!currentUser?.id) return;
         const input = document.getElementById('codigo-idoso');
@@ -365,7 +500,7 @@
         const grid = document.getElementById('grid');
 
         if (!idosos.length) {
-          state.innerHTML = 'Nenhum idoso vinculado a este cuidador. Peca para um admin vincular no painel de usuarios.';
+          state.innerHTML = 'Nenhum idoso vinculado a esta conta ainda. Use o código do idoso ao lado para criar o vínculo.';
           grid.style.display = 'none';
           return;
         }
@@ -379,6 +514,7 @@
             <div class="code-badge">Código ${i.codigoUsuario || '---'}</div>
             <div class="actions">
               <button class="btn btn-primary" onclick="openDashboard(${i.id})">Entrar no painel</button>
+              <button class="btn btn-ghost" onclick="desvincularIdoso(${i.id}, '${(i.nome || 'Idoso').replace(/'/g, "\\'")}')">Desvincular</button>
             </div>
           </article>
         `).join('');
@@ -415,6 +551,7 @@
         redirectByRole(me);
         if (me.role !== 'CUIDADOR') return;
 
+        renderConta();
         await loadIdosos(me);
       }
 
